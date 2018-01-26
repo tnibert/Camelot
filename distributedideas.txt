@@ -1,0 +1,3 @@
+Let's keep thinking of how this could be deployed on a distributed system.
+- back end python divided into tasks and executed on peers
+- data model stored in a peer to peer database
