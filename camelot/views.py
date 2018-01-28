@@ -16,5 +16,12 @@ def index(request):
         else:
             return HttpResponse("Invalid")
 
+    # if user is already logged in
+        # redirect to user page
+
     else:
         return render(request, 'camelot/index.html')
+
+def user_logout(request):
+    logout(request)
+    return HttpResponse("Logout")
