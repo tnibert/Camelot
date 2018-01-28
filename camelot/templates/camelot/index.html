@@ -2,19 +2,19 @@
 <body>
 Welcome to Camelot.
 <!-- login form here -->
-<form name="login" method="post" action="">
+<form name="login" action="" method="post" accept-charset="utf-8">  
     <table>
-        <tr>
-            <td>User Name:</td><td><input type="text" name="username" value="" /></td>
+        <tr><td><label for="usermail">Email: </label></td>  
+        <td><input type="email" name="usermail" placeholder="yourname@email.com" required></td>
         </tr>
         <tr>
-            <td>Password:</td><td><input type="password" name="password" value="" /></td>
+        <td><label for="password">Password: </label></td>
+        <td><input type="password" name="password" placeholder="password" required></td>
         </tr>
         <tr>
-            <td>
-               <input type="submit" name="login" value="Log In" style="font-size:18px; " />
-            </td>
+        <td><input type="submit" value="Login"></td>
         </tr>
-    </table>
+    </table>  
+</form>  
 </body>
 </html>
