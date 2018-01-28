@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # perhaps the way to handle plural is a one to many such as
 # have a contributor model that just has foreign keys of user
@@ -10,10 +11,10 @@ class Profile(models.Model):
     description = models.CharField(max_length=1000)
     # albums
 
-class User(models.Model):
+class AppUser(User):
     # friends
     # friendgroups
-    username = models.CharField(max_length=20)
+    # username = models.CharField(max_length=20)
     # password
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
 
