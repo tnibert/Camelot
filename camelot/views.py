@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 
@@ -17,7 +17,9 @@ def index(request):
             return HttpResponse("Invalid")
 
     # if user is already logged in
+    if request.user.is_authenticated:
         # redirect to user page
+        return HttpResponse("You are logged in")
 
     else:
         return render(request, 'camelot/index.html')
@@ -25,3 +27,5 @@ def index(request):
 def user_logout(request):
     logout(request)
     return HttpResponse("Logout")
+
+# need to implement a user registration function with email confirmation
