@@ -1,8 +1,10 @@
 <html>
 <body>
 Welcome to Camelot.
-<!-- login form here -->
-<form name="login" action="" method="post" accept-charset="utf-8">  
+<!-- login form here, index action value will likely change -->
+<form name="login" action="{% url 'index' %}" method="post" accept-charset="utf-8">  
+    {% csrf_token %}
+
     <table>
         <tr><td><label for="usermail">Email: </label></td>  
         <td><input type="email" name="usermail" placeholder="yourname@email.com" required></td>
