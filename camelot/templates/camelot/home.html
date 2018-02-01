@@ -1,0 +1,12 @@
+<html>
+<body>
+<!-- <a href="{% url 'logout' %}">Logout</a><br><br> 
+Later on we will probably css this a bit, but for now a form button is good -->
+
+<form action="{% url 'logout' %}">
+    <input type="submit" value="Logout" />
+</form>
+
+Welcome to Camelot {{request.user.username}}
+</body>
+</html>

@@ -27,7 +27,7 @@ def index(request):
 def user_home(request):
     # this authentication check needs to be a decorator
     if request.user.is_authenticated:
-        return HttpResponse("User home page")
+        return render(request, 'camelot/home.html')
     else:
         return redirect("index")
 
