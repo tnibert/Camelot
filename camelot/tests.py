@@ -14,3 +14,8 @@ class LoginTests(TestCase):
         response = self.client.post('', self.credentials, follow=True)
         # should be logged in now
         self.assertTrue(response.context['user'].is_authenticated)
+
+    def test_logout(self):
+        pass
+
+    
