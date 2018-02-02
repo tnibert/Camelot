@@ -15,6 +15,7 @@ def index(request):
                 return HttpResponse("Account Disabled")
         else:
             # need to do something like flask's flash function for these...
+            # only one error message should show for all bad logins (don't reveal user's existance)
             return HttpResponse("Invalid")
 
     # if user is already logged in

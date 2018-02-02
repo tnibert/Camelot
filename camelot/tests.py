@@ -1,10 +1,12 @@
 from django.test import TestCase
+from django.contrib.auth.models import User
 
 class LoginTests(TestCase):
     # well this is broken af        
     def setUp(self):
         self.credentials = {
             'username': 'testuser',
+            'email': 'user@test.com',
             'password': 'secret'}
         u = User.objects.create_user(**self.credentials)
         u.save()
@@ -18,4 +20,5 @@ class LoginTests(TestCase):
     def test_logout(self):
         pass
 
-    
+    def test_invalid_login(self):
+        pass
