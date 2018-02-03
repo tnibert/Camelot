@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 
 def index(request):
     if request.method == "POST":
@@ -25,12 +26,9 @@ def index(request):
     else:
         return render(request, 'camelot/index.html')
 
+@login_required
 def user_home(request):
-    # this authentication check needs to be a decorator
-    if request.user.is_authenticated:
-        return render(request, 'camelot/home.html')
-    else:
-        return redirect("index")
+    return render(request, 'camelot/home.html')
 
 def user_logout(request):
     logout(request)
