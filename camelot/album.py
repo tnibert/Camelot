@@ -11,15 +11,18 @@ Album views
 @login_required
 def create_album(request):
     # if this is a POST request we need to process the form data
-    if request.method == 'POST':
+    if request.method == 'POST':        # this all needs to be put in the controller
         # create a form instance and populate it with data from the request:
         form = AlbumCreateForm(request.POST)
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:
-            return HttpResponse('Album')
+            albumname = form.cleaned_data['albumname']
+            albumdescription = form.cleaned_data['description']
+
+            albummodel = albumcontroller.create_album(albumname, albumdescription, request.user.id)
+            # response:
+            return HttpResponse('Created album ' + albummodel.name)
 
     # if a GET (or any other method) we'll create a blank form
     else:

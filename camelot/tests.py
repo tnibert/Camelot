@@ -22,4 +22,17 @@ class LoginTests(TestCase):
     def test_invalid_login(self):
         pass
 
+from .controllers import albumcontroller
+
+class AlbumTests(TestCase):
+    def setUp(self):
+        # create a user
+        pass
+
+    def test_create_controller(self):
+        pass
+
+    def test_create_view(self):
+        pass
+
 # we need to go to each page in urls.py and check the http response code under all conditions
