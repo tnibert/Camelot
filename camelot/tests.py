@@ -26,7 +26,7 @@ class LoginTests(TestCase):
         pass
 
 from .controllers import albumcontroller
-from .album import *
+from .view.album import *
 
 class AlbumTests(TestCase):
     # this setUp code needs to be made universal

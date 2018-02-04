@@ -1,6 +1,7 @@
 from django.urls import path
 from django.conf.urls import url
-from . import views, album
+from . import views
+from .view import album
 
 urlpatterns = [
     path('', views.index, name='index'),
