@@ -14,7 +14,7 @@ from django.dispatch import receiver
 # 3. upload images to that album
 # will take care of friends after that
 
-# one to one relationship with User    
+# one to one relationship with User
 class Profile(models.Model):
     description = models.CharField(max_length=1000)
     user = models.OneToOneField(User, on_delete=models.CASCADE)

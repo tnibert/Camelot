@@ -11,3 +11,4 @@ class SignUpForm(UserCreationForm):
 
 class AlbumCreateForm(forms.Form):
     albumname = forms.CharField(label='Photo album name', max_length=100)
+    description = forms.CharField(label='Photo album description', max_length=500)
