@@ -8,3 +8,6 @@ class SignUpForm(UserCreationForm):
     class Meta:
         model = User
         fields = ('username', 'email', 'password1', 'password2', )
+
+class AlbumCreateForm(forms.Form):
+    albumname = forms.CharField(label='Photo album name', max_length=100)

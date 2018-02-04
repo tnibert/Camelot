@@ -9,7 +9,7 @@ Later on we will probably css this a bit, but for now a form button is good -->
 
 Welcome to Camelot {{request.user.username}}
 <ul class="navbar">
-<li>Create Album</li>
+<li><a href="{% url 'create_album' %}">Create Album</a></li>
 <li>View Albums</li>
 <li>View Friends</li>
 <li>View Profile</li>
