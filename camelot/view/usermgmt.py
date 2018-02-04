@@ -4,8 +4,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
 from django.contrib.auth.models import User
-from .forms import SignUpForm
-from .tokens import account_activation_token
+from ..forms import SignUpForm
+from ..tokens import account_activation_token
 
 # well this will have to get refactored into multiple files eventually...
 
