@@ -11,4 +11,5 @@ urlpatterns = [
     url('^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
         usermgmt.activate, name='activate'),
     path('createalbum', album.create_album, name="create_album"),
+    path('albums', album.display_albums, name="show_albums"),
 ]

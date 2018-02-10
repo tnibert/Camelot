@@ -11,7 +11,7 @@ Album views
 @login_required
 def create_album(request):
     # if this is a POST request we need to process the form data
-    if request.method == 'POST':        # this all needs to be put in the controller
+    if request.method == 'POST':        # this all needs to be put in the controller.. maybe
         # create a form instance and populate it with data from the request:
         form = AlbumCreateForm(request.POST)
         # check whether it's valid:
@@ -33,7 +33,8 @@ def create_album(request):
 
 @login_required
 def display_albums(request):
-    pass
+    albums = albumcontroller.return_albums(request.user.id)
+    return render(request, 'camelot/showalbums.html', {'albums': albums})
 
 @login_required
 def display_album(request):
