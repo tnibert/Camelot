@@ -10,6 +10,7 @@ Album views
 
 @login_required
 def create_album(request):
+    # TEST: this *might* be creating 2 of the same album on the first creation, make unit test
     # if this is a POST request we need to process the form data
     if request.method == 'POST':        # this all needs to be put in the controller.. maybe
         # create a form instance and populate it with data from the request:

@@ -1,11 +1,17 @@
 <html>
 <body>
     <table>
-        {% for album in albums %}
+        <!-- we'll need to limit the number of tds -->
         <tr>
+        {% for album in albums %}
         <td>{{ album.name }}</td>
-        </tr>
         {% endfor %}
+        </tr>
+        <tr>
+        {% for album in albums %}
+        <td>{{ album.description }}</td>
+        {% endfor %}
+        </tr>
      </table>
 </body>
 </html>
