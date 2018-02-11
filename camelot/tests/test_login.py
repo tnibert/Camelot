@@ -1,6 +1,7 @@
-from django.test import TestCase
+from django.test import TestCase, Client
 from django.test.client import RequestFactory
 from django.shortcuts import reverse
+from django.contrib.messages import get_messages
 
 from django.contrib.auth.models import User
 
@@ -24,17 +25,19 @@ class LoginTests(TestCase):
         self.assertTrue(response.context['user'].is_authenticated)
 
     def test_login_view_post(self):
-        request = self.factory.post(reverse("index"), data=self.credentials, follow=True)
-        request.session = self.client.session
+        response = self.client.post(reverse("index"), data=self.credentials, follow=True)
+        #request.session = self.client.session
 
-        response = index(request)
+        #response = index(request)
+        #response.client = Client()
         #print(response)
 
-        # response 302 again... hmm
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, "/home")     # update this with reverse to not directly reference the string
+        self.assertEqual(response.status_code, 200)
+        #self.assertEqual(response.url, reverse("user_home"))
 
-        # need to follow request through...
+        # I suppose this tests our redirect through, sufficient?
+        self.assertRedirects(response, reverse("user_home"))
+
         self.assertTrue(response.context['user'].is_authenticated)
 
     def test_logout(self):
@@ -47,11 +50,15 @@ class LoginTests(TestCase):
             'password': 'notcorrect'}
 
         # send login data
-        response = self.client.post('', badcredentials, follow=True)
+        response = self.client.post(reverse("index"), badcredentials, follow=True)
 
-        print(response)
+        #print(response)
 
         # this will break after we update the login function with a redirect
         self.assertEqual(response.status_code, 200)
+
+        # need to test flash message
+        #msg = get_messages(response)
+        #self.assertEqual(msg[0], "Invalid Login")
 
 # we need to go to each page in urls.py and check the http response code under all conditions
