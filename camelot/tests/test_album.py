@@ -18,9 +18,14 @@ class AlbumTests(TestCase):
         self.u.save()
 
         # send login data
-        #response = self.client.post('', self.credentials, follow=True)
+        response = self.client.post('', self.credentials, follow=True)
 
         self.factory = RequestFactory()
+
+    def test_get_profile_from_uid(self):
+        profile = albumcontroller.get_profile_from_uid(self.u.id)
+        self.assertEqual(profile.user, self.u)
+        self.assertEqual(self.u.profile, profile)
 
     def test_create_controller(self):
         pass
@@ -35,3 +40,6 @@ class AlbumTests(TestCase):
         response = create_album(request)
 
         self.assertEqual(response.status_code, 200)
+
+    def test_return_albums(self):
+        pass
