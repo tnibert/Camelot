@@ -1,7 +1,14 @@
 <html>
 <body>
-Welcome to Camelot.
+Welcome to Camelot.<br>
 <!-- login form here, index action value will likely change -->
+
+{% if messages %}
+    {% for message in messages %}
+        <b>{{ message }}</b><br>
+    {% endfor %}
+{% endif %}
+
 <form name="login" action="{% url 'index' %}" method="post" accept-charset="utf-8">  
     {% csrf_token %}
 

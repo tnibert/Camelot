@@ -4,10 +4,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
 from django.contrib.auth.models import User
+from django.contrib import messages
+
 from ..forms import SignUpForm
 from ..tokens import account_activation_token
-
-# well this will have to get refactored into multiple files eventually...
 
 """
 User login and home page
@@ -23,12 +23,16 @@ def index(request):
                 login(request, user)    # check for login failure?
                 return redirect("user_home")
             else:
-                return HttpResponse("Account Disabled")
+                # add unit test coverage
+                messages.add_message(request, messages.INFO, 'Please confirm your account')
+                return redirect("index")
+
         else:
             # need to do something like flask's flash function for these...
             # only one error message should show for all bad logins (don't reveal user's existance)
-            # need to redirect this to login page
-            return HttpResponse("Invalid")
+            # fix unit test for redirect and check for message
+            messages.add_message(request, messages.INFO, 'Invalid Login')
+            return redirect("index")
 
     # if user is already logged in
     if request.user.is_authenticated:
