@@ -2,21 +2,31 @@ from ..models import Album
 from django.utils import timezone
 from django.contrib.auth.models import User
 
-# we'll probably want to move this function to a different file, probably usermgmt
+# we'll probably want to move this function to a different file
 def get_profile_from_uid(id):
     return User.objects.get(id=id).profile
+
+class AlreadyExistsException(Exception):
+    pass
 
 class albumcontroller:
     """
     Class for accessing albums for a given user
     This will make life easier in the long run
+    All of this will need user permission checks at some point
     """
 
     def create_album(self, name, description):
         try:
-            newalbum = Album(name=name, description=description, pub_date=timezone.now(), owner=self.uprofile)
-            newalbum.save()
-            return newalbum
+            # check if the name already exists for the current user
+            try:
+                Album.objects.get(owner=self.uprofile, name=name)
+            # if not, it's a go
+            except Album.DoesNotExist:
+                newalbum = Album(name=name, description=description, pub_date=timezone.now(), owner=self.uprofile)
+                newalbum.save()
+                return newalbum
+            raise AlreadyExistsException("Album needs unique name")    # may want to make this exception less general
         except:
             raise
 
@@ -31,3 +41,11 @@ class albumcontroller:
     def __init__(self, uid):
         self.uprofile = get_profile_from_uid(uid)
         
+    def return_album(self, owner, name):
+        # currently we can probably have two albums of the same name for a given owner
+        # we could also reference this by primary key, depending on what we can get easiest from the front end
+        try:
+            album = Album.objects.get(owner=owner, name=name)
+            return album
+        except:
+            raise

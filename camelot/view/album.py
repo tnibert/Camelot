@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from ..controllers.albumcontroller import albumcontroller
+from ..controllers.albumcontroller import albumcontroller, AlreadyExistsException
 from ..forms import AlbumCreateForm
 
 """
@@ -27,7 +27,10 @@ def create_album(request):
 
             albumcontrol = albumcontroller(request.user.id)
 
-            albummodel = albumcontrol.create_album(albumname, albumdescription)
+            try:
+                albummodel = albumcontrol.create_album(albumname, albumdescription)
+            except AlreadyExistsException as e:
+                return HttpResponse('Album name must be unique')
 
             # response:
             return HttpResponse('Created album ' + albummodel.name)

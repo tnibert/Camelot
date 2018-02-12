@@ -28,9 +28,9 @@ class AlbumTests(TestCase):
         self.assertEqual(profile.user, self.u)
         self.assertEqual(self.u.profile, profile)
 
-    def test_create_controller(self):
+    def test_create_controller_duplicate_name(self):
         self.albumcontrol.create_album("test title", "test description")
-        # need to either add an assert of accept that test_return_albums() tests this
+        self.assertRaises(AlreadyExistsException, self.albumcontrol.create_album, "test title", "test description2")
 
     def test_create_view(self):
         # Create an instance of a GET request.
@@ -45,11 +45,11 @@ class AlbumTests(TestCase):
 
     def test_return_albums(self):
         # can't count on tests running in order
-        self.albumcontrol.create_album("test title", "test description")
+        self.albumcontrol.create_album("a test title", "test description")
         albums = self.albumcontrol.return_albums()
 
         # there's probably some string compare assert for this
-        assert albums[0].name == "test title"
+        assert albums[0].name == "a test title"
         assert albums[0].description == "test description"
 
     # the following tests are for functionality that hasn't been written yet
