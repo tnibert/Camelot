@@ -6,6 +6,7 @@ from ..forms import AlbumCreateForm
 
 """
 Album views
+Permissions checking should be in this layer
 """
 
 @login_required
@@ -47,8 +48,13 @@ def display_albums(request):
     albumcontrol = albumcontroller(request.user.id)
     albums = albumcontrol.return_albums()
     return render(request, 'camelot/showalbums.html', {'albums': albums})
+    # showalbums.html might be able to be made more generic, may repeat in showalbum.html
 
 @login_required
 def display_album(request):
-    pass
+    # this needs to receive a post
+    albumcontrol = albumcontroller(request.user.id)
+    album = albumcontrol.return_album()
+    # query db for photos in album
+    photos = albumcontrol.get_photos_for_album(album)
 

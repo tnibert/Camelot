@@ -57,6 +57,9 @@ class AlbumTests(TestCase):
     def test_add_image_to_album(self):
         pass
 
+    def test_get_images_for_album(self):
+        pass
+
     def test_remove_image_from_album(self):
         pass
 

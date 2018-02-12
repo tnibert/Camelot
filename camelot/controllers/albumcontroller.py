@@ -13,7 +13,10 @@ class albumcontroller:
     """
     Class for accessing albums for a given user
     This will make life easier in the long run
-    All of this will need user permission checks at some point
+    All of this will need user permission checks at some point - in view layer
+    All of this will need exception catching in view layer as well
+
+    Get a better handle on what objects are returned by the ORM and add docstrings to everything
     """
 
     def create_album(self, name, description):
@@ -47,5 +50,19 @@ class albumcontroller:
         try:
             album = Album.objects.get(owner=owner, name=name)
             return album
+        except:
+            raise
+
+    def add_photo_to_album(self):
+        pass
+
+    def get_photos_for_album(self, album):
+        """
+        :param album: album model object, can feed straight from return_album()
+        :return: queryset of photos
+        Probably best to implement this after we have an add photo view
+        """
+        try:
+            pass
         except:
             raise
