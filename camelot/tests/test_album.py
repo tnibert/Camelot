@@ -4,7 +4,7 @@ from django.shortcuts import reverse
 
 from django.contrib.auth.models import User
 
-from ..controllers import albumcontroller
+from ..controllers.albumcontroller import albumcontroller, get_profile_from_uid
 from ..view.album import *
 
 class AlbumTests(TestCase):
@@ -21,9 +21,10 @@ class AlbumTests(TestCase):
         response = self.client.post('', self.credentials, follow=True)
 
         self.factory = RequestFactory()
+        self.albumcontrol = albumcontroller(self.u.id)
 
     def test_get_profile_from_uid(self):
-        profile = albumcontroller.get_profile_from_uid(self.u.id)
+        profile = get_profile_from_uid(self.u.id)
         self.assertEqual(profile.user, self.u)
         self.assertEqual(self.u.profile, profile)
 

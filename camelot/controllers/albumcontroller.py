@@ -2,23 +2,31 @@ from ..models import Album
 from django.utils import timezone
 from django.contrib.auth.models import User
 
+# we'll probably want to move this function to a different file, probably usermgmt
 def get_profile_from_uid(id):
     return User.objects.get(id=id).profile
 
-def create_album(name, description, ownerid):
-    try:
-        # owner needs to be a profile
-        ownerprofile = User.objects.get(id=ownerid).profile  # I wonder if I can just pass in the user from the request directly...
-        newalbum = Album(name=name, description=description, pub_date=timezone.now(), owner=ownerprofile)
-        newalbum.save()
-        return newalbum
-    except:
-        raise
+class albumcontroller:
+    """
+    Class for accessing albums for a given user
+    This will make life easier in the long run
+    """
 
-def return_albums(ownerid):
-    try:
-        ownerprofile = get_profile_from_uid(ownerid)
-        albums = Album.objects.filter(owner=ownerid)
-        return albums
-    except:
-        raise
+    def create_album(self, name, description):
+        try:
+            newalbum = Album(name=name, description=description, pub_date=timezone.now(), owner=self.uprofile)
+            newalbum.save()
+            return newalbum
+        except:
+            raise
+
+    def return_albums(self):
+        try:
+            albums = Album.objects.filter(owner=self.uprofile)
+            return albums
+        except:
+            raise
+
+    def __init__(self, uid):
+        self.uprofile = get_profile_from_uid(uid)
+        

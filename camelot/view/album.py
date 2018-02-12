@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from ..controllers import albumcontroller
+from ..controllers.albumcontroller import albumcontroller
 from ..forms import AlbumCreateForm
 
 """
@@ -25,7 +25,9 @@ def create_album(request):
             albumname = form.cleaned_data['albumname']
             albumdescription = form.cleaned_data['description']
 
-            albummodel = albumcontroller.create_album(albumname, albumdescription, request.user.id)
+            albumcontrol = albumcontroller(request.user.id)
+
+            albummodel = albumcontrol.create_album(albumname, albumdescription)
 
             # response:
             return HttpResponse('Created album ' + albummodel.name)
@@ -39,7 +41,8 @@ def create_album(request):
 
 @login_required
 def display_albums(request):
-    albums = albumcontroller.return_albums(request.user.id)
+    albumcontrol = albumcontroller(request.user.id)
+    albums = albumcontrol.return_albums()
     return render(request, 'camelot/showalbums.html', {'albums': albums})
 
 @login_required
