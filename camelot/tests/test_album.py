@@ -29,7 +29,8 @@ class AlbumTests(TestCase):
         self.assertEqual(self.u.profile, profile)
 
     def test_create_controller(self):
-        pass
+        self.albumcontrol.create_album("test title", "test description")
+        # need to either add an assert of accept that test_return_albums() tests this
 
     def test_create_view(self):
         # Create an instance of a GET request.
@@ -43,4 +44,10 @@ class AlbumTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_return_albums(self):
-        pass
+        # can't count on tests running in order
+        self.albumcontrol.create_album("test title", "test description")
+        albums = self.albumcontrol.return_albums()
+
+        # there's probably some string compare assert for this
+        assert albums[0].name == "test title"
+        assert albums[0].description == "test description"

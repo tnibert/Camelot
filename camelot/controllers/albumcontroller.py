@@ -23,6 +23,7 @@ class albumcontroller:
     def return_albums(self):
         try:
             albums = Album.objects.filter(owner=self.uprofile)
+            # returns a queryset..
             return albums
         except:
             raise
