@@ -51,3 +51,29 @@ class AlbumTests(TestCase):
         # there's probably some string compare assert for this
         assert albums[0].name == "test title"
         assert albums[0].description == "test description"
+
+    # the following tests are for functionality that hasn't been written yet
+    # just defining the future path
+    def test_add_image_to_album(self):
+        pass
+
+    def test_remove_image_from_album(self):
+        pass
+
+    def test_download_album(self):
+        pass
+
+    def test_add_contributor_to_album(self):
+        pass
+
+    def test_remove_contributor_from_album(self):
+        pass
+
+    def test_get_album_contributors(self):
+        pass
+
+    def test_user_can_access(self):
+        pass
+
+    def test_user_cant_access(self):
+        pass
