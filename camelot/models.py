@@ -47,6 +47,7 @@ class Album(models.Model):
         return self.name
 
 class Photo(models.Model):
-    filename = models.CharField(max_length=200)
+    filename = models.CharField(max_length=200, default='')
+    description = models.CharField(max_length=150)      # these length values should be defined elsewhere
     # foreign key - album
     album = models.ForeignKey(Album, on_delete=models.CASCADE)

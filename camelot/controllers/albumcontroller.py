@@ -1,6 +1,7 @@
-from ..models import Album
+from ..models import Album, Photo
 from django.utils import timezone
 from django.contrib.auth.models import User
+from os import makedirs
 
 # we'll probably want to move this function to a different file
 def get_profile_from_uid(id):
@@ -43,9 +44,10 @@ class albumcontroller:
 
     def __init__(self, uid):
         self.uprofile = get_profile_from_uid(uid)
+        # potentially set a current album variable and just change it when user clicks album
+        # rather than passing in every time, but maybe not
         
     def return_album(self, owner, name):
-        # currently we can probably have two albums of the same name for a given owner
         # we could also reference this by primary key, depending on what we can get easiest from the front end
         try:
             album = Album.objects.get(owner=owner, name=name)
@@ -53,11 +55,31 @@ class albumcontroller:
         except:
             raise
 
-    def add_photo_to_album(self, album, fi):
+    def add_photo_to_album(self, album, description, fi):
         # this could be done in something like celery
-        with open('{}/{}/somefname'.format(self.uprofile, album.name), 'wb+') as destination:
-            for chunk in fi.chunks():
+
+        # add file to database
+        newphoto = Photo(description=description, album=album)
+        newphoto.save()
+
+        # create filename with primary key
+        fname = 'userphotos/{}/{}/{}'.format(self.uprofile.user.id, album.id, newphoto.id)
+
+        # update filename in db now that we have our primary key
+        newphoto.filename = fname
+
+        # well now we definitely depend on python 3.2+
+        makedirs("/".join(fname.split("/")[:-1]), exist_ok=True)
+
+        # save file in chunks to save memory
+        CHUNK_SIZE = 430        # bytes
+        with open(fname, 'wb+') as destination:
+            chunk = fi.read(CHUNK_SIZE)
+            while chunk:  # loop until the chunk is empty (the file is exhausted)
                 destination.write(chunk)
+                chunk = fi.read(CHUNK_SIZE)  # read the next chunk
+
+        return newphoto
 
     def get_photos_for_album(self, album):
         """

@@ -61,15 +61,24 @@ def display_album(request):
 
 @login_required
 def add_photo(request):
+    """
+    put this on hold while I just work on the controller
+    :param request:
+    :return:
+    """
+
     # https://docs.djangoproject.com/en/2.0/topics/http/file-uploads/
     # check that user actually has permission to add to this album
     if request.method == 'POST':
         albumcontrol = albumcontroller(request.user.id)     # there has to be a better way than redeclaring this every time
         form = UploadPhotoForm(request.POST, request.FILES)
+        photodescription = form.cleaned_data['description']
         if form.is_valid():
             for fi in request.FILES:
-                albumcontrol.add_photo_to_album(album, fi)
+                # need to sort out multiple file upload and association with description
+                # how to define album? sent in post
+                albumcontrol.add_photo_to_album(album, photodescription, fi)
             return redirect('')     # where to redirect to...
     else:
         form = UploadPhotoForm()
-    return render(request, 'uploadphoto.html', {'form': form})
+    return render(request, 'camelot/uploadphoto.html', {'form': form})

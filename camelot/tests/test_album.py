@@ -43,7 +43,7 @@ class AlbumTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_return_albums(self):
+    def test_return_albums_controller(self):
         # can't count on tests running in order
         self.albumcontrol.create_album("a test title", "test description")
         albums = self.albumcontrol.return_albums()
@@ -52,10 +52,33 @@ class AlbumTests(TestCase):
         assert albums[0].name == "a test title"
         assert albums[0].description == "test description"
 
+    def test_return_album(self):
+        newalbum = self.albumcontrol.create_album("return album test", "lalala")
+        testalbum = self.albumcontrol.return_album(self.albumcontrol.uprofile, "return album test")
+        assert newalbum == testalbum
+
     # the following tests are for functionality that hasn't been written yet
     # just defining the future path
-    def test_add_image_to_album(self):
-        pass
+    def test_add_image_to_album_controller(self):
+        import shutil
+
+        myalbum = self.albumcontrol.create_album("image add test", "lalala")
+
+        try:
+            # double check that our test is sending the right type for fi and that django will sent in rb mode
+            with open('camelot/tests/resources/testimage.jpg', 'rb') as fi:
+                self.albumcontrol.add_photo_to_album(myalbum, "generic description", fi)
+                # need to add checks for file existence and db existence
+
+        # clean up
+        except:
+            shutil.rmtree("userphotos")
+            raise
+        shutil.rmtree("userphotos")
+        # example (for view):
+        #c = Client()
+        #with open('wishlist.doc') as fp:
+        #    c.post('/customers/wishes/', {'name': 'fred', 'attachment': fp})
 
     def test_get_images_for_album(self):
         pass
