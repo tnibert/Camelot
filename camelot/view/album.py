@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from ..controllers.albumcontroller import albumcontroller, AlreadyExistsException
-from ..forms import AlbumCreateForm
+from ..forms import AlbumCreateForm, UploadPhotoForm
 
 """
 Album views
@@ -57,4 +57,19 @@ def display_album(request):
     album = albumcontrol.return_album()
     # query db for photos in album
     photos = albumcontrol.get_photos_for_album(album)
+    # etc etc
 
+@login_required
+def add_photo(request):
+    # https://docs.djangoproject.com/en/2.0/topics/http/file-uploads/
+    # check that user actually has permission to add to this album
+    if request.method == 'POST':
+        albumcontrol = albumcontroller(request.user.id)     # there has to be a better way than redeclaring this every time
+        form = UploadPhotoForm(request.POST, request.FILES)
+        if form.is_valid():
+            for fi in request.FILES:
+                albumcontrol.add_photo_to_album(album, fi)
+            return redirect('')     # where to redirect to...
+    else:
+        form = UploadPhotoForm()
+    return render(request, 'uploadphoto.html', {'form': form})

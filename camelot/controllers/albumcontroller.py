@@ -53,8 +53,11 @@ class albumcontroller:
         except:
             raise
 
-    def add_photo_to_album(self):
-        pass
+    def add_photo_to_album(self, album, fi):
+        # this could be done in something like celery
+        with open('{}/{}/somefname'.format(self.uprofile, album.name), 'wb+') as destination:
+            for chunk in fi.chunks():
+                destination.write(chunk)
 
     def get_photos_for_album(self, album):
         """
