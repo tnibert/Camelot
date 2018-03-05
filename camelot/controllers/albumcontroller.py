@@ -57,6 +57,7 @@ class albumcontroller:
 
     def add_photo_to_album(self, album, description, fi):
         # this could be done in something like celery
+        # we should probably change this so the image is stored in the database itself
 
         # add file to database
         newphoto = Photo(description=description, album=album)
@@ -85,9 +86,10 @@ class albumcontroller:
         """
         :param album: album model object, can feed straight from return_album()
         :return: queryset of photos
-        Probably best to implement this after we have an add photo view
+        Need to add unit test
         """
         try:
-            pass
+            photos = Photo.objects.filter(album=album)
+            return photos
         except:
             raise
