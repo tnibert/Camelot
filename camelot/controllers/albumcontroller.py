@@ -14,8 +14,8 @@ class albumcontroller:
     """
     Class for accessing albums for a given user
     This will make life easier in the long run
-    All of this will need user permission checks at some point - in view layer
-    All of this will need exception catching in view layer as well
+    All of this will need user permission checks at some point - in view layer... actually maybe in this layer
+    All of this will need exception catching (in view layer? probably not I'm now thinking) as well
 
     Get a better handle on what objects are returned by the ORM and add docstrings to everything
     """
@@ -47,10 +47,11 @@ class albumcontroller:
         # potentially set a current album variable and just change it when user clicks album
         # rather than passing in every time, but maybe not
         
-    def return_album(self, owner, name):
-        # we could also reference this by primary key, depending on what we can get easiest from the front end
+    def return_album(self, id):
+        # we could reference this by primary key, depending on what we can get easiest from the front end
+        # by specifying owner we have a bit of a permission mechanism, but that won't work long term (can't access another user's album
         try:
-            album = Album.objects.get(owner=owner, name=name)
+            album = Album.objects.get(owner=self.uprofile, id=id)
             return album
         except:
             raise

@@ -2,9 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Album Stub Title</title>
 </head>
 <body>
-
+    <table>
+        <!-- we'll need to limit the number of tds -->
+        <tr>
+        {% for photo in photos %}
+        <!-- hopefully this is right, test after adding photo upload -->
+        <td><img src="{{ MEDIA_URL }}{{ photo.filename }}"></img></td>
+        {% endfor %}
+        </tr>
+    </table>
 </body>
 </html>

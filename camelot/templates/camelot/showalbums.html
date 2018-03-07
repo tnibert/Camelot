@@ -4,7 +4,8 @@
         <!-- we'll need to limit the number of tds -->
         <tr>
         {% for album in albums %}
-        <td>{{ album.name }}</td>
+            <!-- need to reference url correctly -->
+            <td><a href="album/{{ album.id }}/">{{ album.name }}</a></td>
         {% endfor %}
         </tr>
         <tr>

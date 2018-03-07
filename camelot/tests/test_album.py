@@ -7,6 +7,8 @@ from django.contrib.auth.models import User
 from ..controllers.albumcontroller import albumcontroller, get_profile_from_uid
 from ..view.album import *
 
+# we should probably split up the controller tests from the view tests
+
 class AlbumTests(TestCase):
     # this setUp code needs to be made universal
     def setUp(self):
@@ -81,6 +83,7 @@ class AlbumTests(TestCase):
         #    c.post('/customers/wishes/', {'name': 'fred', 'attachment': fp})
 
     def test_get_images_for_album(self):
+        # implemented
         pass
 
     def test_remove_image_from_album(self):
@@ -102,4 +105,9 @@ class AlbumTests(TestCase):
         pass
 
     def test_user_cant_access(self):
+        pass
+
+class AlbumViewTests(TestCase):
+    def test_album_view(self):
+        # implemented
         pass

@@ -51,13 +51,19 @@ def display_albums(request):
     # showalbums.html might be able to be made more generic, may repeat in showalbum.html
 
 @login_required
-def display_album(request):
-    # this needs to receive a post
+def display_album(request, id):
+    """
+
+    :param request:
+    :param id: id of album (need to validate permissions)
+    :return:
+    """
     albumcontrol = albumcontroller(request.user.id)
-    album = albumcontrol.return_album()
+    album = albumcontrol.return_album(id)
     # query db for photos in album
     photos = albumcontrol.get_photos_for_album(album)
-    # etc etc
+
+    return render(request, 'camelot/showalbum.html', {'photos': photos})
 
 @login_required
 def add_photo(request):
