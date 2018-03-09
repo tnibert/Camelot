@@ -63,13 +63,13 @@ def display_album(request, id):
     # query db for photos in album
     photos = albumcontrol.get_photos_for_album(album)
 
-    return render(request, 'camelot/showalbum.html', {'photos': photos})
+    return render(request, 'camelot/showalbum.html', {'photos': photos, 'albumid': id})
 
 @login_required
-def add_photo(request):
+def add_photo(request, id):
     """
-    put this on hold while I just work on the controller
     :param request:
+    :param id: id of the album to add photo to
     :return:
     """
 
@@ -78,13 +78,14 @@ def add_photo(request):
     if request.method == 'POST':
         albumcontrol = albumcontroller(request.user.id)     # there has to be a better way than redeclaring this every time
         form = UploadPhotoForm(request.POST, request.FILES)
-        photodescription = form.cleaned_data['description']
+
         if form.is_valid():
-            for fi in request.FILES:
+            photodescription = form.cleaned_data['description']
+            for fname, fdat in request.FILES.items():
                 # need to sort out multiple file upload and association with description
                 # how to define album? sent in post
-                albumcontrol.add_photo_to_album(album, photodescription, fi)
-            return redirect('')     # where to redirect to...
+                albumcontrol.add_photo_to_album(id, photodescription, fdat)
+            return redirect("show_album", id)     # where to redirect to...
     else:
         form = UploadPhotoForm()
-    return render(request, 'camelot/uploadphoto.html', {'form': form})
+    return render(request, 'camelot/uploadphoto.html', {'form': form, 'albumid': id})   # so maybe we make the move to class based views

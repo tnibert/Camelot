@@ -56,9 +56,16 @@ class albumcontroller:
         except:
             raise
 
-    def add_photo_to_album(self, album, description, fi):
+    def add_photo_to_album(self, albumid, description, fi):
+        """
+
+        :param albumid: id of the album to add to
+        :param description: description of the photo
+        :param fi: the image file
+        :return: reference to the newly created photo object
+        """
         # this could be done in something like celery
-        # we should probably change this so the image is stored in the database itself
+        album = self.return_album(albumid)
 
         # add file to database
         newphoto = Photo(description=description, album=album)

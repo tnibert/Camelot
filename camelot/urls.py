@@ -13,5 +13,5 @@ urlpatterns = [
     path('createalbum', album.create_album, name="create_album"),
     path('albums', album.display_albums, name="show_albums"),
     url(r'^album/(?P<id>\d+)/$', album.display_album, name="show_album"),
-    path('uploadphoto', album.add_photo, name="upload_photos"),     # pass in album id?
+    url(r'^album/(?P<id>\d+)/upload_photos/$', album.add_photo, name="upload_photos"),     # pass in album id?
 ]
