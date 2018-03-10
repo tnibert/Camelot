@@ -77,6 +77,8 @@ class albumcontroller:
         # update filename in db now that we have our primary key
         newphoto.filename = fname
 
+        newphoto.save()
+
         # well now we definitely depend on python 3.2+
         makedirs("/".join(fname.split("/")[:-1]), exist_ok=True)
 
@@ -99,5 +101,17 @@ class albumcontroller:
         try:
             photos = Photo.objects.filter(album=album)
             return photos
+        except:
+            raise
+
+    def return_photo(self, photoid):
+        """
+        make unit test
+        :param photoid: the id of the photo in the photos table
+        :return: a single photo
+        """
+        try:
+            photo = Photo.objects.get(id=photoid)
+            return photo
         except:
             raise

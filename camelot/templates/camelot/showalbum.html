@@ -10,8 +10,14 @@
         <!-- we'll need to limit the number of tds -->
         <tr>
         {% for photo in photos %}
+        <!-- maybe need to somehow proportion width and height -->
+        <td><img src="{% url 'show_photo' photo.id %}" width="150" height="150"></img></td>
+        {% endfor %}
+        </tr>
+        <tr>
+        {% for photo in photos %}
         <!-- hopefully this is right, test after adding photo upload -->
-        <td><img src="{{ MEDIA_URL }}{{ photo.filename }}"></img></td>
+        <td>{{ photo.description }}</td>
         {% endfor %}
         </tr>
     </table>

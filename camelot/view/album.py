@@ -89,3 +89,30 @@ def add_photo(request, id):
     else:
         form = UploadPhotoForm()
     return render(request, 'camelot/uploadphoto.html', {'form': form, 'albumid': id})   # so maybe we make the move to class based views
+
+def return_photo_file_http(request, photoid):
+    """
+    wrapper to security show a photo without exposing externally
+    We must ensure the security of photo.filename, because if this can be messed with our whole filesystem could be vulnerable
+    :param request:
+    :param uid: id of user profile that uploaded photo
+    :param albumid: id of album photo belongs to
+    :param photoid: id of photo
+    :return:
+    """
+    albumcontrol = albumcontroller(request.user.id)
+    photo = albumcontrol.return_photo(photoid)
+
+    # add in permissions check
+
+    try:
+        # this scares me from a memory perspective
+        with open(photo.filename, "rb") as f:
+            return HttpResponse(f.read(), content_type="image/*")
+    except IOError:
+        # maybe edit this except to be more applicable..
+        from PIL import Image
+        red = Image.new('RGBA', (1, 1), (255, 0, 0, 0))
+        response = HttpResponse(content_type="image/*")
+        red.save(response, "JPEG")
+        return response
