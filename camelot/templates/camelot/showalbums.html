@@ -1,5 +1,6 @@
-<html>
-<body>
+{% extends 'camelot/baseloggedin.html' %}
+
+{% block content2 %}
     <table>
         <!-- we'll need to limit the number of tds -->
         <tr>
@@ -14,5 +15,4 @@
         {% endfor %}
         </tr>
      </table>
-</body>
-</html>
+{% endblock %}

@@ -1,12 +1,6 @@
-<html>
-<body>
-<!-- <a href="{% url 'logout' %}">Logout</a><br><br> 
-Later on we will probably css this a bit, but for now a form button is good -->
+{% extends 'camelot/baseloggedin.html' %}
 
-<form action="{% url 'logout' %}">
-    <input type="submit" value="Logout" />
-</form>
-
+{% block content2 %}
 Welcome to Camelot {{request.user.username}}
 <ul class="navbar">
 <li><a href="{% url 'create_album' %}">Create Album</a></li>
@@ -15,5 +9,4 @@ Welcome to Camelot {{request.user.username}}
 <li>View Profile</li>
 <li>Edit Profile</li>
 </ul>
-</body>
-</html>
+{% endblock %}

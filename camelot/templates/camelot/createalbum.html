@@ -1,3 +1,6 @@
+{% extends 'camelot/baseloggedin.html' %}
+
+{% block content2 %}
 <form action="{% url 'create_album' %}" method="post">
     <!-- this following bit is repetitive and will need to be put in a separate file and imported in -->
     <!-- description field will need to be way bigger -->
@@ -17,3 +20,4 @@
 
     <input type="submit" value="Submit" />
 </form>
+{% endblock %}

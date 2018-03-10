@@ -1,5 +1,5 @@
-<html>
-<body>
+{% extends 'camelot/baseloggedin.html' %}
+{% block content1 %}
 Welcome to Camelot.<br>
 <!-- login form here, index action value will likely change -->
 
@@ -26,5 +26,4 @@ Welcome to Camelot.<br>
     </table>  
 </form><br>
 <a href="{% url 'user_register' %}">Register</a>
-</body>
-</html>
+{% endblock %}
