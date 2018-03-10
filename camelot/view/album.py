@@ -31,10 +31,11 @@ def create_album(request):
             try:
                 albummodel = albumcontrol.create_album(albumname, albumdescription)
             except AlreadyExistsException as e:
-                return HttpResponse('Album name must be unique')
+                return render(request, 'camelot/messageloggedin.html', {'message': 'Album name must be unique'})
+                #return HttpResponse('Album name must be unique')
 
-            # response:
-            return HttpResponse('Created album ' + albummodel.name)
+            return redirect("show_album", albummodel.id)
+            #return HttpResponse('Created album ' + albummodel.name)
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -77,15 +78,15 @@ def add_photo(request, id):
     # check that user actually has permission to add to this album
     if request.method == 'POST':
         albumcontrol = albumcontroller(request.user.id)     # there has to be a better way than redeclaring this every time
+                                                            # probably with class views and sessions?
         form = UploadPhotoForm(request.POST, request.FILES)
 
         if form.is_valid():
             photodescription = form.cleaned_data['description']
             for fname, fdat in request.FILES.items():
                 # need to sort out multiple file upload and association with description
-                # how to define album? sent in post
                 albumcontrol.add_photo_to_album(id, photodescription, fdat)
-            return redirect("show_album", id)     # where to redirect to...
+            return redirect("show_album", id)
     else:
         form = UploadPhotoForm()
     return render(request, 'camelot/uploadphoto.html', {'form': form, 'albumid': id})   # so maybe we make the move to class based views
