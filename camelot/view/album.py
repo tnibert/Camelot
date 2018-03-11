@@ -6,7 +6,6 @@ from ..forms import AlbumCreateForm, UploadPhotoForm
 
 """
 Album views
-Permissions checking should be in this layer
 """
 
 @login_required

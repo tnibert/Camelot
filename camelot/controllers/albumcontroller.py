@@ -20,6 +20,13 @@ class albumcontroller:
     Get a better handle on what objects are returned by the ORM and add docstrings to everything
     """
 
+    def validate_permission(self):
+        """
+        check if the user has permission to access the material
+        :return: boolean specifying if permission is granted
+        """
+        return True
+
     def create_album(self, name, description):
         try:
             # check if the name already exists for the current user
