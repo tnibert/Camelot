@@ -1,27 +1,13 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 
-class FriendshipTests(TestCase):
+class FriendGroupTests(TestCase):
+
+    """
+    Parent class for friendship and group controller tests so setup code isn't redundant
+    """
 
     def setUp(self):
-        pass
-
-    def test_add_friend(self):
-        pass
-
-    def test_confirm_friend(self):
-        pass
-
-    def test_delete_friend(self):
-        pass
-
-from ..controllers.groupcontroller import groupcontroller
-from ..models import FriendGroup
-
-class GroupControllerTests(TestCase):
-
-    def setUp(self):
-        # redundant?
         self.credentials = {
             'username': 'testuser',
             'email': 'user@test.com',
@@ -40,18 +26,56 @@ class GroupControllerTests(TestCase):
         self.u = User.objects.create_user(**self.credentials)
         self.u.save()
 
-        self.groupcontrol = groupcontroller(self.u.id)
-
         self.friend = User.objects.create_user(**self.friendcredentials)
         self.friend.save()
 
         self.friend2 = User.objects.create_user(**self.friend2credentials)
         self.friend2.save()
 
+from ..controllers.friendcontroller import friendcontroller
+from ..models import Friendship
+
+class FriendshipTests(FriendGroupTests):
+
+    """
+    Controller tests for friendship
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.friendcontrol = friendcontroller(self.u.id)
+
+    def test_add_friend(self):
+        myquery = Friendship.objects.filter(requester=self.u.profile, requestee=self.friend.profile)
+        assert len(myquery) == 0
+        self.friendcontrol.add(self.friend.profile)
+        myquery = Friendship.objects.filter(requester=self.u.profile, requestee=self.friend.profile)
+        assert len(myquery) == 1
+        assert myquery[0].confirmed == False
+
+    def test_confirm_friend(self):
+        pass
+
+    def test_delete_friend(self):
+        pass
+
+from ..controllers.groupcontroller import groupcontroller
+from ..models import FriendGroup
+
+class GroupControllerTests(FriendGroupTests):
+
+    """
+    Controller tests for friendgroups
+    """
+
+    def setUp(self):
+        super().setUp()
         # send login data - these commented lines are for view testing
         #response = self.client.post('', self.credentials, follow=True)
 
         #self.factory = RequestFactory()
+
+        self.groupcontrol = groupcontroller(self.u.id)
 
     def test_create_group(self):
         name = "Test New Group"
@@ -59,7 +83,6 @@ class GroupControllerTests(TestCase):
         myquery = FriendGroup.objects.filter(owner=self.u.profile, name=name)
         assert len(myquery) == 1
         assert newgroup == myquery[0]
-        #print(myquery[0])
 
     def test_create_group_redundant_name(self):
         pass

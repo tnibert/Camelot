@@ -24,7 +24,7 @@ class Friendship(models.Model):
     requester = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='requester')
     requestee = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='requestee')
     confirmed = models.BooleanField(default=False)
-    created = models.DateTimeField('friends since')
+    #created = models.DateTimeField('friends since')
 
 class FriendGroup(models.Model):
     name = models.CharField(max_length=30)
