@@ -25,14 +25,32 @@ class groupcontroller(genericcontroller):
         except:
             raise
 
-    def add_member(self, groupid, profileid):
+    def add_member(self, groupid, profile):
         """
 
         :param groupid: id of group to add to
-        :param profileid: id of user profile to add to group
+        :param profile: user profile to add to group
         :return: boolean, true for success
         """
+        # need to come back and assert that the users are in fact friends once friendship is implemented
+
         # check permission
+        try:
+            # get the group, but only if the owner is the current user
+            group = FriendGroup.objects.get(owner=self.uprofile, id=groupid)
+        except FriendGroup.DoesNotExist:
+            # insert log message here
+            return False
+
+        # check if the profile already exists in the group
+        if group.members.all().filter(id=profile.id).exists():
+            # log
+            return False
+
+        group.members.add(profile)
+        group.save()
+        return True
+
 
     def delete_group(self):
         pass

@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+# verify enforcement of unique user email
+
 # one to one relationship with User
 class Profile(models.Model):
     description = models.CharField(max_length=1000)
@@ -19,7 +21,7 @@ def update_user_profile(sender, instance, created, **kwargs):
 class FriendGroup(models.Model):
     name = models.CharField(max_length=30)
     owner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="groupowner")
-    members = models.ManyToManyField(Profile, related_name="groupmembers", default=None)
+    members = models.ManyToManyField(Profile, related_name="groupmembers")
 
 class Album(models.Model):
     name = models.CharField(max_length=70)
