@@ -8,7 +8,7 @@ class Profile(models.Model):
     description = models.CharField(max_length=1000)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     email_confirmed = models.BooleanField(default=False)
-    #profile_picture = models.ImageField(upload_to='thumbpath', blank=True)
+    #profile_picture = models.ForeignKey(Photo, default=None)
 
 @receiver(post_save, sender=User)
 def update_user_profile(sender, instance, created, **kwargs):
@@ -17,8 +17,9 @@ def update_user_profile(sender, instance, created, **kwargs):
     instance.profile.save()
 
 class FriendGroup(models.Model):
+    name = models.CharField(max_length=30)
     owner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="groupowner")
-    members = models.ManyToManyField(Profile, related_name="groupmembers")
+    members = models.ManyToManyField(Profile, related_name="groupmembers", default=None)
 
 class Album(models.Model):
     name = models.CharField(max_length=70)
