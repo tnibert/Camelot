@@ -4,7 +4,8 @@ from django.shortcuts import reverse
 
 from django.contrib.auth.models import User
 
-from ..controllers.albumcontroller import albumcontroller, get_profile_from_uid
+from ..controllers.albumcontroller import albumcontroller
+from ..controllers.utilities import get_profile_from_uid
 from ..view.album import *
 
 # we should probably split up the controller tests from the view tests
@@ -56,7 +57,7 @@ class AlbumTests(TestCase):
 
     def test_return_album(self):
         newalbum = self.albumcontrol.create_album("return album test", "lalala")
-        testalbum = self.albumcontrol.return_album(self.albumcontrol.uprofile, "return album test")
+        testalbum = self.albumcontrol.return_album(newalbum.id)
         assert newalbum == testalbum
 
     # the following tests are for functionality that hasn't been written yet
@@ -69,7 +70,7 @@ class AlbumTests(TestCase):
         try:
             # double check that our test is sending the right type for fi and that django will sent in rb mode
             with open('camelot/tests/resources/testimage.jpg', 'rb') as fi:
-                self.albumcontrol.add_photo_to_album(myalbum, "generic description", fi)
+                self.albumcontrol.add_photo_to_album(myalbum.id, "generic description", fi)
                 # need to add checks for file existence and db existence
 
         # clean up
