@@ -39,9 +39,10 @@ class GroupControllerTests(TestCase):
 
     def test_create_group(self):
         name = "Test Group"
-        self.groupcontrol.create(name)
+        newgroup = self.groupcontrol.create(name)
         myquery = FriendGroup.objects.filter(owner=self.u.profile, name=name)
         assert len(myquery) == 1
+        assert newgroup == myquery[0]
 
     def test_create_group_redundant_name(self):
         pass
