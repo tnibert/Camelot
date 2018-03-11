@@ -1,14 +1,7 @@
 from ..models import Album, Photo
+from .utilities import *
 from django.utils import timezone
-from django.contrib.auth.models import User
 from os import makedirs
-
-# we'll probably want to move this function to a different file
-def get_profile_from_uid(id):
-    return User.objects.get(id=id).profile
-
-class AlreadyExistsException(Exception):
-    pass
 
 class albumcontroller:
     """
