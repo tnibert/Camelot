@@ -1,15 +1,12 @@
 from ..models import FriendGroup
 from .utilities import *
+from .genericcontroller import genericcontroller
 
-class groupcontroller:
-
-    def __init__(self, uid):
-        # redundant
-        self.uprofile = get_profile_from_uid(uid)
+class groupcontroller(genericcontroller):
 
     def create(self, name):
         """
-
+        create a new friend group
         :param name: name of the group
         :return: reference to the newly created group
         """
@@ -28,8 +25,14 @@ class groupcontroller:
         except:
             raise
 
-    def add_member(self):
-        pass
+    def add_member(self, groupid, profileid):
+        """
+
+        :param groupid: id of group to add to
+        :param profileid: id of user profile to add to group
+        :return: boolean, true for success
+        """
+        # check permission
 
     def delete_group(self):
         pass

@@ -1,9 +1,10 @@
 from ..models import Album, Photo
 from .utilities import *
+from .genericcontroller import genericcontroller
 from django.utils import timezone
 from os import makedirs
 
-class albumcontroller:
+class albumcontroller(genericcontroller):
     """
     Class for accessing albums for a given user
     This will make life easier in the long run
@@ -12,13 +13,6 @@ class albumcontroller:
 
     Get a better handle on what objects are returned by the ORM and add docstrings to everything
     """
-
-    def validate_permission(self):
-        """
-        check if the user has permission to access the material
-        :return: boolean specifying if permission is granted
-        """
-        return True
 
     def create_album(self, name, description):
         try:
@@ -41,11 +35,6 @@ class albumcontroller:
             return albums
         except:
             raise
-
-    def __init__(self, uid):
-        self.uprofile = get_profile_from_uid(uid)
-        # potentially set a current album variable and just change it when user clicks album
-        # rather than passing in every time, but maybe not
         
     def return_album(self, id):
         # we could reference this by primary key, depending on what we can get easiest from the front end
@@ -115,3 +104,6 @@ class albumcontroller:
             return photo
         except:
             raise
+
+    def delete_album(self):
+        pass

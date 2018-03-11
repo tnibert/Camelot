@@ -5,3 +5,6 @@ def get_profile_from_uid(id):
 
 class AlreadyExistsException(Exception):
     pass
+
+class PermissionException(Exception):
+    pass
