@@ -1,7 +1,6 @@
-class friendcontroller:
+from .genericcontroller import genericcontroller
 
-    def __init__(self):
-        pass
+class friendcontroller(genericcontroller):
 
     def add(self):
         pass
@@ -10,4 +9,10 @@ class friendcontroller:
         pass
 
     def delete(self):
+        pass
+
+    def return_friend_list(self):
+        pass
+
+    def return_pending_requests(self):
         pass

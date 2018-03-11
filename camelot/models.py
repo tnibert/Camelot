@@ -11,12 +11,20 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     email_confirmed = models.BooleanField(default=False)
     #profile_picture = models.ForeignKey(Photo, default=None)
+    # beware of this symmetrical thing, test well
+    friends = models.ManyToManyField('self', through='Friendship', symmetrical=False)
 
 @receiver(post_save, sender=User)
 def update_user_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
     instance.profile.save()
+
+class Friendship(models.Model):
+    requester = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='requester')
+    requestee = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='requestee')
+    confirmed = models.BooleanField(default=False)
+    created = models.DateTimeField('friends since')
 
 class FriendGroup(models.Model):
     name = models.CharField(max_length=30)
