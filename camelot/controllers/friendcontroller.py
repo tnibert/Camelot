@@ -1,6 +1,7 @@
 from .genericcontroller import genericcontroller
 from ..models import Friendship, Profile, FriendGroup
 from .utilities import AlreadyExistsException
+from django.db.models import Q
 
 class friendcontroller(genericcontroller):
 
@@ -60,9 +61,9 @@ class friendcontroller(genericcontroller):
         :param profile: profile who's friends to return
         :return: queryset containing all friend profiles
         """
-        # well this is currently broken
-        print(profile.friends.all())
-        return profile.friends.all().filter(confirmed=True)
+        # way broken
+        # this doesn't make sense, figure it out
+        return profile.friends.all().filter(Q(requestee__confirmed=True) | Q(requester__confirmed=True))
 
     def return_pending_requests(self):
         """

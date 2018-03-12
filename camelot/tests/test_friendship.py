@@ -39,12 +39,14 @@ class FriendshipTests(FriendGroupTests):
 
     """
     Controller tests for friendship
+    Must test that both friends have a friend
     """
 
     def setUp(self):
         super().setUp()
         self.friendcontrol = friendcontroller(self.u.id)
         self.otherfriendcontrol = friendcontroller(self.friend.id)
+        self.otherfriendcontrol2 = friendcontroller(self.friend2.id)
 
     def test_add_friend(self):
         myquery = Friendship.objects.filter(requester=self.u.profile, requestee=self.friend.profile)
@@ -62,12 +64,28 @@ class FriendshipTests(FriendGroupTests):
         #assert len(self.otherfriendcontrol.return_friend_list(self.friendcontrol.uprofile)) == 1
         myquery = Friendship.objects.filter(requester=self.u.profile, requestee=self.friend.profile, confirmed=True)
         assert len(myquery) == 1
+        #print(self.u.profile.friends.all())
 
     def test_delete_friend(self):
         pass
 
     def test_return_friend_list(self):
-        pass
+        # this must be tested more
+        # totally broken
+        self.friendcontrol.add(self.friend.profile)
+        assert len(self.friendcontrol.return_friend_list(self.u.profile)) == 0
+        self.otherfriendcontrol.confirm(self.u.profile)
+        assert len(self.friendcontrol.return_friend_list(self.u.profile)) == 1
+        self.friendcontrol.add(self.friend2.profile)
+        self.otherfriendcontrol2.confirm(self.u.profile)
+        assert len(self.friendcontrol.return_friend_list(self.u.profile)) == 2
+
+        # following asserts fail
+        assert len(self.otherfriendcontrol.return_friend_list(self.friend.profile)) == 1
+
+        # make sure other friends each have 1 friend
+        assert len(self.friendcontrol.return_friend_list(self.friend.profile)) == 1
+        assert len(self.friendcontrol.return_friend_list(self.friend2.profile)) == 1
 
     def test_return_pending_requests(self):
         assert len(self.friendcontrol.return_pending_requests()) == 0
