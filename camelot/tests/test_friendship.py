@@ -70,7 +70,11 @@ class FriendshipTests(FriendGroupTests):
         pass
 
     def test_return_pending_requests(self):
-        pass
+        assert len(self.friendcontrol.return_pending_requests()) == 0
+        self.otherfriendcontrol.add(self.u.profile)
+        assert len(self.friendcontrol.return_pending_requests()) == 1
+        self.friendcontrol.confirm(self.otherfriendcontrol.uprofile)
+        assert len(self.friendcontrol.return_pending_requests()) == 0
 
 from ..controllers.groupcontroller import groupcontroller
 from ..models import FriendGroup
