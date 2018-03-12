@@ -28,16 +28,45 @@ class friendcontroller(genericcontroller):
         except:
             raise
 
-    def confirm(self):
+    def confirm(self, profile):
         # in this method we will confirm the friendship and add the profile to the profile's friends
         # and add created time
-        pass
+        """
+        Confirm a friend request
+        :param profile: the requester of the friendship to confirm
+        :return: boolean, True on success, False on failure
+        """
+        # check if a valid friend request exists
+        try:
+            relation = Friendship.objects.get(requester=profile, requestee=self.uprofile, confirmed=False)
+        except Friendship.DoesNotExist:
+            return False
+
+        # check that the friendship is unconfirmed and that the current user is the valid requestee
+        if not relation.confirmed and relation.requestee == self.uprofile:
+            relation.confirmed = True
+            relation.save()
+            # need to add friend to profile?
+            return True
+        else:
+            return False
 
     def delete(self):
         pass
 
-    def return_friend_list(self):
-        pass
+    def return_friend_list(self, profile):
+        """
+
+        :param profile: profile who's friends to return
+        :return: queryset containing all friend profiles
+        """
+        # well this is currently broken
+        print(profile.friends.all())
+        return profile.friends.all().filter(confirmed=True)
 
     def return_pending_requests(self):
-        pass
+        """
+
+        :return: queryset containing all unconfirmed friendships for the current user
+        """
+        return Friendship.objects.all().filter(requestee=self.uprofile, confirmed=False)

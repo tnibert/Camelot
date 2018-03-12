@@ -44,6 +44,7 @@ class FriendshipTests(FriendGroupTests):
     def setUp(self):
         super().setUp()
         self.friendcontrol = friendcontroller(self.u.id)
+        self.otherfriendcontrol = friendcontroller(self.friend.id)
 
     def test_add_friend(self):
         myquery = Friendship.objects.filter(requester=self.u.profile, requestee=self.friend.profile)
@@ -54,9 +55,21 @@ class FriendshipTests(FriendGroupTests):
         assert myquery[0].confirmed == False
 
     def test_confirm_friend(self):
-        pass
+        self.friendcontrol.add(self.friend.profile)
+        #assert len(self.otherfriendcontrol.return_friend_list(self.otherfriendcontrol.uprofile)) == 0
+        assert self.otherfriendcontrol.confirm(self.u.profile)
+        #assert len(self.otherfriendcontrol.return_friend_list(self.otherfriendcontrol.uprofile)) == 1
+        #assert len(self.otherfriendcontrol.return_friend_list(self.friendcontrol.uprofile)) == 1
+        myquery = Friendship.objects.filter(requester=self.u.profile, requestee=self.friend.profile, confirmed=True)
+        assert len(myquery) == 1
 
     def test_delete_friend(self):
+        pass
+
+    def test_return_friend_list(self):
+        pass
+
+    def test_return_pending_requests(self):
         pass
 
 from ..controllers.groupcontroller import groupcontroller

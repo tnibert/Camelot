@@ -20,6 +20,9 @@ def update_user_profile(sender, instance, created, **kwargs):
         Profile.objects.create(user=instance)
     instance.profile.save()
 
+# investigate constraints
+# there should never be more than one of these for a given relationship
+# including requester and requestee reversed
 class Friendship(models.Model):
     requester = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='requester')
     requestee = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='requestee')
