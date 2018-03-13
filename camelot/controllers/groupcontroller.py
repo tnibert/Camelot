@@ -39,7 +39,7 @@ class groupcontroller(genericcontroller):
             # get the group, but only if the owner is the current user
             group = FriendGroup.objects.get(owner=self.uprofile, id=groupid)
         except FriendGroup.DoesNotExist:
-            # insert log message here
+            # insert log message here, maybe raise permission exception
             return False
 
         # check if the profile already exists in the group

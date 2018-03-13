@@ -12,7 +12,8 @@ class Profile(models.Model):
     email_confirmed = models.BooleanField(default=False)
     #profile_picture = models.ForeignKey(Photo, default=None)
     # beware of this symmetrical thing, test well
-    friends = models.ManyToManyField('self', through='Friendship', symmetrical=False)
+    # ok, we've probably been overcomplicating this, friends are a one to many and we will access them through friendship
+    #friends = models.Many #('self', through='Friendship', symmetrical=False)
 
 @receiver(post_save, sender=User)
 def update_user_profile(sender, instance, created, **kwargs):
@@ -23,7 +24,14 @@ def update_user_profile(sender, instance, created, **kwargs):
 # investigate constraints
 # there should never be more than one of these for a given relationship
 # including requester and requestee reversed
+# so a Profile can have many Friendships
+# there needs to be a better way, requester and requestee only matter until the friendship is confirmed
+# after that, they should be the same
 class Friendship(models.Model):
+    class Meta:
+        # define that requester and requestee must be a unique combination
+        # check if this goes both ways interchangeably
+        unique_together = ('requester', 'requestee')
     requester = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='requester')
     requestee = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='requestee')
     confirmed = models.BooleanField(default=False)
@@ -32,6 +40,7 @@ class Friendship(models.Model):
 class FriendGroup(models.Model):
     name = models.CharField(max_length=30)
     owner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="groupowner")
+    # may be better to link to Friendship, but maybe not
     members = models.ManyToManyField(Profile, related_name="groupmembers")
 
 class Album(models.Model):

@@ -7,6 +7,9 @@ from django.contrib.auth.models import User
 
 from ..view.usermgmt import *
 
+# these need to be expanded out into user management tests
+# probably in an additional test case class
+
 class LoginTests(TestCase):
     def setUp(self):
         self.credentials = {

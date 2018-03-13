@@ -59,11 +59,10 @@ class friendcontroller(genericcontroller):
         """
 
         :param profile: profile who's friends to return
-        :return: queryset containing all friend profiles
+        :return: queryset containing all Friendships for the profile
         """
-        # way broken
-        # this doesn't make sense, figure it out
-        return profile.friends.all().filter(Q(requestee__confirmed=True) | Q(requester__confirmed=True))
+        # make sure to check uprofile has permission to see the profile's friend list
+        return Friendship.objects.all().filter((Q(requestee=profile) | Q(requester=profile)) & Q(confirmed=True))
 
     def return_pending_requests(self):
         """

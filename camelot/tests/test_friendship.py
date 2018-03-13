@@ -58,20 +58,18 @@ class FriendshipTests(FriendGroupTests):
 
     def test_confirm_friend(self):
         self.friendcontrol.add(self.friend.profile)
-        #assert len(self.otherfriendcontrol.return_friend_list(self.otherfriendcontrol.uprofile)) == 0
+
         assert self.otherfriendcontrol.confirm(self.u.profile)
-        #assert len(self.otherfriendcontrol.return_friend_list(self.otherfriendcontrol.uprofile)) == 1
-        #assert len(self.otherfriendcontrol.return_friend_list(self.friendcontrol.uprofile)) == 1
+
         myquery = Friendship.objects.filter(requester=self.u.profile, requestee=self.friend.profile, confirmed=True)
         assert len(myquery) == 1
-        #print(self.u.profile.friends.all())
+        # expand this coverage, check that we properly return false
 
     def test_delete_friend(self):
         pass
 
     def test_return_friend_list(self):
         # this must be tested more
-        # totally broken
         self.friendcontrol.add(self.friend.profile)
         assert len(self.friendcontrol.return_friend_list(self.u.profile)) == 0
         self.otherfriendcontrol.confirm(self.u.profile)
@@ -80,7 +78,6 @@ class FriendshipTests(FriendGroupTests):
         self.otherfriendcontrol2.confirm(self.u.profile)
         assert len(self.friendcontrol.return_friend_list(self.u.profile)) == 2
 
-        # following asserts fail
         assert len(self.otherfriendcontrol.return_friend_list(self.friend.profile)) == 1
 
         # make sure other friends each have 1 friend
