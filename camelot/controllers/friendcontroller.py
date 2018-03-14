@@ -73,7 +73,7 @@ class friendcontroller(genericcontroller):
 
 def are_friends(profile1, profile2):
     """
-    Test if two users are friends
+    Test if two users are friends, only returns True if the friendship is confirmed
     :param profile1:
     :param profile2:
     :return: boolean, True if friends

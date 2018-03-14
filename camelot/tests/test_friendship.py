@@ -32,6 +32,10 @@ class FriendGroupTests(TestCase):
         self.friend2 = User.objects.create_user(**self.friend2credentials)
         self.friend2.save()
 
+        self.friendcontrol = friendcontroller(self.u.id)
+        self.otherfriendcontrol = friendcontroller(self.friend.id)
+        self.otherfriendcontrol2 = friendcontroller(self.friend2.id)
+
 from ..controllers.friendcontroller import friendcontroller, are_friends
 from ..models import Friendship
 
@@ -44,9 +48,6 @@ class FriendshipTests(FriendGroupTests):
 
     def setUp(self):
         super().setUp()
-        self.friendcontrol = friendcontroller(self.u.id)
-        self.otherfriendcontrol = friendcontroller(self.friend.id)
-        self.otherfriendcontrol2 = friendcontroller(self.friend2.id)
 
     def test_add_friend(self):
         myquery = Friendship.objects.filter(requester=self.u.profile, requestee=self.friend.profile)
@@ -139,11 +140,30 @@ class GroupControllerTests(FriendGroupTests):
         name = "Test Add Member"
         newgroup = self.groupcontrol.create(name)
 
+        # can't add user to group who is not a friend
+        assert not self.groupcontrol.add_member(newgroup.id, self.friend.profile)
+        assert len(newgroup.members.all()) == 0
+
+        # become friends
+        self.friendcontrol.add(self.friend.profile)
+        self.otherfriendcontrol.confirm(self.u.profile)
+
+        # now can add to group
         assert self.groupcontrol.add_member(newgroup.id, self.friend.profile)
         assert len(newgroup.members.all()) == 1
+        # cannot add user to group twice
         assert not self.groupcontrol.add_member(newgroup.id, self.friend.profile)
         assert len(newgroup.members.all()) == 1
 
+        # can't add other user to group
+        assert not self.groupcontrol.add_member(newgroup.id, self.friend2.profile)
+        assert len(newgroup.members.all()) == 1
+
+        # become friends
+        self.friendcontrol.add(self.friend2.profile)
+        self.otherfriendcontrol2.confirm(self.u.profile)
+
+        # now it's all good
         assert self.groupcontrol.add_member(newgroup.id, self.friend2.profile)
         assert len(newgroup.members.all()) == 2
 

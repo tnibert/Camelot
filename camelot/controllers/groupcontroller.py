@@ -1,6 +1,7 @@
 from ..models import FriendGroup
 from .utilities import *
 from .genericcontroller import genericcontroller
+from .friendcontroller import are_friends
 
 class groupcontroller(genericcontroller):
 
@@ -32,7 +33,13 @@ class groupcontroller(genericcontroller):
         :param profile: user profile to add to group
         :return: boolean, true for success
         """
-        # need to come back and assert that the users are in fact friends once friendship is implemented
+        # assert that the users are in fact friends
+        # although who knows, maybe you do want to give someone who isn't your friend certain view access
+        try:
+            assert are_friends(profile, self.uprofile)
+        except Exception as e:
+            # log
+            return False
 
         # check permission
         try:
