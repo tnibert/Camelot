@@ -7,7 +7,7 @@ from django.dispatch import receiver
 
 # one to one relationship with User
 class Profile(models.Model):
-    description = models.CharField(max_length=1000)
+    description = models.CharField(max_length=1000, default="")
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     email_confirmed = models.BooleanField(default=False)
     #profile_picture = models.ForeignKey(Photo, default=None)
