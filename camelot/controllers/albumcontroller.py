@@ -107,3 +107,11 @@ class albumcontroller(genericcontroller):
 
     def delete_album(self):
         pass
+
+    def has_permission_to_view(self, album):
+        """
+        Check if the current user has permission to view the specified album
+        :param album: the album who's permissions to check
+        :return: boolean
+        """
+        pass
