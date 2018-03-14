@@ -70,3 +70,20 @@ class friendcontroller(genericcontroller):
         :return: queryset containing all unconfirmed friendships for the current user
         """
         return Friendship.objects.all().filter(requestee=self.uprofile, confirmed=False)
+
+def are_friends(profile1, profile2):
+    """
+    Test if two users are friends
+    :param profile1:
+    :param profile2:
+    :return: boolean, True if friends
+    """
+    # oh god this is ugly
+    try:
+        Friendship.objects.get(requester=profile1, requestee=profile2, confirmed=True)
+    except Friendship.DoesNotExist:
+        try:
+            Friendship.objects.get(requester=profile2, requestee=profile1, confirmed=True)
+        except Friendship.DoesNotExist:
+            return False
+    return True

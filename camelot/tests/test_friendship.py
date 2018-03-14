@@ -32,7 +32,7 @@ class FriendGroupTests(TestCase):
         self.friend2 = User.objects.create_user(**self.friend2credentials)
         self.friend2.save()
 
-from ..controllers.friendcontroller import friendcontroller
+from ..controllers.friendcontroller import friendcontroller, are_friends
 from ..models import Friendship
 
 class FriendshipTests(FriendGroupTests):
@@ -90,6 +90,19 @@ class FriendshipTests(FriendGroupTests):
         assert len(self.friendcontrol.return_pending_requests()) == 1
         self.friendcontrol.confirm(self.otherfriendcontrol.uprofile)
         assert len(self.friendcontrol.return_pending_requests()) == 0
+
+    def test_friend_test(self):
+        # we start as not friends
+        assert not are_friends(self.friend.profile, self.u.profile)
+        assert not are_friends(self.u.profile, self.friend.profile)
+
+        # add friends
+        self.friendcontrol.add(self.friend.profile)
+        self.otherfriendcontrol.confirm(self.u.profile)
+
+        # now we are friends
+        assert are_friends(self.friend.profile, self.u.profile)
+        assert are_friends(self.u.profile, self.friend.profile)
 
 from ..controllers.groupcontroller import groupcontroller
 from ..models import FriendGroup
