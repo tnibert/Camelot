@@ -6,7 +6,7 @@
         <tr>
         {% for album in albums %}
             <!-- need to reference url correctly -->
-            <td><a href="album/{{ album.id }}/">{{ album.name }}</a></td>
+            <td><a href="{% url 'show_album' album.id %}">{{ album.name }}</a></td>
         {% endfor %}
         </tr>
         <tr>
