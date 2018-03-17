@@ -28,13 +28,16 @@ class albumcontroller(genericcontroller):
         except:
             raise
 
-    def return_albums(self):
+    def return_albums(self, profile=None):
         """
-        This will need to be changed, we can't always return the current user's albums
+        Need to verify permissions for albums to return
         :return:
         """
+        if profile is None:
+            profile = self.uprofile
+
         try:
-            albums = Album.objects.filter(owner=self.uprofile)
+            albums = Album.objects.filter(owner=profile)
             # returns a queryset..
             return albums
         except:
@@ -42,14 +45,14 @@ class albumcontroller(genericcontroller):
         
     def return_album(self, id):
         """
-        This will need to be changed in the same way as the previous method
+        Need to verify permissions for album
         :param id:
         :return:
         """
         # we could reference this by primary key, depending on what we can get easiest from the front end
         # by specifying owner we have a bit of a permission mechanism, but that won't work long term (can't access another user's album
         try:
-            album = Album.objects.get(owner=self.uprofile, id=id)
+            album = Album.objects.get(id=id)
             return album
         except:
             raise

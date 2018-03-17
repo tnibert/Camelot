@@ -11,8 +11,8 @@ class friendcontroller(genericcontroller):
         :param profile: profile of user to add
         :return: friendship object or raise exception
         """
-        # TODO you should not be able to be friends with yourself
-        # in this method we will only create a friendship that is not confirmed
+
+        # you should not be able to be friends with yourself
         if profile == self.uprofile:
             raise AddSelfException("Tried to add self as friend")
 

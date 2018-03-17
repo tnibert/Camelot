@@ -44,9 +44,9 @@ def create_album(request):
 
 
 @login_required
-def display_albums(request):
+def display_albums(request, userid):
     albumcontrol = albumcontroller(request.user.id)
-    albums = albumcontrol.return_albums()
+    albums = albumcontrol.return_albums(userid)
     return render(request, 'camelot/showalbums.html', {'albums': albums})
     # showalbums.html might be able to be made more generic, may repeat in showalbum.html
 
