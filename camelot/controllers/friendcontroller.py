@@ -9,8 +9,9 @@ class friendcontroller(genericcontroller):
         """
         add a friend, at the end of this method the friendship will still need to be confirmed
         :param profile: profile of user to add
-        :return: boolean, true on success, false on failure
+        :return: friendship object or raise exception
         """
+        # TODO you should not be able to be friends with yourself
         # in this method we will only create a friendship that is not confirmed
         try:
             # check if a friendship already exists
@@ -25,7 +26,7 @@ class friendcontroller(genericcontroller):
                     newfriendship = Friendship(requester=self.uprofile, requestee=profile, confirmed=False)
                     newfriendship.save()
                     return newfriendship
-            raise AlreadyExistsException("Group needs unique name")
+            raise AlreadyExistsException("Already friends")
         except:
             raise
 
@@ -71,6 +72,21 @@ class friendcontroller(genericcontroller):
         """
         return Friendship.objects.all().filter(requestee=self.uprofile, confirmed=False)
 
+    def filter_friendships(self, qset):
+        """
+        Converts a list of friendships to the relevant profiles (i.e. not current user)
+        :param qset: queryset of friendship objects
+        :return: list of profile objects corresponding to the friendship objects
+        """
+        # this long loop makes me wary
+        profiles = []
+        for friendship in qset:
+            if friendship.requestee == self.uprofile:
+                profiles.append(friendship.requester)
+            else:
+                profiles.append(friendship.requestee)
+        return profiles
+
 def are_friends(profile1, profile2):
     """
     Test if two users are friends, only returns True if the friendship is confirmed
@@ -87,3 +103,4 @@ def are_friends(profile1, profile2):
         except Friendship.DoesNotExist:
             return False
     return True
+

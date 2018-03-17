@@ -1,0 +1,12 @@
+{% extends 'camelot/baseloggedin.html' %}
+
+{% block content2 %}
+    {% for fship in pending %}
+        <a href="{% url 'show_profile' fship.requester.user.id %}">{{ fship.requester.user.username }}</a>
+        <br>
+        <form action="{% url 'confirm_friend' fship.requester.user.id %}">
+            <input type="submit" value="Confirm" />
+        </form>
+        <br><br>
+    {% endfor %}
+{% endblock %}

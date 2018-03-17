@@ -17,4 +17,7 @@ urlpatterns = [
     url(r'^photo/(?P<photoid>\d+)/$', album.return_photo_file_http, name="show_photo"),
     url(r'^profile/(?P<userid>\d+)/$', profile.show_profile, name="show_profile"),
     url(r'^profile/(?P<userid>\d+)/friends$', friend.view_friend_list, name="show_friends"),
+    url(r'^profile/(?P<userid>\d+)/add_friend$', friend.add_friend, name="add_friend"),
+    url(r'^profile/(?P<userid>\d+)/confirm', friend.confirm_friend, name="confirm_friend"),
+    path('pending_requests', friend.show_pending_friend_reqs, name="show_pending_requests"),
 ]

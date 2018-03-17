@@ -11,4 +11,4 @@ class profilecontroller(genericcontroller):
         """
         profile = get_profile_from_uid(uid)
         # we will want to have a separate display name later
-        return {"name": profile.user.username, "description": profile.description}
+        return {"uid": profile.user.id, "name": profile.user.username, "description": profile.description}

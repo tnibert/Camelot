@@ -1,9 +1,8 @@
 {% extends 'camelot/baseloggedin.html' %}
 
 {% block content2 %}
-    {% for friendship in friendlist %}
-        <!-- this is not how this ends, this is for testing, we must get profiles from this query -->
-        <a href="{% url 'show_profile' friendship.requestee.user.id %}">{{ friendship.requestee.user.username }}</a> - <a href="{% url 'show_profile' friendship.requester.user.id %}">{{ friendship.requester.user.username }}</a>
+    {% for friend in friendlist %}
+        <a href="{% url 'show_profile' friend.user.id %}">{{ friend.user.username }}</a>
         <br>
     {% endfor %}
 {% endblock %}
