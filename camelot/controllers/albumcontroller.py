@@ -29,6 +29,10 @@ class albumcontroller(genericcontroller):
             raise
 
     def return_albums(self):
+        """
+        This will need to be changed, we can't always return the current user's albums
+        :return:
+        """
         try:
             albums = Album.objects.filter(owner=self.uprofile)
             # returns a queryset..
@@ -37,6 +41,11 @@ class albumcontroller(genericcontroller):
             raise
         
     def return_album(self, id):
+        """
+        This will need to be changed in the same way as the previous method
+        :param id:
+        :return:
+        """
         # we could reference this by primary key, depending on what we can get easiest from the front end
         # by specifying owner we have a bit of a permission mechanism, but that won't work long term (can't access another user's album
         try:
