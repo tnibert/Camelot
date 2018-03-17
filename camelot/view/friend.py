@@ -14,8 +14,11 @@ def add_friend(request, userid):
     return redirect("show_profile", userid)
 
 @login_required()
-def confirm_friend(request):
-    pass
+def confirm_friend(request, userid):
+    friendcontrol = friendcontroller(request.user.id)
+    # may want to check the following return value and do something
+    friendcontrol.confirm(get_profile_from_uid(userid))
+    return redirect("show_pending_requests")
 
 @login_required
 def delete_friend(request):
@@ -32,7 +35,7 @@ def view_friend_list(request, userid):
     friendcontrol = friendcontroller(request.user.id)
     profile = get_profile_from_uid(userid)
     friendshiplist = friendcontrol.return_friend_list(profile)
-    friendplist = friendcontroller.filter_friendships(friendshiplist)
+    friendplist = friendcontrol.filter_friendships(friendshiplist)
     return render(request, 'camelot/showfriends.html', {'friendlist': friendplist})
 
 @login_required
