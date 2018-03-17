@@ -1,15 +1,23 @@
 {% extends 'camelot/base.html' %}
 
 {% block content1 %}
-<ul>
 
+<ul>
+    {% if request.user.is_authenticated %}
+    {{ request.user }}
     <li><a href="{% url 'index' %}">Home</a></li>
 
     <li><form action="{% url 'logout' %}">
     <input type="submit" value="Logout" />
     </form></li>
 
+    {% else %}
+    <li><a href="{% url 'index' %}">Homepage</a></li>
+
+    {% endif %}
+
 </ul>
+
 {% block content2 %}
 {% endblock %}
 {% endblock %}

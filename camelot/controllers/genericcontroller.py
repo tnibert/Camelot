@@ -7,6 +7,8 @@ class genericcontroller:
         # get the current user profile
         if uid:
             self.uprofile = get_profile_from_uid(uid)
+        else:
+            self.uprofile = None
 
     # may not belong here, but let's just drop it here for a sec
     def validate_permission(self):

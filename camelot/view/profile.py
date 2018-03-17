@@ -3,7 +3,6 @@ from django.shortcuts import render
 from ..controllers.profilecontroller import profilecontroller
 from ..controllers.utilities import PermissionException
 
-@login_required
 def show_profile(request, userid):
     """
 
@@ -13,7 +12,7 @@ def show_profile(request, userid):
     """
     # a controller might not be the best way to handle profiles...
     # consistency is a really nice thing though...
-    pcontrol = profilecontroller()
+    pcontrol = profilecontroller(request.user.id)
     try:
         data = pcontrol.return_profile_data(userid)
     except PermissionException:

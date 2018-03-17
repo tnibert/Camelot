@@ -3,7 +3,13 @@
 {% extends 'camelot/baseloggedin.html' %}
 {% block content2 %}
 <!-- we will need to add some if statements and an add/unfriend button -->
+{% if friendstatus == "not friends" %}
 <a href="{% url 'add_friend' uid %}">Add Friend</a><br>
+{% elif friendstatus == "friends" %}
+<a href="">Unfriend</a><br>
+{% elif friendstatus == "pending" %}
+Friend request pending<br>
+{% endif %}
 <p>{{ name }}</p>
 <p>{{ description }}</p>
 <p><a href="{%url 'show_albums' uid %}">Albums</a></p>

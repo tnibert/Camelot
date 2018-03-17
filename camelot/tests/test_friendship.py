@@ -171,3 +171,6 @@ class GroupControllerTests(FriendGroupTests):
 
     def test_delete_member(self):
         pass
+
+    def test_are_friends_check(self):
+        pass

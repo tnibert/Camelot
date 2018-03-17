@@ -90,19 +90,21 @@ class friendcontroller(genericcontroller):
                 profiles.append(friendship.requestee)
         return profiles
 
-def are_friends(profile1, profile2):
+def are_friends(profile1, profile2, confirmed=True):
     """
-    Test if two users are friends, only returns True if the friendship is confirmed
+    Test if two users are friends or pending
     :param profile1:
     :param profile2:
+    :param confirmed: boolean, if True will only return True if friendship is confirmed
+                      if False will only return True if friendship is pending
     :return: boolean, True if friends
     """
     # oh god this is ugly
     try:
-        Friendship.objects.get(requester=profile1, requestee=profile2, confirmed=True)
+        Friendship.objects.get(requester=profile1, requestee=profile2, confirmed=confirmed)
     except Friendship.DoesNotExist:
         try:
-            Friendship.objects.get(requester=profile2, requestee=profile1, confirmed=True)
+            Friendship.objects.get(requester=profile2, requestee=profile1, confirmed=confirmed)
         except Friendship.DoesNotExist:
             return False
     return True
