@@ -57,7 +57,7 @@ class friendcontroller(genericcontroller):
 
     def return_friend_list(self, profile):
         """
-
+        This may need to be modified to return a list of profiles, not a queryset of friendships
         :param profile: profile who's friends to return
         :return: queryset containing all Friendships for the profile
         """

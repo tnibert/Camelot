@@ -1,6 +1,6 @@
 from django.urls import path
 from django.conf.urls import url
-from .view import album, usermgmt, profile
+from .view import album, usermgmt, profile, friend
 
 urlpatterns = [
     path('', usermgmt.index, name='index'),
@@ -16,4 +16,5 @@ urlpatterns = [
     url(r'^album/(?P<id>\d+)/upload_photos/$', album.add_photo, name="upload_photos"),
     url(r'^photo/(?P<photoid>\d+)/$', album.return_photo_file_http, name="show_photo"),
     url(r'^profile/(?P<userid>\d+)/$', profile.show_profile, name="show_profile"),
+    url(r'^profile/(?P<userid>\d+)/friends$', friend.view_friend_list, name="show_friends"),
 ]

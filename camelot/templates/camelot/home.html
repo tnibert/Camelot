@@ -5,7 +5,7 @@ Welcome to Camelot {{request.user.username}}
 <ul class="navbar">
 <li><a href="{% url 'create_album' %}">Create Album</a></li>
 <li><a href="{%url 'show_albums' %}">View Albums</a></li>
-<li>View Friends</li>
+<li><a href="{% url 'show_friends' request.user.id %}">View Friends</a></li>
 <li><a href="{% url 'show_profile' request.user.id %}">View Profile</a></li>
 <li>Edit Profile</li>
 </ul>
