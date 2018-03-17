@@ -1,6 +1,6 @@
 from .genericcontroller import genericcontroller
 from ..models import Friendship, Profile, FriendGroup
-from .utilities import AlreadyExistsException
+from .utilities import AlreadyExistsException, AddSelfException
 from django.db.models import Q
 
 class friendcontroller(genericcontroller):
@@ -13,6 +13,9 @@ class friendcontroller(genericcontroller):
         """
         # TODO you should not be able to be friends with yourself
         # in this method we will only create a friendship that is not confirmed
+        if profile == self.uprofile:
+            raise AddSelfException("Tried to add self as friend")
+
         try:
             # check if a friendship already exists
             try:

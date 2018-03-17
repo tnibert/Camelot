@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from ..controllers.friendcontroller import friendcontroller
-from ..controllers.utilities import get_profile_from_uid, AlreadyExistsException
+from ..controllers.utilities import get_profile_from_uid, AlreadyExistsException, AddSelfException
 
 @login_required()
 def add_friend(request, userid):
@@ -11,6 +11,8 @@ def add_friend(request, userid):
     except AlreadyExistsException:
         # replace the following with something else
         return redirect("user_home") # error
+    except AddSelfException:
+        return render(request, "camelot/messageloggedin.html", {"message": "Silly human, you can't add yourself"})
     return redirect("show_profile", userid)
 
 @login_required()

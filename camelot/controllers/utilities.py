@@ -8,3 +8,6 @@ class AlreadyExistsException(Exception):
 
 class PermissionException(Exception):
     pass
+
+class AddSelfException(Exception):
+    pass
