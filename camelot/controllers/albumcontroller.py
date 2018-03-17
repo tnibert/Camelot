@@ -15,6 +15,7 @@ class albumcontroller(genericcontroller):
     """
 
     def create_album(self, name, description):
+
         try:
             # check if the name already exists for the current user
             try:
@@ -59,14 +60,18 @@ class albumcontroller(genericcontroller):
 
     def add_photo_to_album(self, albumid, description, fi):
         """
-
+        this could be done in something like celery
         :param albumid: id of the album to add to
         :param description: description of the photo
         :param fi: the image file
         :return: reference to the newly created photo object
         """
-        # this could be done in something like celery
+
         album = self.return_album(albumid)
+
+        # check that user has permission to add to album
+        if not ((self.uprofile == album.owner) or (self.uprofile in album.contributors.all())):
+            raise PermissionException("User is not album owner or contributor")
 
         # add file to database
         newphoto = Photo(description=description, album=album)

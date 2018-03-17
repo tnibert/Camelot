@@ -1,7 +1,9 @@
 {% extends 'camelot/baseloggedin.html' %}
 
 {% block content2 %}
-    <a href="{% url 'upload_photos' albumid %}">Add New Photos</a><br>
+    {% if request.user.profile == album.owner %} <!-- or album contributor -->
+    <a href="{% url 'upload_photos' album.id %}">Add New Photos</a><br>
+    {% endif %}
     <table>
         <!-- we'll need to limit the number of tds -->
         <tr>

@@ -5,7 +5,7 @@ from django.shortcuts import reverse
 from django.contrib.auth.models import User
 
 from ..controllers.albumcontroller import albumcontroller
-from ..controllers.utilities import get_profile_from_uid
+from ..controllers.utilities import *
 from ..view.album import *
 
 # we should probably split up the controller tests from the view tests
@@ -20,11 +20,19 @@ class AlbumTests(TestCase):
         self.u = User.objects.create_user(**self.credentials)
         self.u.save()
 
+        self.credentials = {
+            'username': 'testuser2',
+            'email': 'user2@test.com',
+            'password': 'secret'}
+        self.u2 = User.objects.create_user(**self.credentials)
+        self.u2.save()
+
         # send login data
         response = self.client.post('', self.credentials, follow=True)
 
         self.factory = RequestFactory()
         self.albumcontrol = albumcontroller(self.u.id)
+        self.albumcontrol2 = albumcontroller(self.u2.id)
 
     def test_get_profile_from_uid(self):
         profile = get_profile_from_uid(self.u.id)
@@ -60,8 +68,6 @@ class AlbumTests(TestCase):
         testalbum = self.albumcontrol.return_album(newalbum.id)
         assert newalbum == testalbum
 
-    # the following tests are for functionality that hasn't been written yet
-    # just defining the future path
     def test_add_image_to_album_controller(self):
         import shutil
 
@@ -82,6 +88,12 @@ class AlbumTests(TestCase):
         #c = Client()
         #with open('wishlist.doc') as fp:
         #    c.post('/customers/wishes/', {'name': 'fred', 'attachment': fp})
+
+    def test_add_image_to_other_user_album_controller(self):
+        notmyalbum = self.albumcontrol2.create_album("other person's album", "ruh roh")
+
+        with open('camelot/tests/resources/testimage.jpg', 'rb') as fi:
+            self.assertRaises(PermissionException, self.albumcontrol.add_photo_to_album, notmyalbum.id, "generic description", fi)
 
     def test_get_images_for_album(self):
         # implemented

@@ -63,11 +63,12 @@ def display_album(request, id):
     # query db for photos in album
     photos = albumcontrol.get_photos_for_album(album)
 
-    return render(request, 'camelot/showalbum.html', {'photos': photos, 'albumid': id})
+    return render(request, 'camelot/showalbum.html', {'photos': photos, 'album': album})
 
 @login_required
 def add_photo(request, id):
     """
+    Need to check if user has permission to access this view
     :param request:
     :param id: id of the album to add photo to
     :return:
