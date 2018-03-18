@@ -8,6 +8,9 @@ from ..controllers.albumcontroller import albumcontroller
 from ..controllers.utilities import *
 from ..view.album import *
 
+import os
+import shutil
+
 # we should probably split up the controller tests from the view tests
 
 class AlbumTests(TestCase):
@@ -33,6 +36,8 @@ class AlbumTests(TestCase):
         self.factory = RequestFactory()
         self.albumcontrol = albumcontroller(self.u.id)
         self.albumcontrol2 = albumcontroller(self.u2.id)
+
+        self.testdir = "testdir"
 
     def test_get_profile_from_uid(self):
         profile = get_profile_from_uid(self.u.id)
@@ -69,31 +74,44 @@ class AlbumTests(TestCase):
         assert newalbum == testalbum
 
     def test_add_image_to_album_controller(self):
-        import shutil
+
+        if not os.path.exists(self.testdir):
+            os.makedirs(self.testdir)
+        os.chdir(self.testdir)
 
         myalbum = self.albumcontrol.create_album("image add test", "lalala")
 
         try:
             # double check that our test is sending the right type for fi and that django will sent in rb mode
-            with open('camelot/tests/resources/testimage.jpg', 'rb') as fi:
+            with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
                 self.albumcontrol.add_photo_to_album(myalbum.id, "generic description", fi)
                 # need to add checks for file existence and db existence
 
         # clean up
         except:
-            shutil.rmtree("userphotos")
+            os.chdir("..")
+            shutil.rmtree(self.testdir)
             raise
-        shutil.rmtree("userphotos")
+        os.chdir("..")
+        shutil.rmtree(self.testdir)
         # example (for view):
         #c = Client()
         #with open('wishlist.doc') as fp:
         #    c.post('/customers/wishes/', {'name': 'fred', 'attachment': fp})
 
     def test_add_image_to_other_user_album_controller(self):
+
+        if not os.path.exists(self.testdir):
+            os.makedirs(self.testdir)
+        os.chdir(self.testdir)
+
         notmyalbum = self.albumcontrol2.create_album("other person's album", "ruh roh")
 
-        with open('camelot/tests/resources/testimage.jpg', 'rb') as fi:
+        with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
             self.assertRaises(PermissionException, self.albumcontrol.add_photo_to_album, notmyalbum.id, "generic description", fi)
+
+        os.chdir("..")
+        shutil.rmtree(self.testdir)
 
     def test_get_images_for_album(self):
         # implemented
