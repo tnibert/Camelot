@@ -18,3 +18,8 @@ class UploadPhotoForm(forms.Form):
     file = forms.ImageField()        # read django security doc regarding this
                                     # https://docs.djangoproject.com/en/2.0/topics/security/#user-uploaded-content-security
 
+class EditProfileForm(forms.Form):
+    # need to have existing description filled in by default on form display
+    description = forms.CharField(label='Description', max_length=300,
+                                  # the following might be best done in css
+                                  widget=forms.Textarea(attrs={'cols': 50, 'rows': 6}))

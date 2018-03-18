@@ -1,8 +1,5 @@
-<!-- we will probably need to do some kind of if in this to check if the user is logged in -->
-<!-- must plan out permissions more explicitly -->
 {% extends 'camelot/baseloggedin.html' %}
 {% block content2 %}
-<!-- we will need to add some if statements and an add/unfriend button -->
 {% if friendstatus == "not friends" %}
 <a href="{% url 'add_friend' uid %}">Add Friend</a><br>
 {% elif friendstatus == "friends" %}
@@ -11,6 +8,7 @@
 Friend request pending<br>
 {% endif %}
 <p>{{ name }}</p>
+<p>Description:</p>
 <p>{{ description }}</p>
 <p><a href="{%url 'show_albums' uid %}">Albums</a></p>
 {% endblock %}

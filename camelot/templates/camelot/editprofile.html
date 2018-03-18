@@ -1,0 +1,22 @@
+{% extends 'camelot/baseloggedin.html' %}
+{% block content2 %}
+<form action="{% url 'update_profile' %}" method="post">
+    <!-- this following bit is repetitive and will need to be put in a separate file and imported in -->
+    <!-- description field will need to be way bigger -->
+    {% csrf_token %}
+    {% for field in form %}
+      <p>
+        {{ field.label_tag }}<br>
+        {{ field }}
+        {% if field.help_text %}
+          <small style="color: grey">{{ field.help_text }}</small>
+        {% endif %}
+        {% for error in field.errors %}
+          <p style="color: red">{{ error }}</p>
+        {% endfor %}
+      </p>
+    {% endfor %}
+
+    <input type="submit" value="Submit" />
+</form>
+{% endblock %}
