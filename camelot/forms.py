@@ -23,3 +23,29 @@ class EditProfileForm(forms.Form):
     description = forms.CharField(label='Description', max_length=300,
                                   # the following might be best done in css
                                   widget=forms.Textarea(attrs={'cols': 50, 'rows': 6}))
+
+class ManageGroupsForm(forms.Form):
+    """
+    So requirements:
+    - must be able to add users to a group
+    - must be able to delete users from a group
+    - must be able to add a group
+    - must be able to delete a group
+    This may be best done in multiple forms
+
+    Workflow will be:
+    Add friend -> specify groups -> confirm friend -> specify groups
+    or
+    Home -> manage groups
+    Perhaps it would be best to define the groups in terms of the friend, e.g. you go
+    to a friend and you edit their group permissions from there
+    ... yes, I think that is simpler
+    In that case manage groups only needs to add or delete groups
+    """
+    pass
+
+class FriendGroupingForm(forms.Form):
+    """
+    List groups in a scroll box that allows selecting of multiple entries
+    """
+    pass
