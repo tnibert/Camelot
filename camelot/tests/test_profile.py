@@ -34,12 +34,20 @@ class ProfileControllerTests(TestCase):
         assert test["name"] == self.u2.username
         assert test["description"] == self.u2.profile.description
 
+        # non logged in user sees profile
+        # later we fine tune
+        test = self.profilecontrolanon.return_profile_data(self.u2.id)
+        assert test["friendstatus"] == None
+        assert test["uid"] == self.u2.id
+        assert test["name"] == self.u2.username
+        assert test["description"] == self.u2.profile.description
+
     def test_update_profile_data(self):
         pass
 
 from ..view.profile import *
 
-class ProfileViewTests(TestCase):
+class ProfileViewTestsLoggedIn(TestCase):
     def setUp(self):
         # create user
         self.credentials = {
@@ -68,3 +76,15 @@ class ProfileViewTests(TestCase):
 
     def test_update_profile_view(self):
         pass
+
+class ProfileViewTestsNotLoggedIn(TestCase):
+    def setUp(self):
+        # create user
+        self.credentials = {
+            'username': 'testuser',
+            'email': 'user@test.com',
+            'password': 'secret'}
+        self.u = User.objects.create_user(**self.credentials)
+        self.u.save()
+
+        self.factory = RequestFactory()
