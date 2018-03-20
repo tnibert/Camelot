@@ -3,6 +3,8 @@ from django.test.client import RequestFactory
 from django.contrib.auth.models import User
 from django.shortcuts import reverse
 
+from ..controllers import profilecontroller
+
 class ProfileControllerTests(TestCase):
     def setUp(self):
         self.credentials = {
@@ -10,6 +12,7 @@ class ProfileControllerTests(TestCase):
             'email': 'user@test.com',
             'password': 'secret'}
         self.u = User.objects.create_user(**self.credentials)
+        self.u.profile.description = "I don't think therefore I am"
         self.u.save()
 
         self.credentials = {
@@ -17,10 +20,19 @@ class ProfileControllerTests(TestCase):
             'email': 'user2@test.com',
             'password': 'secret'}
         self.u2 = User.objects.create_user(**self.credentials)
+        self.u2.profile.description = "Hajimemashite yoroshiku onegaishimasu"
         self.u2.save()
 
+        self.profilecontrol1 = profilecontroller(self.u.id)
+        self.profilecontrol2 = profilecontroller(self.u2.id)
+        self.profilecontrolanon = profilecontroller()
+
     def test_return_profile_data(self):
-        pass
+        test = self.profilecontrol1.return_profile_data(self.u2.id)
+        assert test["friendstatus"] == "not friends"
+        assert test["uid"] == self.u2.id
+        assert test["name"] == self.u2.username
+        assert test["description"] == self.u2.profile.description
 
     def test_update_profile_data(self):
         pass
