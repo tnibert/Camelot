@@ -10,5 +10,6 @@ Friend request pending<br>
 <p>{{ name }}</p>
 <p>Description:</p>
 <p>{{ description }}</p>
-<p><a href="{%url 'show_albums' uid %}">Albums</a></p>
+<p><a href="{% url 'show_albums' uid %}">Albums</a></p>
+<p><a href="{% url 'show_friends' uid %}">Friends</a></p>
 {% endblock %}
