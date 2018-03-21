@@ -74,8 +74,37 @@ class ProfileViewTestsLoggedIn(TestCase):
 
         # test with another user's id
 
-    def test_update_profile_view(self):
-        pass
+    def test_update_profile_get(self):
+        """
+        Logged in user should be able to get update profile page
+        """
+        request = self.factory.get(reverse("update_profile"))
+        request.user = self.u
+        request.session = {}
+
+        response = update_profile(request)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_update_profile_post(self):
+        """
+        Logged in user should be able to update profile information via post
+        This test is broken, we aren't sending a valid csrf token
+        Probably need to get page first, get csrf token from that, then post in same session
+        """
+        #from urllib.parse import urlencode
+        description = "I am a pumpkin"
+        data = {'description': description}
+        #request = self.factory.post(reverse("update_profile"), data=data, content_type="application/x-www-form-urlencoded")
+        request = self.factory.post(reverse("update_profile"), data)
+        request.user = self.u
+        request.session = {}
+
+        response = update_profile(request)
+
+        self.assertEqual(response.status_code, 302)
+        #print(self.u.profile.description)
+        assert self.u.profile.description == description
 
 class ProfileViewTestsNotLoggedIn(TestCase):
     def setUp(self):
@@ -88,3 +117,25 @@ class ProfileViewTestsNotLoggedIn(TestCase):
         self.u.save()
 
         self.factory = RequestFactory()
+
+    def test_show_profile(self):
+        """
+        Non logged in user should be able to view profile
+        unless private
+        :return:
+        """
+        pass
+
+    def test_update_profile_get(self):
+        """
+        Non logged in user should not be able to get update profile page
+        :return:
+        """
+        pass
+
+    def test_update_profile_post(self):
+        """
+        Non logged in user should not be able to post to update profile
+        :return:
+        """
+        pass
