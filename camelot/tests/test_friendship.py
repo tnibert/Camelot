@@ -70,7 +70,12 @@ class FriendshipTests(FriendGroupTests):
         pass
 
     def test_return_friend_list(self):
-        # this must be tested more
+        # TODO: Expand these unit tests on the train in the morning
+        """
+        this must be tested more - omg a soothsayer up in here O_O *facepalm*
+        ... it's getting late though... for the train
+        test who friends are
+        """
         self.friendcontrol.add(self.friend.profile)
         assert len(self.friendcontrol.return_friend_list(self.u.profile)) == 0
         self.otherfriendcontrol.confirm(self.u.profile)
@@ -84,6 +89,12 @@ class FriendshipTests(FriendGroupTests):
         # make sure other friends each have 1 friend
         assert len(self.friendcontrol.return_friend_list(self.friend.profile)) == 1
         assert len(self.friendcontrol.return_friend_list(self.friend2.profile)) == 1
+
+    def test_filter_friends(self):
+        pass
+
+    def test_return_friendship_list(self):
+        pass
 
     def test_return_pending_requests(self):
         assert len(self.friendcontrol.return_pending_requests()) == 0

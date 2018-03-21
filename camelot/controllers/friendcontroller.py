@@ -59,9 +59,9 @@ class friendcontroller(genericcontroller):
     def delete(self):
         pass
 
-    def return_friend_list(self, profile):
+    def return_friendship_list(self, profile):
         """
-        This may need to be modified to return a list of profiles, not a queryset of friendships
+        Return all of the friendships connected to a given profile
         :param profile: profile who's friends to return
         :return: queryset containing all Friendships for the profile
         """
@@ -75,20 +75,35 @@ class friendcontroller(genericcontroller):
         """
         return Friendship.objects.all().filter(requestee=self.uprofile, confirmed=False)
 
-    def filter_friendships(self, qset):
+    def filter_friendships(self, qset, refprofile):
         """
-        Converts a list of friendships to the relevant profiles (i.e. not current user)
+        Converts a list of friendships to the relevant profiles
+        Called in return_friend_list
+        Really should be a private method
         :param qset: queryset of friendship objects
+        :param refprofile: the profile that we are referencing the friends from, e.g. return the friend in the friendship
+        who is not this profile.  As in, we view a profile's friend list in the UI, we get the friendships, we filter the
+        friendships by returning whoever is not the refprofile.  We return refprofile's friends from the queryset returned
+        by return_friend_list().
+        ... maybe we want to just call this in return_friend_list and return this for that
         :return: list of profile objects corresponding to the friendship objects
         """
         # this long loop makes me wary
         profiles = []
         for friendship in qset:
-            if friendship.requestee == self.uprofile:
+            if friendship.requestee == refprofile:
                 profiles.append(friendship.requester)
             else:
                 profiles.append(friendship.requestee)
         return profiles
+
+    def return_friend_list(self, profile):
+        """
+        Return the friend list for a given profile as a list of profiles
+        :param profile: profile to get friend list of
+        :return: list of profiles
+        """
+        return self.filter_friendships(self.return_friendship_list(profile), profile)
 
 def are_friends(profile1, profile2, confirmed=True):
     """

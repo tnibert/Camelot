@@ -15,6 +15,9 @@ class Profile(models.Model):
     # ok, we've probably been overcomplicating this, friends are a one to many and we will access them through friendship
     #friends = models.Many #('self', through='Friendship', symmetrical=False)
 
+    def __str__(self):
+        return "Profile " + str(self.id) + ": " + str(self.user.username)
+
 @receiver(post_save, sender=User)
 def update_user_profile(sender, instance, created, **kwargs):
     if created:
@@ -36,6 +39,9 @@ class Friendship(models.Model):
     requestee = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='requestee')
     confirmed = models.BooleanField(default=False)
     #created = models.DateTimeField('friends since')
+
+    def __str__(self):
+        return str(self.requester) + "->" + str(self.requestee) + " : " + str(self.confirmed)
 
 class FriendGroup(models.Model):
     name = models.CharField(max_length=30)

@@ -36,8 +36,13 @@ def view_friend_list(request, userid):
     """
     friendcontrol = friendcontroller(request.user.id)
     profile = get_profile_from_uid(userid)
-    friendshiplist = friendcontrol.return_friend_list(profile)
-    friendplist = friendcontrol.filter_friendships(friendshiplist)
+
+    #print(userid)
+
+    friendplist = friendcontrol.return_friend_list(profile)
+
+    #[print(x) for x in friendplist]
+
     return render(request, 'camelot/showfriends.html', {'friendlist': friendplist})
 
 @login_required
