@@ -67,3 +67,18 @@ class groupcontroller(genericcontroller):
 
     def delete_member(self):
         pass
+
+    def return_groups(self, profile=None):
+        """
+        Returns a list of the groups for a given user
+        :param profile: profile of a user to see groups owned by
+        :return: queryset of groups
+        """
+        if profile is None:
+            profile = self.uprofile
+        if profile is None:
+            return None
+
+        groups = FriendGroup.objects.filter(owner=profile)
+
+        return groups

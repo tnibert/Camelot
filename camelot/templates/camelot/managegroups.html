@@ -1,5 +1,15 @@
 {% extends 'camelot/baseloggedin.html' %}
 
 {% block content2 %}
+<table>
+    {% for group in groups %}
+    <tr>
+        <td>group.name</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<!-- add button for adding group -->
+<!-- add buton for deleting group -->
 
 {% endblock %}

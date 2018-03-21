@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from ..controllers.friendcontroller import friendcontroller
 from ..controllers.utilities import get_profile_from_uid, AlreadyExistsException, AddSelfException
 
-@login_required()
+@login_required
 def add_friend(request, userid):
     friendcontrol = friendcontroller(request.user.id)
     try:
@@ -15,7 +15,7 @@ def add_friend(request, userid):
         return render(request, "camelot/messageloggedin.html", {"message": "Silly human, you can't add yourself"})
     return redirect("show_profile", userid)
 
-@login_required()
+@login_required
 def confirm_friend(request, userid):
     friendcontrol = friendcontroller(request.user.id)
     # may want to check the following return value and do something

@@ -185,3 +185,6 @@ class GroupControllerTests(FriendGroupTests):
 
     def test_are_friends_check(self):
         pass
+
+    def test_return_groups(self):
+        pass
