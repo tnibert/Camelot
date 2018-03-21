@@ -13,7 +13,7 @@ import shutil
 
 # we should probably split up the controller tests from the view tests
 
-class AlbumTests(TestCase):
+class AlbumControllerTests(TestCase):
     # this setUp code needs to be made universal
     def setUp(self):
         self.credentials = {
@@ -47,17 +47,6 @@ class AlbumTests(TestCase):
     def test_create_controller_duplicate_name(self):
         self.albumcontrol.create_album("test title", "test description")
         self.assertRaises(AlreadyExistsException, self.albumcontrol.create_album, "test title", "test description2")
-
-    def test_create_view(self):
-        # Create an instance of a GET request.
-        request = self.factory.get(reverse("create_album"))
-        request.user = self.u
-        request.session = {}
-
-        # Test my_view() as if it were deployed at /customer/details
-        response = create_album(request)
-
-        self.assertEqual(response.status_code, 200)
 
     def test_return_albums_controller(self):
         # can't count on tests running in order
@@ -139,6 +128,37 @@ class AlbumTests(TestCase):
         pass
 
 class AlbumViewTests(TestCase):
+    def setUp(self):
+        self.credentials = {
+            'username': 'testuser',
+            'email': 'user@test.com',
+            'password': 'secret'}
+        self.u = User.objects.create_user(**self.credentials)
+        self.u.save()
+
+        self.credentials = {
+            'username': 'testuser2',
+            'email': 'user2@test.com',
+            'password': 'secret'}
+        self.u2 = User.objects.create_user(**self.credentials)
+        self.u2.save()
+
+        # send login data
+        response = self.client.post('', self.credentials, follow=True)
+
+        self.factory = RequestFactory()
+
     def test_album_view(self):
         # implemented
         pass
+
+    def test_create_view(self):
+        # Create an instance of a GET request.
+        request = self.factory.get(reverse("create_album"))
+        request.user = self.u
+        request.session = {}
+
+        # Test my_view() as if it were deployed at /customer/details
+        response = create_album(request)
+
+        self.assertEqual(response.status_code, 200)
