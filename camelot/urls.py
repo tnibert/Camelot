@@ -1,6 +1,6 @@
 from django.urls import path
 from django.conf.urls import url
-from .view import album, usermgmt, profile, friend
+from .view import album, usermgmt, profile, friend, group
 
 urlpatterns = [
     path('', usermgmt.index, name='index'),
@@ -21,4 +21,5 @@ urlpatterns = [
     url(r'^profile/(?P<userid>\d+)/confirm$', friend.confirm_friend, name="confirm_friend"),
     path('pending_requests', friend.show_pending_friend_reqs, name="show_pending_requests"),
     path('update_profile', profile.update_profile, name='update_profile'),
+    path('manage_groups', group.manage_groups, name='manage_groups'),
 ]

@@ -9,6 +9,6 @@
 <li><a href="{% url 'show_pending_requests' %}">View Pending Friend Requests</a></li>
 <li><a href="{% url 'show_profile' request.user.id %}">View Profile</a></li>
 <li><a href="{% url 'update_profile' %}">Edit Profile</a></li>
-<li><a href="">Manage Friend Groups</a></li>
+<li><a href="{% url 'manage_groups' %}">Manage Friend Groups</a></li>
 </ul>
 {% endblock %}

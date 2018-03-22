@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
-from ..controllers import groupcontroller
+from ..controllers.groupcontroller import groupcontroller
 
 """
 Let's try to make this a bit more... restful?
@@ -28,4 +28,4 @@ def manage_groups(request):
     groups = groupcontrol.return_groups()
 
     retdict = {'groups': groups}        # how will this translate to a json view?  Test in browser
-    return render(request, 'camelot/manage_groups.html', retdict)
+    return render(request, 'camelot/managegroups.html', retdict)
