@@ -28,6 +28,9 @@ class ProfileControllerTests(TestCase):
         self.profilecontrolanon = profilecontroller()
 
     def test_return_profile_data(self):
+        """
+        Profile data returned by controller should match user and profile information from db
+        """
         test = self.profilecontrol1.return_profile_data(self.u2.id)
         assert test["friendstatus"] == "not friends"
         assert test["uid"] == self.u2.id
@@ -63,11 +66,16 @@ class ProfileViewTestsLoggedIn(TestCase):
         self.factory = RequestFactory()
 
     def test_show_profile(self):
+        """
+        Profile page should return 200 for all users logged in and not logged in
+        Content will vary based on profile permissions?  Maybe not, just albums
+        """
         # Create an instance of a GET request.
         request = self.factory.get(reverse("show_profile", kwargs={'userid': self.u.id}))
         request.user = self.u
         request.session = {}
 
+        # self.client.get()?
         response = show_profile(request, self.u.id)
 
         self.assertEqual(response.status_code, 200)
@@ -100,10 +108,10 @@ class ProfileViewTestsLoggedIn(TestCase):
         request.user = self.u
         request.session = {}
 
-        response = update_profile(request)
+        response = self.client.post(reverse("update_profile"), data, follow=True)
 
-        self.assertEqual(response.status_code, 302)
-        #print(self.u.profile.description)
+        self.assertEqual(response.status_code, 200)
+        print(self.u.profile.description)
         assert self.u.profile.description == description
 
 class ProfileViewTestsNotLoggedIn(TestCase):

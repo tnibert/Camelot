@@ -44,7 +44,20 @@ class LoginTests(TestCase):
         self.assertTrue(response.context['user'].is_authenticated)
 
     def test_logout(self):
-        pass
+        """
+        Logout page (with follow True) should return 200 and leave user not authenticated
+        """
+        # login
+        response = self.client.post('', self.credentials, follow=True)
+
+        # logout
+        response = self.client.post(reverse('logout'), follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.context['user'].is_authenticated)
+
+        # if we try to logout again we get a 302 redirect (no follow) (to index page)
+        response = self.client.post(reverse('logout'))
+        self.assertEqual(response.status_code, 302)
 
     def test_invalid_login(self):
         badcredentials = {
