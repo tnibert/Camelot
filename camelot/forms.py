@@ -2,6 +2,8 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
+from .constants import *
+
 class SignUpForm(UserCreationForm):
     email = forms.EmailField(help_text='Required')
 
@@ -43,6 +45,12 @@ class ManageGroupsForm(forms.Form):
     In that case manage groups only needs to add or delete groups
     """
     pass
+
+class AddGroupForm(forms.Form):
+    """
+    Form to add a group
+    """
+    name = forms.CharField(label='Group Name', max_length=GROUPNAMELEN)
 
 class FriendGroupingForm(forms.Form):
     """

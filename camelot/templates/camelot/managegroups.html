@@ -1,15 +1,21 @@
 {% extends 'camelot/baseloggedin.html' %}
 
 {% block content2 %}
+<h2>Groups</h2>
 <table>
     {% for group in groups %}
     <tr>
-        <td>group.name</td>
+        <td>{{ group.name }}</td>
     </tr>
     {% endfor %}
 </table>
-
+<br>
 <!-- add button for adding group -->
+<h2>Add New Group</h2>
+<form action="{% url 'create_group' %}" method="post">
+    {% include 'camelot/genericformtemp.html' with form=addform %}
+    <input type="submit" value="Add" />
+</form>
 <!-- add buton for deleting group -->
 
 {% endblock %}

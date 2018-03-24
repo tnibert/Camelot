@@ -12,6 +12,7 @@ Welcome to Camelot.<br>
 <form name="login" action="{% url 'index' %}" method="post" accept-charset="utf-8">  
     {% csrf_token %}
 
+    <!-- this might be better implemented the normal form way -->
     <table>
         <tr><td><label for="username">Username: </label></td>  
         <td><input type="text" name="username" placeholder="username" required></td>

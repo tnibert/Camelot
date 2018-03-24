@@ -22,4 +22,5 @@ urlpatterns = [
     path('pending_requests', friend.show_pending_friend_reqs, name="show_pending_requests"),
     path('update_profile', profile.update_profile, name='update_profile'),
     path('manage_groups', group.manage_groups, name='manage_groups'),
+    path('create_group', group.create_group, name='create_group'),
 ]

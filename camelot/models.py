@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+from .constants import *
 # verify enforcement of unique user email
 
 # one to one relationship with User
@@ -44,7 +45,7 @@ class Friendship(models.Model):
         return str(self.requester) + "->" + str(self.requestee) + " : " + str(self.confirmed)
 
 class FriendGroup(models.Model):
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=GROUPNAMELEN)
     owner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="groupowner")
     # may be better to link to Friendship, but maybe not
     members = models.ManyToManyField(Profile, related_name="groupmembers")
