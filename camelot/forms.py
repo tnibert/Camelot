@@ -73,5 +73,5 @@ class MyGroupSelectForm(forms.Form):
         super(MyGroupSelectForm, self).__init__(*args, **kwargs)
         control = groupcontroller(myuid)
         ch = lambda: [(x.id, x.name) for x in control.return_groups()]
-        self.fields['name'] = choicefieldtype(
+        self.fields['idname'] = choicefieldtype(
             label='Group Name', choices=ch)

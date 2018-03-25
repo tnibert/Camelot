@@ -1,0 +1,10 @@
+{% extends 'camelot/baseloggedin.html' %}
+
+{% block content2 %}
+<h2>Choose Groups</h2>
+<p>To select multiple groups, press ctrl while clicking.</p>
+<form action="{% url 'add_friend_to_groups' uid %}" method="post">
+    {% include 'camelot/genericformtemp.html' %}
+    <input type="submit" value="Add To Groups" />
+</form>
+{% endblock %}

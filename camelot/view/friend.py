@@ -13,7 +13,7 @@ def add_friend(request, userid):
         return redirect("user_home") # error
     except AddSelfException:
         return render(request, "camelot/messageloggedin.html", {"message": "Silly human, you can't add yourself"})
-    return redirect("show_profile", userid)
+    return redirect("add_friend_to_groups", userid)
 
 @login_required
 def confirm_friend(request, userid):

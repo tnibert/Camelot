@@ -23,4 +23,6 @@ urlpatterns = [
     path('update_profile', profile.update_profile, name='update_profile'),
     path('manage_groups', group.manage_groups, name='manage_groups'),
     path('create_group', group.create_group, name='create_group'),
+    url(r'^add_friend_to_groups/(?P<userid>\d+)/$', group.add_friend_to_group, name="add_friend_to_groups"),
+
 ]

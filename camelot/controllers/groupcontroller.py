@@ -31,15 +31,15 @@ class groupcontroller(genericcontroller):
 
     def add_member(self, groupid, profile):
         """
-
+        Add a friend to a group
         :param groupid: id of group to add to
         :param profile: user profile to add to group
         :return: boolean, true for success
         """
-        # assert that the users are in fact friends
+        # assert that the users are in fact friends, or at least pending
         # although who knows, maybe you do want to give someone who isn't your friend certain view access
         try:
-            assert are_friends(profile, self.uprofile)
+            assert (are_friends(profile, self.uprofile, confirmed=True) or are_friends(profile, self.uprofile, confirmed=False))
         except Exception as e:
             # log
             return False

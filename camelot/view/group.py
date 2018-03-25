@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.forms import ChoiceField, MultipleChoiceField
 
 from ..controllers.groupcontroller import groupcontroller
+from ..controllers.utilities import get_profile_from_uid
 from ..forms import AddGroupForm, MyGroupSelectForm
 
 """
@@ -54,3 +55,44 @@ def manage_groups(request):
 
     retdict = {'groups': groups, 'addform': addform, 'delform': deleteform}        # how will this translate to a json view?  Test in browser
     return render(request, 'camelot/managegroups.html', retdict)
+
+@login_required
+def manage_group(request, id):
+    """
+    View to manage an inidividual group
+    :param request:
+    :param id: id of the group to manage
+    :return:
+    """
+
+@login_required
+def add_friend_to_group(request, userid):
+    """
+    View to add a friend to a group
+    Need to check if a friendship exists before allowing access
+    :param request:
+    :param userid: user id of the friend to add to groups
+    :return:
+    """
+
+    if request.method == 'POST':
+        groupcontrol = groupcontroller(request.user.id)
+
+        form = MyGroupSelectForm(request.user.id, MultipleChoiceField, request.POST)
+
+        if form.is_valid():
+            # list of group ids
+            groups = form.cleaned_data['idname']
+            for groupid in groups:
+                try:
+                    # this assert may need to be handled at a higher level depending on what django does
+                    assert groupcontrol.add_member(int(groupid), get_profile_from_uid(userid))
+                except Exception as e:
+                    raise e
+
+        return redirect("show_profile", userid)
+
+    form = MyGroupSelectForm(request.user.id, MultipleChoiceField)
+
+    retdict = {'uid': userid, 'form': form}
+    return render(request, 'camelot/addfriendtogroup.html', retdict)
