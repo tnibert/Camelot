@@ -62,10 +62,16 @@ class FriendGroupingForm(forms.Form):
 
 class MyGroupSelectForm(forms.Form):
 
-    def __init__(self, myuid, *args, **kwargs):
+    def __init__(self, myuid, choicefieldtype, *args, **kwargs):
+        """
+        Form populated by the current user's groups
+        :param myuid: current user's id
+        :param choicefieldtype: Type of field to instantiate.  Valid types are forms.ChoiceField and forms.MultipleChoiceField.
+        :param args:
+        :param kwargs:
+        """
         super(MyGroupSelectForm, self).__init__(*args, **kwargs)
         control = groupcontroller(myuid)
         ch = lambda: [(x.id, x.name) for x in control.return_groups()]
-        self.fields['name'] = forms.ChoiceField(
+        self.fields['name'] = choicefieldtype(
             label='Group Name', choices=ch)
-        #self.fields['name'].choices = [x.name for x in control.return_groups()]

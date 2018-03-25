@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
+from django.forms import ChoiceField, MultipleChoiceField
 
 from ..controllers.groupcontroller import groupcontroller
 from ..forms import AddGroupForm, MyGroupSelectForm
@@ -49,7 +50,7 @@ def manage_groups(request):
     groupcontrol = groupcontroller(request.user.id)
     groups = groupcontrol.return_groups()
     addform = AddGroupForm()        # how would I render a django form in a java android app?
-    deleteform = MyGroupSelectForm(request.user.id)
+    deleteform = MyGroupSelectForm(request.user.id, ChoiceField)
 
     retdict = {'groups': groups, 'addform': addform, 'delform': deleteform}        # how will this translate to a json view?  Test in browser
     return render(request, 'camelot/managegroups.html', retdict)
