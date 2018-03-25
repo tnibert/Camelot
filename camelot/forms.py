@@ -3,6 +3,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
 from .constants import *
+from .models import FriendGroup
+from .controllers.groupcontroller import groupcontroller
 
 class SignUpForm(UserCreationForm):
     email = forms.EmailField(help_text='Required')
@@ -57,3 +59,13 @@ class FriendGroupingForm(forms.Form):
     List groups in a scroll box that allows selecting of multiple entries
     """
     pass
+
+class MyGroupSelectForm(forms.Form):
+
+    def __init__(self, myuid, *args, **kwargs):
+        super(MyGroupSelectForm, self).__init__(*args, **kwargs)
+        control = groupcontroller(myuid)
+        ch = lambda: [(x.id, x.name) for x in control.return_groups()]
+        self.fields['name'] = forms.ChoiceField(
+            label='Group Name', choices=ch)
+        #self.fields['name'].choices = [x.name for x in control.return_groups()]

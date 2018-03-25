@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 
 from ..controllers.groupcontroller import groupcontroller
-from ..forms import AddGroupForm
+from ..forms import AddGroupForm, MyGroupSelectForm
 
 """
 Let's try to make this a bit more... restful?  Whatever that really means
@@ -49,6 +49,7 @@ def manage_groups(request):
     groupcontrol = groupcontroller(request.user.id)
     groups = groupcontrol.return_groups()
     addform = AddGroupForm()        # how would I render a django form in a java android app?
+    deleteform = MyGroupSelectForm(request.user.id)
 
-    retdict = {'groups': groups, 'addform': addform}        # how will this translate to a json view?  Test in browser
+    retdict = {'groups': groups, 'addform': addform, 'delform': deleteform}        # how will this translate to a json view?  Test in browser
     return render(request, 'camelot/managegroups.html', retdict)
