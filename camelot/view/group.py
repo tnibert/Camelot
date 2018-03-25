@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.forms import ChoiceField, MultipleChoiceField
 from django.http import Http404
 
-from ..controllers.groupcontroller import groupcontroller
+from ..controllers.groupcontroller import groupcontroller, is_in_group, return_group_from_id
 from ..controllers.friendcontroller import are_friends
 from ..controllers.utilities import get_profile_from_uid
 from ..forms import AddGroupForm, MyGroupSelectForm
@@ -87,14 +87,20 @@ def add_friend_to_group(request, userid):
         form = MyGroupSelectForm(request.user.id, MultipleChoiceField, request.POST)
 
         if form.is_valid():
+            profile = get_profile_from_uid(userid)
+
             # list of group ids
-            groups = form.cleaned_data['idname']
+            groups = [int(x) for x in form.cleaned_data['idname']]
             for groupid in groups:
-                try:
-                    # this assert may need to be handled at a higher level depending on what django does
-                    assert groupcontrol.add_member(int(groupid), get_profile_from_uid(userid))
-                except Exception as e:
-                    raise e
+                group = return_group_from_id(groupid)
+                if is_in_group(group, profile):
+                    pass
+                else:
+                    try:
+                        # this assert may need to be handled at a higher level depending on what django does
+                        assert groupcontrol.add_member(groupid, profile)
+                    except Exception as e:
+                        raise e
 
         # if we are in pending requests, we want to redirect to the pending page... hmm... :\
         return redirect("show_profile", userid)

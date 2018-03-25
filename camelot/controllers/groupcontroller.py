@@ -53,7 +53,7 @@ class groupcontroller(genericcontroller):
             return False
 
         # check if the profile already exists in the group
-        if group.members.all().filter(id=profile.id).exists():
+        if is_in_group(group, profile):
             # log
             return False
 
@@ -82,3 +82,22 @@ class groupcontroller(genericcontroller):
         groups = FriendGroup.objects.filter(owner=profile)
 
         return groups
+
+def is_in_group(group, profile):
+    # todo: unit test
+    """
+    Wrapper to check if profile is in group
+    :param group: group to test membership in
+    :param profile: profile to test membership of
+    :return: boolean, True is profile is in group, False if not
+    """
+    return group.members.all().filter(id=profile.id).exists()
+
+def return_group_from_id(id):
+    # todo: unit test
+    """
+    Wrapper to return the group based on the id
+    :param id: id of group
+    :return: group object
+    """
+    return FriendGroup.objects.get(id=id)
