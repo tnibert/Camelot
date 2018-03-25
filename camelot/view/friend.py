@@ -20,7 +20,7 @@ def confirm_friend(request, userid):
     friendcontrol = friendcontroller(request.user.id)
     # may want to check the following return value and do something
     friendcontrol.confirm(get_profile_from_uid(userid))
-    return redirect("show_pending_requests")
+    return redirect("add_friend_to_groups", userid)
 
 @login_required
 def delete_friend(request):

@@ -1,8 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.forms import ChoiceField, MultipleChoiceField
+from django.http import Http404
 
 from ..controllers.groupcontroller import groupcontroller
+from ..controllers.friendcontroller import are_friends
 from ..controllers.utilities import get_profile_from_uid
 from ..forms import AddGroupForm, MyGroupSelectForm
 
@@ -74,6 +76,10 @@ def add_friend_to_group(request, userid):
     :param userid: user id of the friend to add to groups
     :return:
     """
+    # check that the users are at least pending friends before rendering
+    if not (are_friends(get_profile_from_uid(request.user.id), get_profile_from_uid(userid), confirmed=True) \
+            or are_friends(get_profile_from_uid(request.user.id), get_profile_from_uid(userid), confirmed=False)):
+        raise Http404
 
     if request.method == 'POST':
         groupcontrol = groupcontroller(request.user.id)
@@ -90,6 +96,7 @@ def add_friend_to_group(request, userid):
                 except Exception as e:
                     raise e
 
+        # if we are in pending requests, we want to redirect to the pending page... hmm... :\
         return redirect("show_profile", userid)
 
     form = MyGroupSelectForm(request.user.id, MultipleChoiceField)

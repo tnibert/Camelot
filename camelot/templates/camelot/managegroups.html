@@ -6,6 +6,11 @@
     {% for group in groups %}
     <tr>
         <td>{{ group.name }}</td>
+        <td>
+            {% for member in group.members.all %}
+            {{ member }}
+            {% endfor %}
+        </td>
     </tr>
     {% endfor %}
 </table>
