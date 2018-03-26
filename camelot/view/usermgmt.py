@@ -2,12 +2,12 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-
 from django.contrib.auth.models import User
 from django.contrib import messages
 
 from ..forms import SignUpForm
 from ..tokens import account_activation_token
+from ..controllers.friendcontroller import friendcontroller
 
 """
 User login and home page
@@ -43,7 +43,10 @@ def index(request):
 
 @login_required
 def user_home(request):
-    return render(request, 'camelot/home.html')
+    retdict = {
+        "pendingreqs": len(friendcontroller(request.user.id).return_pending_requests())
+    }
+    return render(request, 'camelot/home.html', retdict)
 
 def user_logout(request):
     logout(request)

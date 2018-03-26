@@ -6,7 +6,7 @@
 <li><a href="{% url 'create_album' %}">Create Album</a></li>
 <li><a href="{%url 'show_albums' request.user.id %}">View Albums</a></li>
 <li><a href="{% url 'show_friends' request.user.id %}">View Friends</a></li>
-<li><a href="{% url 'show_pending_requests' %}">View Pending Friend Requests</a></li>
+<li><a href="{% url 'show_pending_requests' %}">View Pending Friend Requests</a> ({{ pendingreqs }})</li>
 <li><a href="{% url 'show_profile' request.user.id %}">View Profile</a></li>
 <li><a href="{% url 'update_profile' %}">Edit Profile</a></li>
 <li><a href="{% url 'manage_groups' %}">Manage Friend Groups</a></li>
