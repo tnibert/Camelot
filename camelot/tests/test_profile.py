@@ -30,12 +30,18 @@ class ProfileControllerTests(TestCase):
     def test_return_profile_data(self):
         """
         Profile data returned by controller should match user and profile information from db
+        If user gets own profile, friendstatus is None, a pending friend "pending", a friend "friends", not a friend "not friends"
+        If non logged in user gets profile, friendstatus is None
         """
         test = self.profilecontrol1.return_profile_data(self.u2.id)
         assert test["friendstatus"] == "not friends"
         assert test["uid"] == self.u2.id
         assert test["name"] == self.u2.username
         assert test["description"] == self.u2.profile.description
+
+        # test that there is no friendstatus if we get our own profile data
+        test = self.profilecontrol1.return_profile_data(self.u.id)
+        assert test["friendstatus"] is None
 
         # non logged in user sees profile
         # later we fine tune

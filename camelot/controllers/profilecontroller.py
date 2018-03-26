@@ -15,8 +15,12 @@ class profilecontroller(genericcontroller):
         friendstatus = None     # default if not logged in
 
         if self.uprofile:
+            # check identity
+            if self.uprofile == profile:
+                # friendstatus is None
+                pass
             # check friendship
-            if are_friends(self.uprofile, profile):
+            elif are_friends(self.uprofile, profile):
                 friendstatus = "friends"
             # check pending
             elif are_friends(self.uprofile, profile, confirmed=False):
