@@ -7,4 +7,7 @@
     {% include 'camelot/genericformtemp.html' %}
     <input type="submit" value="Add To Groups" />
 </form>
+<form action="{% url 'show_profile' uid %}">
+    <input type="submit" value="Skip" />
+</form>
 {% endblock %}
