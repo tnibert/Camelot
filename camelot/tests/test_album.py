@@ -208,6 +208,12 @@ class AlbumControllerTests(TestCase):
         # non friend user can't view
         assert not self.albumcontrol2.has_permission_to_view(testalbum)
 
+    def test_collate_owner_and_contrib(self):
+        pass
+
+    def test_change_access_type(self):
+        pass
+
 
 class AlbumViewTests(TestCase):
     def setUp(self):

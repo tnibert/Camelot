@@ -62,7 +62,8 @@ class Album(models.Model):
     pub_date = models.DateTimeField('date published')
     contributors = models.ManyToManyField(Profile, related_name="albumcontributors")
     owner = models.ForeignKey(Profile, on_delete=models.CASCADE)
-
+    # 1 is public, 2 is all friends, 3 is groups, 4 is private
+    accesstype = models.IntegerField(default=ALBUM_ALLFRIENDS)
     # we'll need to check that these are only groups owned by our contributors
     groups = models.ManyToManyField(FriendGroup, related_name="albumgroup")
 

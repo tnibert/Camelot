@@ -3,6 +3,7 @@ from .utilities import *
 from .friendcontroller import are_friends
 from .genericcontroller import genericcontroller
 from .groupcontroller import is_in_group
+from ..constants import *
 from django.utils import timezone
 from os import makedirs
 
@@ -24,7 +25,8 @@ class albumcontroller(genericcontroller):
                 Album.objects.get(owner=self.uprofile, name=name)
             # if not, it's a go
             except Album.DoesNotExist:
-                newalbum = Album(name=name, description=description, pub_date=timezone.now(), owner=self.uprofile)
+                newalbum = Album(name=name, description=description, pub_date=timezone.now(), owner=self.uprofile,
+                                 accesstype=ALBUM_ALLFRIENDS)
                 newalbum.save()
                 return newalbum
             raise AlreadyExistsException("Album needs unique name")    # may want to make this exception less general
@@ -127,22 +129,63 @@ class albumcontroller(genericcontroller):
     def delete_album(self):
         pass
 
+
+    def collate_owner_and_contrib(self, album):
+        # todo: unit test
+        """
+        Combine owner and contributors into list
+        :param album: album to collate
+        :return: list of owner and contributors
+        """
+        lst = list(album.contributors.all())
+        lst.append(album.owner)
+        return lst
+
+
+    def set_accesstype(self, album, type):
+        """
+        Set access type for an album, only owner can do this
+        :param album: album to set
+        :return: boolean of success or failure
+        """
+        if self.uprofile == album.owner and ALBUM_PUBLIC <= type <= ALBUM_PRIVATE:
+            album.accesstype = type
+            return True
+        else:
+            return False
+
+
     def has_permission_to_view(self, album):
         """
         Check if the current user has permission to view the specified album
         :param album: the album who's permissions to check
         :return: boolean
+        Damn this is some overhead...
         """
-        # owner and contributors can view
+        # if public, can view
+        if album.accesstype == ALBUM_PUBLIC:
+            return True
+
+        # owner and contributors can view, checks for ALBUM_PRIVATE access type
         if self.uprofile == album.owner or self.uprofile in album.contributors.all():
             return True
 
-        # check uprofile against all groups
-        for group in album.groups.all():
-            if is_in_group(group, self.uprofile):
-                return True
+        # this may need to be a bit more fleshed out
+        # what if owner wants to show to all friends, but contributor only to a group?
+        if album.accesstype == ALBUM_ALLFRIENDS:
+            for i in self.collate_owner_and_contrib(album):
+                if are_friends(self.uprofile, i):
+                    return True
 
+        elif album.accesstype == ALBUM_GROUPS:
+            # check uprofile against all groups
+            for group in album.groups.all():
+                if is_in_group(group, self.uprofile):
+                    return True
+
+        # if we have not returned True, no access
         return False
+
 
     def add_contributor_to_album(self, album, contributor):
         """

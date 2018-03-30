@@ -4,12 +4,15 @@ from django.test import TestCase
 In this file we need to define what our access permissions need to be
 and test correct access and access violations
 
-Default groups:
-Public, All Friends, Private
-We need to prevent user modification of these groups, possibly make them a subclass
+Access types:
+Public, All Friends, Groups, Private
+public - everyone can view
+all friends - all friends can view (DEFAULT)
+groups - only group members can view
+private - only owner and contributors can view
 
 Album:
-If album has no groups, default is all friends.  Default groups are exclusive.
+If album has no groups, default is all friends.
 Contributor can always view album
 
 To validate an album:
