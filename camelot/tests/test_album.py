@@ -38,6 +38,9 @@ class AlbumControllerTests(TestCase):
         self.albumcontrol = albumcontroller(self.u.id)
         self.albumcontrol2 = albumcontroller(self.u2.id)
 
+        # not logged in
+        self.albumcontrol3 = albumcontroller()
+
         self.groupcontrol = groupcontroller(self.u.id)
 
         self.testdir = "testdir"
@@ -206,10 +209,12 @@ class AlbumControllerTests(TestCase):
         self.albumcontrol.set_accesstype(testalbum, ALBUM_PUBLIC)
         # non friend can view album
         assert self.albumcontrol2.has_permission_to_view(testalbum)
+        assert self.albumcontrol3.has_permission_to_view(testalbum)
 
         # change access to all friends, non friend cannot view
         self.albumcontrol.set_accesstype(testalbum, ALBUM_ALLFRIENDS)
         assert not self.albumcontrol2.has_permission_to_view(testalbum)
+        assert not self.albumcontrol3.has_permission_to_view(testalbum)
 
         # add friend and can view
         complete_add_friends(self.u.id, self.u2.id)
