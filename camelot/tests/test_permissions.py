@@ -10,6 +10,7 @@ We need to prevent user modification of these groups, possibly make them a subcl
 
 Album:
 If album has no groups, default is all friends.  Default groups are exclusive.
+Contributor can always view album
 
 To validate an album:
 Check if accessing user is in album's groups

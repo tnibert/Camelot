@@ -1,5 +1,6 @@
 from ..models import Album, Photo
 from .utilities import *
+from .friendcontroller import are_friends
 from .genericcontroller import genericcontroller
 from django.utils import timezone
 from os import makedirs
@@ -136,11 +137,15 @@ class albumcontroller(genericcontroller):
     def add_contributor_to_album(self, album, contributor):
         """
         Add a contributor to album
-        :param album:
-        :param contributor:
-        :return:
+        :param album: album to add contributor to
+        :param contributor: Profile of user to add as contributor
+        :return: False if not friends, True on success
         """
-        pass
+        # check if users are friends?
+        if not are_friends(album.owner, contributor):
+            return False
+        album.contributors.add(contributor)
+        return True
 
     def add_group_to_album(self, album, group):
         """

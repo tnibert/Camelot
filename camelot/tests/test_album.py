@@ -8,6 +8,7 @@ from ..controllers.albumcontroller import albumcontroller
 from ..controllers.groupcontroller import groupcontroller
 from ..controllers.utilities import *
 from ..view.album import *
+from .helperfunctions import complete_add_friends
 
 import os
 import shutil
@@ -109,6 +110,30 @@ class AlbumControllerTests(TestCase):
     def test_get_images_for_album(self):
         # implemented
         pass
+
+    def test_add_contributor_to_album(self):
+        """
+        Test adding a contributor to album
+        Owner and new contributor must be friends
+        """
+
+        testalbum = self.albumcontrol.create_album("test album", "test description")
+
+        # not friends, cannot add
+        assert not self.albumcontrol.add_contributor_to_album(testalbum, self.u2.profile)
+        assert len(testalbum.contributors.all()) == 0
+
+        # add friends
+        complete_add_friends(self.u.id, self.u2.id)
+        # now can add contributor
+        assert self.albumcontrol.add_contributor_to_album(testalbum, self.u2.profile)
+
+        assert len(testalbum.contributors.all()) == 1
+        assert self.u2.profile in testalbum.contributors.all()
+
+        # confirm cannot re add contributor
+        self.albumcontrol.add_contributor_to_album(testalbum, self.u2.profile)
+        assert len(testalbum.contributors.all()) == 1
 
     def test_add_group_to_album(self):
         """

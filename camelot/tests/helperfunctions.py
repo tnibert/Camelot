@@ -10,5 +10,6 @@ def complete_add_friends(requesterid, requesteeid):
     """
     friendcontrol1 = friendcontroller(requesterid)
     friendcontrol2 = friendcontroller(requesteeid)
-    friendcontrol1.add(friendcontrol2.profile)
+    fship = friendcontrol1.add(friendcontrol2.profile)
     friendcontrol2.confirm(friendcontrol1.profile)
+    return fship
