@@ -55,9 +55,9 @@ class profilecontroller(genericcontroller):
         groupcontrol = groupcontroller(self.uprofile.user.id)
         try:
             # no need to check if groups already exist, groupcontroller creation will do that
-            groupcontrol.create("Public")
-            groupcontrol.create("All Friends")
-            groupcontrol.create("Private")
+            groupcontrol.create("Family")
+            groupcontrol.create("Coworkers")
+            groupcontrol.create("School Friends")
         except Exception as e:
             raise(e)
         return True
