@@ -87,17 +87,19 @@ class albumcontroller(genericcontroller):
         
     def return_album(self, id):
         """
-        Need to verify permissions for album
+        Return an album by id, verifying permissions for album
         :param id:
-        :return:
+        :return: album or raise exception
         """
         # we could reference this by primary key, depending on what we can get easiest from the front end
-        # by specifying owner we have a bit of a permission mechanism, but that won't work long term (can't access another user's album
         try:
             album = Album.objects.get(id=id)
-            return album
         except:
             raise
+        if self.has_permission_to_view(album):
+            return album
+        else:
+            raise PermissionException
 
     def add_photo_to_album(self, albumid, description, fi):
         """

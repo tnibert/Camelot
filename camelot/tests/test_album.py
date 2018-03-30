@@ -67,6 +67,8 @@ class AlbumControllerTests(TestCase):
         newalbum = self.albumcontrol.create_album("return album test", "lalala")
         testalbum = self.albumcontrol.return_album(newalbum.id)
         assert newalbum == testalbum
+        self.assertRaises(PermissionException, self.albumcontrol2.return_album, newalbum.id)
+
 
     def test_add_image_to_album_controller(self):
 
