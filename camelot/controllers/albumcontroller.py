@@ -136,7 +136,7 @@ class albumcontroller(genericcontroller):
         :param album: album to set
         :return: boolean of success or failure
         """
-        if self.uprofile == album.owner and ALBUM_PUBLIC <= type <= ALBUM_PRIVATE:
+        if self.uprofile == album.owner and ALBUM_PUBLIC <= type <= ALBUM_PRIVATE and isinstance(type, int):
             album.accesstype = type
             return True
         else:

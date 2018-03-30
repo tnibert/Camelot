@@ -9,6 +9,7 @@ from ..controllers.groupcontroller import groupcontroller
 from ..controllers.utilities import *
 from ..view.album import *
 from .helperfunctions import complete_add_friends
+from ..constants import *
 
 import os
 import shutil
@@ -221,7 +222,37 @@ class AlbumControllerTests(TestCase):
         assert self.u2.profile in contribs
 
     def test_change_access_type(self):
-        pass
+        """
+        Default access type is all friends
+        Only owner can change access type
+        Access type must be valid integer
+        :return:
+        """
+        testalbum = self.albumcontrol.create_album("access type test", "testing access type")
+        # default all friends
+        assert testalbum.accesstype == ALBUM_ALLFRIENDS
+
+        # change to public
+        assert self.albumcontrol.set_accesstype(testalbum, ALBUM_PUBLIC)
+        assert testalbum.accesstype == ALBUM_PUBLIC
+
+        # change to groups
+        assert self.albumcontrol.set_accesstype(testalbum, ALBUM_GROUPS)
+        assert testalbum.accesstype == ALBUM_GROUPS
+
+        # change to private
+        assert self.albumcontrol.set_accesstype(testalbum, ALBUM_PRIVATE)
+        assert testalbum.accesstype == ALBUM_PRIVATE
+
+        # set an album you don't own
+        testalbum2 = self.albumcontrol2.create_album("set invalid", "test set invalid")
+        assert not self.albumcontrol.set_accesstype(testalbum2, ALBUM_PUBLIC)
+        assert testalbum2.accesstype == ALBUM_ALLFRIENDS
+
+        # set to float and invalid int
+        assert not self.albumcontrol.set_accesstype(testalbum, 2.5)
+        assert not self.albumcontrol.set_accesstype(testalbum, 100)
+        assert testalbum.accesstype == ALBUM_PRIVATE
 
 
 class AlbumViewTests(TestCase):
