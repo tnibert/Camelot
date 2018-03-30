@@ -84,7 +84,6 @@ class groupcontroller(genericcontroller):
         return groups
 
 def is_in_group(group, profile):
-    # todo: unit test
     """
     Wrapper to check if profile is in group
     :param group: group to test membership in

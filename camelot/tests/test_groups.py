@@ -2,7 +2,8 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.shortcuts import reverse
 from .test_friendship import FriendGroupControllerTests
-from ..controllers.groupcontroller import groupcontroller
+from ..controllers.groupcontroller import groupcontroller, is_in_group
+from .helperfunctions import complete_add_friends
 from ..models import FriendGroup
 
 class GroupControllerTests(FriendGroupControllerTests):
@@ -107,6 +108,20 @@ class GroupControllerTests(FriendGroupControllerTests):
         assert ret3[1] == newgroup3
 
         # todo: test none case
+
+    def test_is_in_group(self):
+        """
+        Test utility to check if a profile is in a given group
+        Before adding to group return false
+        After return true
+        """
+        name = "Test in group"
+        newgroup = self.groupcontrol.create(name)
+        assert not is_in_group(newgroup, self.friend.profile)
+        complete_add_friends(self.u.id, self.friend.id)
+        self.groupcontrol.add_member(newgroup.id, self.friend.profile)
+        assert is_in_group(newgroup, self.friend.profile)
+
 
 from django.test.client import RequestFactory
 from ..view.group import *
