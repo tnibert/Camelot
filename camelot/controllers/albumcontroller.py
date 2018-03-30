@@ -136,8 +136,9 @@ class albumcontroller(genericcontroller):
     def add_group_to_album(self, album, group):
         """
         Add a friendgroup access to an album
+        Prevent adding group to album that is not own or contributor
         :param album:
         :param group:
         :return:
         """
-        pass
+        album.groups.add(group)

@@ -6,7 +6,7 @@ and test correct access and access violations
 
 Default groups:
 Public, All Friends, Private
-We need to prevent user modification of these groups
+We need to prevent user modification of these groups, possibly make them a subclass
 
 Album:
 If album has no groups, default is all friends.  Default groups are exclusive.

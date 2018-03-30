@@ -5,6 +5,7 @@ from django.shortcuts import reverse
 from django.contrib.auth.models import User
 
 from ..controllers.albumcontroller import albumcontroller
+from ..controllers.groupcontroller import groupcontroller
 from ..controllers.utilities import *
 from ..view.album import *
 
@@ -89,7 +90,10 @@ class AlbumControllerTests(TestCase):
         #    c.post('/customers/wishes/', {'name': 'fred', 'attachment': fp})
 
     def test_add_image_to_other_user_album_controller(self):
-
+        """
+        User should not be able to add image to another user's album
+        :return:
+        """
         if not os.path.exists(self.testdir):
             os.makedirs(self.testdir)
         os.chdir(self.testdir)
@@ -105,6 +109,20 @@ class AlbumControllerTests(TestCase):
     def test_get_images_for_album(self):
         # implemented
         pass
+
+    def test_add_group_to_album(self):
+        """
+        Test adding a group to an album
+        Need to test that we can't add group to album that is not our own
+        :return:
+        """
+        groupcontrol = groupcontroller(self.u.id)
+        testgroup = groupcontrol.create("test group")
+        testalbum = self.albumcontrol.create_album("test album", "test description")
+        self.albumcontrol.add_group_to_album(testalbum, testgroup)
+        assert len(testalbum.groups.all()) == 1
+        assert testgroup in testalbum.groups.all()
+
 
     def test_remove_image_from_album(self):
         pass

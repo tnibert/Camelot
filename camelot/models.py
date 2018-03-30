@@ -53,6 +53,9 @@ class FriendGroup(models.Model):
     # may be better to link to Friendship, but maybe not
     members = models.ManyToManyField(Profile, related_name="groupmembers")
 
+    def __str__(self):
+        return str(self.name)
+
 class Album(models.Model):
     name = models.CharField(max_length=70)
     description = models.CharField(max_length=300)
