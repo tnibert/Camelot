@@ -1,6 +1,7 @@
 from .genericcontroller import genericcontroller
 from .utilities import get_profile_from_uid, PermissionException
 from .friendcontroller import are_friends
+from .groupcontroller import groupcontroller
 
 class profilecontroller(genericcontroller):
 
@@ -45,3 +46,18 @@ class profilecontroller(genericcontroller):
         self.uprofile.description = desc
         self.uprofile.save()
         return self.uprofile
+
+    def create_default_groups(self):
+        """
+        Create Public, All Friends, and Private groups
+        :return: True on success
+        """
+        groupcontrol = groupcontroller(self.uprofile.user.id)
+        try:
+            # no need to check if groups already exist, groupcontroller creation will do that
+            groupcontrol.create("Public")
+            groupcontrol.create("All Friends")
+            groupcontrol.create("Private")
+        except Exception as e:
+            raise(e)
+        return True

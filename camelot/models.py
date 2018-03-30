@@ -4,6 +4,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from .constants import *
+
+
 # verify enforcement of unique user email
 
 # one to one relationship with User
@@ -24,6 +26,7 @@ def update_user_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
     instance.profile.save()
+
 
 # investigate constraints
 # there should never be more than one of these for a given relationship

@@ -61,6 +61,8 @@ from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
 
+from ..controllers.profilecontroller import profilecontroller
+
 # need to implement a user registration function with email confirmation
 # need to error handle if email can't be sent
 def register(request):
@@ -102,6 +104,11 @@ def activate(request, uidb64, token):
         user.is_active = True
         user.profile.email_confirmed = True
         user.save()
+
+        # create default groups
+        profilecontrol = profilecontroller(uid)
+        profilecontrol.create_default_groups()
+
         login(request, user)
         return redirect('user_home')
     else:

@@ -132,3 +132,12 @@ class albumcontroller(genericcontroller):
         :return: boolean
         """
         pass
+
+    def add_group_to_album(self, album, group):
+        """
+        Add a friendgroup access to an album
+        :param album:
+        :param group:
+        :return:
+        """
+        pass
