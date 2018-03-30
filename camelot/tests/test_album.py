@@ -123,6 +123,17 @@ class AlbumControllerTests(TestCase):
         assert len(testalbum.groups.all()) == 1
         assert testgroup in testalbum.groups.all()
 
+        # confirm adding a second time does nothing
+        self.albumcontrol.add_group_to_album(testalbum, testgroup)
+        assert len(testalbum.groups.all()) == 1
+
+        # confirm can't add group to another user's album
+
+        # add as contributor
+
+        # confirm can add group to other user's album
+
+
 
     def test_remove_image_from_album(self):
         pass

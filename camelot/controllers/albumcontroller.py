@@ -133,6 +133,15 @@ class albumcontroller(genericcontroller):
         """
         pass
 
+    def add_contributor_to_album(self, album, contributor):
+        """
+        Add a contributor to album
+        :param album:
+        :param contributor:
+        :return:
+        """
+        pass
+
     def add_group_to_album(self, album, group):
         """
         Add a friendgroup access to an album
