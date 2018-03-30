@@ -13,8 +13,6 @@ from .helperfunctions import complete_add_friends
 import os
 import shutil
 
-# we should probably split up the controller tests from the view tests
-
 class AlbumControllerTests(TestCase):
     # this setUp code needs to be made universal
     def setUp(self):
@@ -177,8 +175,6 @@ class AlbumControllerTests(TestCase):
         assert len(testalbum.groups.all()) == 2
 
 
-
-
     def test_remove_image_from_album(self):
         pass
 
@@ -192,10 +188,26 @@ class AlbumControllerTests(TestCase):
         pass
 
     def test_user_can_access(self):
-        pass
+        """
+        Permissions check to view album
+        We have groups and we have access types
+        """
+        testalbum = self.albumcontrol.create_album("access test", "testing access")
+        # owner can view
+        assert self.albumcontrol.has_permission_to_view(testalbum)
+        # contributor can view
+
+        # user in access group can view
+
 
     def test_user_cant_access(self):
-        pass
+        """
+        Permissions check to not view album
+        """
+        testalbum = self.albumcontrol.create_album("access test", "testing access")
+        # non friend user can't view
+        assert not self.albumcontrol2.has_permission_to_view(testalbum)
+
 
 class AlbumViewTests(TestCase):
     def setUp(self):

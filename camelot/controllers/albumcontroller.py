@@ -2,6 +2,7 @@ from ..models import Album, Photo
 from .utilities import *
 from .friendcontroller import are_friends
 from .genericcontroller import genericcontroller
+from .groupcontroller import is_in_group
 from django.utils import timezone
 from os import makedirs
 
@@ -132,7 +133,16 @@ class albumcontroller(genericcontroller):
         :param album: the album who's permissions to check
         :return: boolean
         """
-        pass
+        # owner and contributors can view
+        if self.uprofile == album.owner or self.uprofile in album.contributors.all():
+            return True
+
+        # check uprofile against all groups
+        for group in album.groups.all():
+            if is_in_group(group, self.uprofile):
+                return True
+
+        return False
 
     def add_contributor_to_album(self, album, contributor):
         """
