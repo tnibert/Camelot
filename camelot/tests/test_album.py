@@ -4,7 +4,7 @@ from django.shortcuts import reverse
 
 from django.contrib.auth.models import User
 
-from ..controllers.albumcontroller import albumcontroller
+from ..controllers.albumcontroller import albumcontroller, collate_owner_and_contrib
 from ..controllers.groupcontroller import groupcontroller
 from ..controllers.utilities import *
 from ..view.album import *
@@ -209,7 +209,16 @@ class AlbumControllerTests(TestCase):
         assert not self.albumcontrol2.has_permission_to_view(testalbum)
 
     def test_collate_owner_and_contrib(self):
-        pass
+        """
+        Test collate_owner_and_contrib(), returns list of album owner and contributors
+        """
+        testalbum = self.albumcontrol.create_album("collate test", "testing collate tool")
+        complete_add_friends(self.u.id, self.u2.id)
+        self.albumcontrol.add_contributor_to_album(testalbum, self.u2.profile)
+        contribs = collate_owner_and_contrib(testalbum)
+        assert len(contribs) == 2
+        assert self.u.profile in contribs
+        assert self.u2.profile in contribs
 
     def test_change_access_type(self):
         pass

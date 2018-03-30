@@ -130,18 +130,6 @@ class albumcontroller(genericcontroller):
         pass
 
 
-    def collate_owner_and_contrib(self, album):
-        # todo: unit test
-        """
-        Combine owner and contributors into list
-        :param album: album to collate
-        :return: list of owner and contributors
-        """
-        lst = list(album.contributors.all())
-        lst.append(album.owner)
-        return lst
-
-
     def set_accesstype(self, album, type):
         """
         Set access type for an album, only owner can do this
@@ -173,7 +161,7 @@ class albumcontroller(genericcontroller):
         # this may need to be a bit more fleshed out
         # what if owner wants to show to all friends, but contributor only to a group?
         if album.accesstype == ALBUM_ALLFRIENDS:
-            for i in self.collate_owner_and_contrib(album):
+            for i in collate_owner_and_contrib(album):
                 if are_friends(self.uprofile, i):
                     return True
 
@@ -217,3 +205,13 @@ class albumcontroller(genericcontroller):
 
         album.groups.add(group)
         return True
+
+def collate_owner_and_contrib(album):
+    """
+    Combine owner and contributors into list
+    :param album: album to collate
+    :return: list of owner and contributors
+    """
+    lst = list(album.contributors.all())
+    lst.append(album.owner)
+    return lst
