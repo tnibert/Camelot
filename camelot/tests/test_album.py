@@ -196,6 +196,7 @@ class AlbumControllerTests(TestCase):
         Access types are more universal - public, all friends, groups, private
         Groups take effect in the groups access type
         Test takes permission check through full range of relationships
+        Need to test for user not logged in case
         """
         testalbum = self.albumcontrol.create_album("access test", "testing access")
         # owner can view

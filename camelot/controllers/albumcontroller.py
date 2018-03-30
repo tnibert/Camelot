@@ -33,20 +33,57 @@ class albumcontroller(genericcontroller):
         except:
             raise
 
+    def has_permission_to_view(self, album):
+        """
+        Check if the current user has permission to view the specified album
+        :param album: the album who's permissions to check
+        :return: boolean
+        Damn this is some overhead...
+        """
+        # if public, can view
+        if album.accesstype == ALBUM_PUBLIC:
+            return True
+
+        # owner and contributors can view, checks for ALBUM_PRIVATE access type
+        if self.uprofile == album.owner or self.uprofile in album.contributors.all():
+            return True
+
+        # this may need to be a bit more fleshed out
+        # what if owner wants to show to all friends, but contributor only to a group?
+        if album.accesstype == ALBUM_ALLFRIENDS:
+            for i in collate_owner_and_contrib(album):
+                if are_friends(self.uprofile, i):
+                    return True
+
+        elif album.accesstype == ALBUM_GROUPS:
+            # check uprofile against all groups
+            for group in album.groups.all():
+                if is_in_group(group, self.uprofile):
+                    return True
+
+        # if we have not returned True, no access
+        return False
+
     def return_albums(self, profile=None):
         """
-        Need to verify permissions for albums to return
-        :return:
+        Return albums for a given profile, verifying permissions for albums to return
+        Eventually we will want to return albums the profile contributes to as well
+        :return: list of albums
         """
         if profile is None:
             profile = self.uprofile
 
         try:
-            albums = Album.objects.filter(owner=profile)
-            # returns a queryset..
-            return albums
-        except:
-            raise
+            albumset = Album.objects.filter(owner=profile)
+        except Exception as e:
+            raise e
+
+        albums = []
+        for album in albumset:
+            if self.has_permission_to_view(album):
+                albums.append(album)
+
+        return albums
         
     def return_album(self, id):
         """
@@ -141,38 +178,6 @@ class albumcontroller(genericcontroller):
             return True
         else:
             return False
-
-
-    def has_permission_to_view(self, album):
-        """
-        Check if the current user has permission to view the specified album
-        :param album: the album who's permissions to check
-        :return: boolean
-        Damn this is some overhead...
-        """
-        # if public, can view
-        if album.accesstype == ALBUM_PUBLIC:
-            return True
-
-        # owner and contributors can view, checks for ALBUM_PRIVATE access type
-        if self.uprofile == album.owner or self.uprofile in album.contributors.all():
-            return True
-
-        # this may need to be a bit more fleshed out
-        # what if owner wants to show to all friends, but contributor only to a group?
-        if album.accesstype == ALBUM_ALLFRIENDS:
-            for i in collate_owner_and_contrib(album):
-                if are_friends(self.uprofile, i):
-                    return True
-
-        elif album.accesstype == ALBUM_GROUPS:
-            # check uprofile against all groups
-            for group in album.groups.all():
-                if is_in_group(group, self.uprofile):
-                    return True
-
-        # if we have not returned True, no access
-        return False
 
 
     def add_contributor_to_album(self, album, contributor):
