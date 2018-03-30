@@ -153,6 +153,14 @@ class albumcontroller(genericcontroller):
         Prevent adding group to album that is not own or contributor
         :param album:
         :param group:
-        :return:
+        :return: boolean indicating success of failure
         """
+        # if we don't own the group, no bueno
+        if group.owner != self.uprofile:
+            return False
+        # if we aren't owner or contributor to the album, dame dame desu
+        if album.owner != self.uprofile and self.uprofile not in album.contributors.all():
+            return False
+
         album.groups.add(group)
+        return True

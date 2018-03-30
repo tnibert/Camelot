@@ -1,15 +1,15 @@
 from ..controllers.friendcontroller import friendcontroller
-
+from ..controllers.utilities import get_profile_from_uid
 # add friends
 def complete_add_friends(requesterid, requesteeid):
     """
-
-    :param requesterid:
-    :param requesteeid:
+    Execute a full friend request and confirm for testing
+    :param requesterid: userid of requester
+    :param requesteeid: userid of requestee
     :return: friendship object
     """
     friendcontrol1 = friendcontroller(requesterid)
     friendcontrol2 = friendcontroller(requesteeid)
-    fship = friendcontrol1.add(friendcontrol2.profile)
-    friendcontrol2.confirm(friendcontrol1.profile)
+    fship = friendcontrol1.add(get_profile_from_uid(requesteeid))
+    friendcontrol2.confirm(get_profile_from_uid(requesterid))
     return fship

@@ -153,10 +153,29 @@ class AlbumControllerTests(TestCase):
         assert len(testalbum.groups.all()) == 1
 
         # confirm can't add group to another user's album
+        groupcontrol2 = groupcontroller(self.u2.id)
+        testgroup2 = groupcontrol2.create("test group 2")
+
+        assert not self.albumcontrol2.add_group_to_album(testalbum, testgroup2)
+
+        # can't add group we don't own to an album
+        assert not self.albumcontrol.add_group_to_album(testalbum, testgroup2)
+
+        # add friends, but still cannot add group to friend's album
+        complete_add_friends(self.u.id, self.u2.id)
+        assert not self.albumcontrol2.add_group_to_album(testalbum, testgroup)
+
+        assert len(testalbum.groups.all()) == 1
 
         # add as contributor
-
+        self.albumcontrol.add_contributor_to_album(testalbum, self.u2.profile)
         # confirm can add group to other user's album
+        assert self.albumcontrol2.add_group_to_album(testalbum, testgroup2)
+
+        assert testgroup in testalbum.groups.all()
+        assert testgroup2 in testalbum.groups.all()
+        assert len(testalbum.groups.all()) == 2
+
 
 
 
@@ -164,9 +183,6 @@ class AlbumControllerTests(TestCase):
         pass
 
     def test_download_album(self):
-        pass
-
-    def test_add_contributor_to_album(self):
         pass
 
     def test_remove_contributor_from_album(self):
