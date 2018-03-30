@@ -38,6 +38,8 @@ class AlbumControllerTests(TestCase):
         self.albumcontrol = albumcontroller(self.u.id)
         self.albumcontrol2 = albumcontroller(self.u2.id)
 
+        self.groupcontrol = groupcontroller(self.u.id)
+
         self.testdir = "testdir"
 
     def test_get_profile_from_uid(self):
@@ -175,7 +177,6 @@ class AlbumControllerTests(TestCase):
         assert testgroup2 in testalbum.groups.all()
         assert len(testalbum.groups.all()) == 2
 
-
     def test_remove_image_from_album(self):
         pass
 
@@ -188,26 +189,51 @@ class AlbumControllerTests(TestCase):
     def test_get_album_contributors(self):
         pass
 
-    def test_user_can_access(self):
+    def test_user_access(self):
         """
         Permissions check to view album
         We have groups and we have access types
+        Access types are more universal - public, all friends, groups, private
+        Groups take effect in the groups access type
+        Test takes permission check through full range of relationships
         """
         testalbum = self.albumcontrol.create_album("access test", "testing access")
         # owner can view
         assert self.albumcontrol.has_permission_to_view(testalbum)
-        # contributor can view
 
-        # user in access group can view
+        # change access to public
+        self.albumcontrol.set_accesstype(testalbum, ALBUM_PUBLIC)
+        # non friend can view album
+        assert self.albumcontrol2.has_permission_to_view(testalbum)
 
-
-    def test_user_cant_access(self):
-        """
-        Permissions check to not view album
-        """
-        testalbum = self.albumcontrol.create_album("access test", "testing access")
-        # non friend user can't view
+        # change access to all friends, non friend cannot view
+        self.albumcontrol.set_accesstype(testalbum, ALBUM_ALLFRIENDS)
         assert not self.albumcontrol2.has_permission_to_view(testalbum)
+
+        # add friend and can view
+        complete_add_friends(self.u.id, self.u2.id)
+        assert self.albumcontrol2.has_permission_to_view(testalbum)
+
+        # change access to groups, friend cannot view
+        self.albumcontrol.set_accesstype(testalbum, ALBUM_GROUPS)
+        assert not self.albumcontrol2.has_permission_to_view(testalbum)
+
+        # create group, add member, and add group to album
+        # friend will be able to view
+        testgroup = self.groupcontrol.create("test group")
+        self.groupcontrol.add_member(testgroup.id, self.u2.profile)
+        self.albumcontrol.add_group_to_album(testalbum, testgroup)
+        assert self.albumcontrol2.has_permission_to_view(testalbum)
+
+        # set access to private
+        self.albumcontrol.set_accesstype(testalbum, ALBUM_PRIVATE)
+        assert not self.albumcontrol2.has_permission_to_view(testalbum)
+
+        # contributor can view
+        self.albumcontrol.add_contributor_to_album(testalbum, self.u2.profile)
+        assert self.albumcontrol2.has_permission_to_view(testalbum)
+        # owner can view
+        assert self.albumcontrol.has_permission_to_view(testalbum)
 
     def test_collate_owner_and_contrib(self):
         """
