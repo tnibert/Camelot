@@ -7,7 +7,7 @@ from ..controllers.friendcontroller import are_friends
 from ..forms import AlbumCreateForm, UploadPhotoForm, EditAlbumAccesstypeForm, MyGroupSelectForm, AddContributorForm
 from ..constants import *
 from ..controllers.utilities import *
-from ..models import Profile
+from ..models import Profile, FriendGroup
 
 """
 Album views
@@ -144,13 +144,12 @@ def manage_album_permissions(request, albumid):
         "accesstype": ACCESSTYPES[album.accesstype]
     }
 
-    #retdict["accesstypes"] = accesstypes
-
     if album.owner == request.user.profile:
         retdict["accesstypeform"] = EditAlbumAccesstypeForm()
         retdict["addcontributorsform"] = AddContributorForm(request.user.id, album)
 
     if album.accesstype == ALBUM_GROUPS:
+        retdict["groups"] = list(album.groups.all())        # todo: this needs to be changed to only show for current user
         retdict["groupform"] = MyGroupSelectForm(request.user.id, MultipleChoiceField)
 
     return render(request, "camelot/managealbumpermission.html", retdict)
@@ -182,14 +181,43 @@ def update_access_type(request, id):
     return Http404
 
 @login_required
-def update_groups(request, id):
+def add_groups(request, albumid):
     """
-
+    Add a group to an album
     :param request:
-    :param id:
+    :param albumid:
     :return:
     """
-    pass
+    if request.method == 'POST':
+        albumcontrol = albumcontroller(request.user.id)
+        album = albumcontrol.return_album(albumid)
+
+        # only owner or contributors can add a group
+        if albumcontrol.uprofile != album.owner and albumcontrol.uprofile not in album.contributors.all():
+            raise PermissionException
+
+        form = MyGroupSelectForm(request.user.id, MultipleChoiceField, request.POST)
+
+        if form.is_valid():
+            groups = [FriendGroup.objects.get(id=int(x)) for x in form.cleaned_data['idname']]
+            for g in groups:
+                # redundant
+                # ok, error checking is in controller, let's let it do it's job
+                #if albumcontrol.uprofile != g.owner:
+                #    raise PermissionException
+                if g in album.groups.all():
+                    continue
+                else:
+                    try:
+                        # this assert may need to be handled at a higher level depending on what django does
+                        assert albumcontrol.add_group_to_album(album, g)
+                    except Exception as e:
+                        raise PermissionException
+
+        return redirect("manage_album", album.id)
+
+    # if not a post, we 404
+    return Http404
 
 @login_required
 def add_contrib(request, albumid):
@@ -227,7 +255,6 @@ def add_contrib(request, albumid):
                     except Exception as e:
                         raise e
 
-        # if we are in pending requests, we want to redirect to the pending page... hmm... :\
         return redirect("manage_album", album.id)
 
     # if not a post, we 404

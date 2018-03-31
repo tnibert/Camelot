@@ -4,7 +4,10 @@
 <!-- display info -->
 Owner: {{ owner }}<br>
 Contributors: {% for c in contributors %}{{ c }} {% endfor %}<br>
-Who can view: {{ accesstype }}
+Who can view: {{ accesstype }}<br>
+{% if groups %}
+Current groups: {% for g in groups %}{{ g }} {% endfor %}
+{% endif %}
 
 {% if accesstypeform %}
 <h2>Change Access Type</h2>
@@ -24,7 +27,7 @@ Who can view: {{ accesstype }}
 
 {% if groupform %}
 <h2>Add New Group To Album</h2>
-<form action="{% url 'update_album_groups' albumid %}" method="post">
+<form action="{% url 'add_album_groups' albumid %}" method="post">
     {% include 'camelot/genericformtemp.html' with form=groupform %}
     <input type="submit" value="Add Groups" />
 </form>

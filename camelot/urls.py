@@ -26,6 +26,6 @@ urlpatterns = [
     url(r'^add_friend_to_groups/(?P<userid>\d+)/$', group.add_friend_to_group, name="add_friend_to_groups"),
     url(r'^album/(?P<albumid>\d+)/manage$', album.manage_album_permissions, name="manage_album"),
     url(r'^album/(?P<id>\d+)/update_access_type$', album.update_access_type, name="update_album_access"),
-    url(r'^album/(?P<id>\d+)/update_groups$', album.update_groups, name="update_album_groups"),
+    url(r'^album/(?P<albumid>\d+)/add_groups$', album.add_groups, name="add_album_groups"),
     url(r'^album/(?P<albumid>\d+)/add_contributor$', album.add_contrib, name="add_album_contrib"),
 ]
