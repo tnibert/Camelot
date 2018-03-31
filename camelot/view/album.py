@@ -3,9 +3,11 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404
 from django.forms import MultipleChoiceField
 from ..controllers.albumcontroller import albumcontroller
+from ..controllers.friendcontroller import are_friends
 from ..forms import AlbumCreateForm, UploadPhotoForm, EditAlbumAccesstypeForm, MyGroupSelectForm, AddContributorForm
 from ..constants import *
 from ..controllers.utilities import *
+from ..models import Profile
 
 """
 Album views
@@ -192,9 +194,41 @@ def update_groups(request, id):
 @login_required
 def add_contrib(request, albumid):
     """
-
+    Add a contributor to the album
+    This function makes me cry
     :param request:
     :param albumid: album id
-    :return:
+    :return: redirect to album management page or 404 if not post
     """
-    pass
+    if request.method == 'POST':
+        albumcontrol = albumcontroller(request.user.id)
+        album = albumcontrol.return_album(albumid)
+
+        # only owner can add contributors
+        if albumcontrol.uprofile != album.owner:
+            raise PermissionException
+
+        form = AddContributorForm(request.user.id, album, request.POST)
+
+        if form.is_valid():
+            # should this db query be in a controller?  for now we will leave it as this
+            contributors = [Profile.objects.get(id=int(x)) for x in form.cleaned_data['idname']]
+            for c in contributors:
+                # redundant with add_contributor_to_album() ?
+                if not are_friends(c, albumcontrol.uprofile):
+                    raise PermissionException
+
+                if c in album.contributors.all():
+                    continue
+                else:
+                    try:
+                        # this assert may need to be handled at a higher level depending on what django does
+                        assert albumcontrol.add_contributor_to_album(album, c)
+                    except Exception as e:
+                        raise e
+
+        # if we are in pending requests, we want to redirect to the pending page... hmm... :\
+        return redirect("manage_album", album.id)
+
+    # if not a post, we 404
+    return Http404
