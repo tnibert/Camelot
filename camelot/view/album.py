@@ -134,7 +134,7 @@ def manage_album_permissions(request, albumid):
     # may raise permission exception
     album = albumcontrol.return_album(albumid)
 
-    if album.owner != request.user.profile and request.user.profile not in album.contributors:
+    if album.owner != request.user.profile and request.user.profile not in album.contributors.all():
         raise PermissionException
 
     retdict = {
