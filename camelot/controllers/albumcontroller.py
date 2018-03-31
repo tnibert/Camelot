@@ -213,6 +213,9 @@ class albumcontroller(genericcontroller):
         album.groups.add(group)
         return True
 
+    def remove_group_from_album(self, album, group):
+        pass
+
 def collate_owner_and_contrib(album):
     """
     Combine owner and contributors into list

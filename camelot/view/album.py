@@ -1,8 +1,11 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from ..controllers.albumcontroller import albumcontroller, AlreadyExistsException
-from ..forms import AlbumCreateForm, UploadPhotoForm
+from django.http import HttpResponse, Http404
+from django.forms import MultipleChoiceField
+from ..controllers.albumcontroller import albumcontroller
+from ..forms import AlbumCreateForm, UploadPhotoForm, EditAlbumAccesstypeForm, MyGroupSelectForm
+from ..constants import *
+from ..controllers.utilities import *
 
 """
 Album views
@@ -10,7 +13,6 @@ Album views
 
 @login_required
 def create_album(request):
-    # TEST: this *might* be creating 2 of the same album on the first creation, make unit test
 
     # if this is a POST request we need to process the form data
     if request.method == 'POST':        # this all needs to be put in the controller.. maybe
@@ -31,10 +33,8 @@ def create_album(request):
                 albummodel = albumcontrol.create_album(albumname, albumdescription)
             except AlreadyExistsException as e:
                 return render(request, 'camelot/messageloggedin.html', {'message': 'Album name must be unique'})
-                #return HttpResponse('Album name must be unique')
 
             return redirect("show_album", albummodel.id)
-            #return HttpResponse('Created album ' + albummodel.name)
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -58,6 +58,7 @@ def display_album(request, id):
     :param id: id of album (need to validate permissions)
     :return:
     """
+    # todo: add check for permission exception raised
     albumcontrol = albumcontroller(request.user.id)
     album = albumcontrol.return_album(id)
     # query db for photos in album
@@ -104,7 +105,7 @@ def return_photo_file_http(request, photoid):
     albumcontrol = albumcontroller(request.user.id)
     photo = albumcontrol.return_photo(photoid)
 
-    # add in permissions check
+    # todo: add in permissions check
 
     try:
         # this scares me from a memory perspective
@@ -117,3 +118,48 @@ def return_photo_file_http(request, photoid):
         response = HttpResponse(content_type="image/*")
         red.save(response, "JPEG")
         return response
+
+
+@login_required
+def manage_album_permissions(request, albumid):
+    """
+    Page to manage permissions of album
+    Owner should be able to set access type
+    Contributors and owner should be able to set groups (but only own groups)
+    """
+    albumcontrol = albumcontroller(request.user.id)
+
+    # may raise permission exception
+    album = albumcontrol.return_album(albumid)
+
+    if album.owner != request.user.profile and request.user.profile not in album.contributors:
+        raise PermissionException
+
+    retdict = {
+        "owner": album.owner.user.username,
+        "contributors": [contrib.user.username for contrib in list(album.contributors.all())]
+    }
+
+    accesstypes = {ALBUM_PUBLIC: "public",
+                   ALBUM_ALLFRIENDS: "all friends",
+                   ALBUM_GROUPS: "specified groups",
+                   ALBUM_PRIVATE: "owner and contributors"}
+
+    retdict["accesstypes"] = accesstypes
+
+    if album.owner == request.user.profile:
+        retdict["accesstypeform"] = EditAlbumAccesstypeForm()
+
+    if album.accesstype == ALBUM_GROUPS:
+        retdict["groupform"] = MyGroupSelectForm(request.user.id, MultipleChoiceField)
+
+    return render(request, "camelot/managealbumpermission.html", retdict)
+
+@login_required
+def update_access_type(request):
+    pass
+
+@login_required
+def update_groups(request):
+    pass
+

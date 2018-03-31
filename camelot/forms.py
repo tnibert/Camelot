@@ -75,3 +75,6 @@ class MyGroupSelectForm(forms.Form):
         ch = lambda: [(x.id, x.name) for x in control.return_groups()]
         self.fields['idname'] = choicefieldtype(
             label='Group Name', choices=ch)
+
+class EditAlbumAccesstypeForm(forms.Form):
+    pass
