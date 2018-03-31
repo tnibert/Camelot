@@ -135,17 +135,18 @@ def manage_album_permissions(request, albumid):
     if album.owner != request.user.profile and request.user.profile not in album.contributors:
         raise PermissionException
 
-    retdict = {
-        "owner": album.owner.user.username,
-        "contributors": [contrib.user.username for contrib in list(album.contributors.all())]
-    }
-
     accesstypes = {ALBUM_PUBLIC: "public",
                    ALBUM_ALLFRIENDS: "all friends",
                    ALBUM_GROUPS: "specified groups",
                    ALBUM_PRIVATE: "owner and contributors"}
 
-    retdict["accesstypes"] = accesstypes
+    retdict = {
+        "owner": album.owner.user.username,
+        "contributors": [contrib.user.username for contrib in list(album.contributors.all())],
+        "accesstype": accesstypes[album.accesstype]
+    }
+
+    #retdict["accesstypes"] = accesstypes
 
     if album.owner == request.user.profile:
         retdict["accesstypeform"] = EditAlbumAccesstypeForm()
