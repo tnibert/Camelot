@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404
 from django.forms import MultipleChoiceField
 from ..controllers.albumcontroller import albumcontroller
-from ..forms import AlbumCreateForm, UploadPhotoForm, EditAlbumAccesstypeForm, MyGroupSelectForm
+from ..forms import AlbumCreateForm, UploadPhotoForm, EditAlbumAccesstypeForm, MyGroupSelectForm, AddContributorForm
 from ..constants import *
 from ..controllers.utilities import *
 
@@ -146,6 +146,7 @@ def manage_album_permissions(request, albumid):
 
     if album.owner == request.user.profile:
         retdict["accesstypeform"] = EditAlbumAccesstypeForm()
+        retdict["addcontributorsform"] = AddContributorForm(request.user.id, album)
 
     if album.accesstype == ALBUM_GROUPS:
         retdict["groupform"] = MyGroupSelectForm(request.user.id, MultipleChoiceField)
@@ -155,9 +156,9 @@ def manage_album_permissions(request, albumid):
 @login_required
 def update_access_type(request, id):
     """
-
+    Update the access type for a given album
     :param request:
-    :param id:
+    :param id: album id
     :return:
     """
     if request.method == 'POST':
@@ -173,12 +174,27 @@ def update_access_type(request, id):
             atype = int(form.cleaned_data["mytype"])
             print(atype)
             assert atype in ACCESSTYPES.keys()
-            assert albumcontrol.set_accesstype(album, atype)
+            albumcontrol.set_accesstype(album, atype)
             return redirect("manage_album", id)
 
     return Http404
 
 @login_required
 def update_groups(request, id):
+    """
+
+    :param request:
+    :param id:
+    :return:
+    """
     pass
 
+@login_required
+def add_contrib(request, albumid):
+    """
+
+    :param request:
+    :param albumid: album id
+    :return:
+    """
+    pass

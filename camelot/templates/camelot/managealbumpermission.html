@@ -14,8 +14,16 @@ Who can view: {{ accesstype }}
 </form>
 {% endif %}
 
+{% if addcontributorsform %}
+<h2>Add Album Contributors</h2>
+<form action="{% url 'add_album_contrib' albumid %}" method="post">
+    {% include 'camelot/genericformtemp.html' with form=addcontributorsform %}
+    <input type="submit" value="Add Contributor" />
+</form>
+{% endif %}
+
 {% if groupform %}
-<h2>Add New Group</h2>
+<h2>Add New Group To Album</h2>
 <form action="{% url 'update_album_groups' albumid %}" method="post">
     {% include 'camelot/genericformtemp.html' with form=groupform %}
     <input type="submit" value="Add Groups" />

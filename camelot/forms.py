@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from .constants import *
 from .models import FriendGroup
 from .controllers.groupcontroller import groupcontroller
+from .controllers.friendcontroller import friendcontroller
 
 class SignUpForm(UserCreationForm):
     email = forms.EmailField(help_text='Required')
@@ -77,3 +78,19 @@ class EditAlbumAccesstypeForm(forms.Form):
     Form to edit album access type
     """
     mytype = forms.ChoiceField(label="Access Types", choices=ACCESSTYPES.items())
+
+class AddContributorForm(forms.Form):
+
+    def __init__(self, myuid, album, *args, **kwargs):
+        """
+        Form populated by the current user's groups
+        :param myuid: current user's id
+        :param choicefieldtype: Type of field to instantiate.  Valid types are forms.ChoiceField and forms.MultipleChoiceField.
+        :param args:
+        :param kwargs:
+        """
+        super(AddContributorForm, self).__init__(*args, **kwargs)
+        control = friendcontroller(myuid)
+        ch = lambda: [(x.id, x.user.username) for x in control.return_friend_list(control.uprofile) if x not in album.contributors.all()]
+        self.fields['idname'] = forms.MultipleChoiceField(
+            label='New Contributor', choices=ch)
