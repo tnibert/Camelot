@@ -48,17 +48,13 @@ class ManageGroupsForm(forms.Form):
     """
     pass
 
+
 class AddGroupForm(forms.Form):
     """
     Form to add a group
     """
     name = forms.CharField(label='Group Name', max_length=GROUPNAMELEN)
 
-class FriendGroupingForm(forms.Form):
-    """
-    List groups in a scroll box that allows selecting of multiple entries
-    """
-    pass
 
 class MyGroupSelectForm(forms.Form):
 
@@ -77,4 +73,7 @@ class MyGroupSelectForm(forms.Form):
             label='Group Name', choices=ch)
 
 class EditAlbumAccesstypeForm(forms.Form):
-    pass
+    """
+    Form to edit album access type
+    """
+    mytype = forms.ChoiceField(label="Access Types", choices=ACCESSTYPES.items())

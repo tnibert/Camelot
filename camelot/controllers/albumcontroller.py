@@ -33,6 +33,7 @@ class albumcontroller(genericcontroller):
         except:
             raise
 
+    # may want to also add methods for edit permission
     def has_permission_to_view(self, album):
         """
         Check if the current user has permission to view the specified album
@@ -177,6 +178,7 @@ class albumcontroller(genericcontroller):
         """
         if self.uprofile == album.owner and ALBUM_PUBLIC <= type <= ALBUM_PRIVATE and isinstance(type, int):
             album.accesstype = type
+            album.save()
             return True
         else:
             return False
@@ -218,6 +220,15 @@ class albumcontroller(genericcontroller):
 
     def remove_contributor_from_album(self, album, contributor):
         pass
+
+    def return_groups(self, album):
+        """
+        Return all groups for an album
+        :param album:
+        :return: queryset of groups
+        """
+        # todo: unit test
+        return album.groups.all()
 
 def collate_owner_and_contrib(album):
     """

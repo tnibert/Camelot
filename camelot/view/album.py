@@ -15,7 +15,7 @@ Album views
 def create_album(request):
 
     # if this is a POST request we need to process the form data
-    if request.method == 'POST':        # this all needs to be put in the controller.. maybe
+    if request.method == 'POST':
 
         # create a form instance and populate it with data from the request:
         form = AlbumCreateForm(request.POST)
@@ -135,15 +135,11 @@ def manage_album_permissions(request, albumid):
     if album.owner != request.user.profile and request.user.profile not in album.contributors:
         raise PermissionException
 
-    accesstypes = {ALBUM_PUBLIC: "public",
-                   ALBUM_ALLFRIENDS: "all friends",
-                   ALBUM_GROUPS: "specified groups",
-                   ALBUM_PRIVATE: "owner and contributors"}
-
     retdict = {
         "owner": album.owner.user.username,
         "contributors": [contrib.user.username for contrib in list(album.contributors.all())],
-        "accesstype": accesstypes[album.accesstype]
+        "albumid": album.id,
+        "accesstype": ACCESSTYPES[album.accesstype]
     }
 
     #retdict["accesstypes"] = accesstypes
@@ -157,10 +153,32 @@ def manage_album_permissions(request, albumid):
     return render(request, "camelot/managealbumpermission.html", retdict)
 
 @login_required
-def update_access_type(request):
-    pass
+def update_access_type(request, id):
+    """
+
+    :param request:
+    :param id:
+    :return:
+    """
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = EditAlbumAccesstypeForm(request.POST)
+
+        # check whether it's valid:
+        if form.is_valid():
+            albumcontrol = albumcontroller(request.user.id)
+            album = albumcontrol.return_album(id)
+            if album.owner != albumcontrol.uprofile:
+                raise PermissionException
+            atype = int(form.cleaned_data["mytype"])
+            print(atype)
+            assert atype in ACCESSTYPES.keys()
+            assert albumcontrol.set_accesstype(album, atype)
+            return redirect("manage_album", id)
+
+    return Http404
 
 @login_required
-def update_groups(request):
+def update_groups(request, id):
     pass
 

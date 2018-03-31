@@ -6,4 +6,19 @@ Owner: {{ owner }}<br>
 Contributors: {% for c in contributors %}{{ c }} {% endfor %}<br>
 Who can view: {{ accesstype }}
 
+{% if accesstypeform %}
+<h2>Change Access Type</h2>
+<form action="{% url 'update_album_access' albumid %}" method="post">
+    {% include 'camelot/genericformtemp.html' with form=accesstypeform %}
+    <input type="submit" value="Update" />
+</form>
+{% endif %}
+
+{% if groupform %}
+<h2>Add New Group</h2>
+<form action="{% url 'update_album_groups' albumid %}" method="post">
+    {% include 'camelot/genericformtemp.html' with form=groupform %}
+    <input type="submit" value="Add Groups" />
+</form>
+{% endif %}
 {% endblock %}
