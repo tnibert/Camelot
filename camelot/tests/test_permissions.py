@@ -1,13 +1,14 @@
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.contrib.auth.models import User, AnonymousUser
+from django.shortcuts import reverse
 
 from ..controllers.albumcontroller import albumcontroller
 from ..controllers.groupcontroller import groupcontroller
 from ..controllers.utilities import PermissionException
 from ..constants import *
 from ..view import album
-from django.shortcuts import reverse
+from .helperfunctions import complete_add_friends
 
 """
 In this file we need to define what our access permissions need to be
@@ -54,6 +55,12 @@ class AlbumViewPermissionsTest(TestCase):
         - can add/remove own groups
         - can add/remove contributors
         - can add photos to album
+
+    Implemented:
+    - check all view album calls
+    Need to:
+    - check access rights for edit and manage endpoints
+    - check access rights for viewing and uploading photos
     """
     def setUp(self):
         self.credentials = {
@@ -63,11 +70,11 @@ class AlbumViewPermissionsTest(TestCase):
         self.u = User.objects.create_user(**self.credentials)
         self.u.save()
 
-        self.credentials = {
+        self.credentials2 = {
             'username': 'testuser2',
             'email': 'user2@test.com',
             'password': 'secret'}
-        self.u2 = User.objects.create_user(**self.credentials)
+        self.u2 = User.objects.create_user(**self.credentials2)
         self.u2.save()
 
         # send login data
@@ -91,6 +98,7 @@ class AlbumViewPermissionsTest(TestCase):
     def test_not_logged_in(self):
         """
         Can view public album only
+        todo: test can view public photo
         Cannot view other access types
         cannot edit album or upload photos
         Cannot add non logged in user to group
@@ -120,16 +128,154 @@ class AlbumViewPermissionsTest(TestCase):
         # show_photo
 
     def test_logged_in_not_friend(self):
-        pass
+        """
+        Logged in not friend has same permissions as non logged in user
+        """
+
+        response = self.client.post('', self.credentials2, follow=True)
+
+        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PUBLIC)
+        request = self.factory.get(reverse("show_album", kwargs={'id': self.testalbum.id}))
+        request.user = self.u2
+
+        response = album.display_album(request, self.testalbum.id)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_ALLFRIENDS)
+
+        self.assertRaises(PermissionException, album.display_album, request, self.testalbum.id)
+
+        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_GROUPS)
+
+        self.assertRaises(PermissionException, album.display_album, request, self.testalbum.id)
+
+        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PRIVATE)
+
+        self.assertRaises(PermissionException, album.display_album, request, self.testalbum.id)
 
     def test_logged_in_friend_not_in_group(self):
-        pass
+
+        complete_add_friends(self.u.id, self.u2.id)
+
+        response = self.client.post('', self.credentials2, follow=True)
+
+        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PUBLIC)
+        request = self.factory.get(reverse("show_album", kwargs={'id': self.testalbum.id}))
+        request.user = self.u2
+
+        response = album.display_album(request, self.testalbum.id)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_ALLFRIENDS)
+
+        response = album.display_album(request, self.testalbum.id)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_GROUPS)
+
+        self.assertRaises(PermissionException, album.display_album, request, self.testalbum.id)
+
+        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PRIVATE)
+
+        self.assertRaises(PermissionException, album.display_album, request, self.testalbum.id)
 
     def test_logged_in_friend_in_group(self):
-        pass
+        complete_add_friends(self.u.id, self.u2.id)
+        self.groupcontrol.add_member(self.testgroup.id, self.u2.profile)
+
+        response = self.client.post('', self.credentials2, follow=True)
+
+        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PUBLIC)
+        request = self.factory.get(reverse("show_album", kwargs={'id': self.testalbum.id}))
+        request.user = self.u2
+
+        response = album.display_album(request, self.testalbum.id)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_ALLFRIENDS)
+
+        response = album.display_album(request, self.testalbum.id)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_GROUPS)
+
+        response = album.display_album(request, self.testalbum.id)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PRIVATE)
+
+        self.assertRaises(PermissionException, album.display_album, request, self.testalbum.id)
 
     def test_logged_in_contributor(self):
-        pass
+        # add as contributor before adding friend
+        assert not self.albumcontrol.add_contributor_to_album(self.testalbum, self.u2.profile)
+
+        complete_add_friends(self.u.id, self.u2.id)
+
+        assert self.albumcontrol.add_contributor_to_album(self.testalbum, self.u2.profile)
+
+        response = self.client.post('', self.credentials2, follow=True)
+
+        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PUBLIC)
+        request = self.factory.get(reverse("show_album", kwargs={'id': self.testalbum.id}))
+        request.user = self.u2
+
+        response = album.display_album(request, self.testalbum.id)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_ALLFRIENDS)
+
+        response = album.display_album(request, self.testalbum.id)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_GROUPS)
+
+        response = album.display_album(request, self.testalbum.id)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PRIVATE)
+
+        response = album.display_album(request, self.testalbum.id)
+
+        self.assertEqual(response.status_code, 200)
 
     def test_logged_in_owner(self):
-        pass
+        """
+        Login as album creator (owner) and access all access types
+        """
+        response = self.client.post('', self.credentials, follow=True)
+
+        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PUBLIC)
+        request = self.factory.get(reverse("show_album", kwargs={'id': self.testalbum.id}))
+        request.user = self.u
+
+        response = album.display_album(request, self.testalbum.id)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_ALLFRIENDS)
+
+        response = album.display_album(request, self.testalbum.id)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_GROUPS)
+
+        response = album.display_album(request, self.testalbum.id)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PRIVATE)
+
+        response = album.display_album(request, self.testalbum.id)
+
+        self.assertEqual(response.status_code, 200)

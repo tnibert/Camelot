@@ -298,11 +298,11 @@ class AlbumViewTests(TestCase):
         self.u = User.objects.create_user(**self.credentials)
         self.u.save()
 
-        self.credentials = {
+        self.credentials2 = {
             'username': 'testuser2',
             'email': 'user2@test.com',
             'password': 'secret'}
-        self.u2 = User.objects.create_user(**self.credentials)
+        self.u2 = User.objects.create_user(**self.credentials2)
         self.u2.save()
 
         # send login data
@@ -320,7 +320,6 @@ class AlbumViewTests(TestCase):
         request.user = self.u
         request.session = {}
 
-        # Test my_view() as if it were deployed at /customer/details
         response = create_album(request)
 
         self.assertEqual(response.status_code, 200)
