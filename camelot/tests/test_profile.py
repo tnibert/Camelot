@@ -103,21 +103,21 @@ class ProfileViewTestsLoggedIn(TestCase):
     def test_update_profile_post(self):
         """
         Logged in user should be able to update profile information via post
-        This test is broken, we aren't sending a valid csrf token
-        Probably need to get page first, get csrf token from that, then post in same session
+        This is our template for how to test a post
         """
-        #from urllib.parse import urlencode
-        description = "I am a pumpkin"
-        data = {'description': description}
-        #request = self.factory.post(reverse("update_profile"), data=data, content_type="application/x-www-form-urlencoded")
-        request = self.factory.post(reverse("update_profile"), data)
-        request.user = self.u
-        request.session = {}
 
-        response = self.client.post(reverse("update_profile"), data, follow=True)
+        response = self.client.get(reverse('update_profile'))
+
+        myform = response.context['form']
+
+        description = "I am a pumpkin"
+        data = myform.initial
+        data['description'] = description
+
+        response = self.client.post(reverse('update_profile'), data, follow=True)
 
         self.assertEqual(response.status_code, 200)
-        print(self.u.profile.description)
+        self.u.profile.refresh_from_db()
         assert self.u.profile.description == description
 
 class ProfileViewTestsNotLoggedIn(TestCase):
