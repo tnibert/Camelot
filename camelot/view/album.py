@@ -52,7 +52,6 @@ def display_albums(request, userid):
     return render(request, 'camelot/showalbums.html', {'albums': albums})
     # showalbums.html might be able to be made more generic, may repeat in showalbum.html
 
-@login_required
 def display_album(request, id):
     """
 
@@ -96,7 +95,7 @@ def add_photo(request, id):
 
 def return_photo_file_http(request, photoid):
     """
-    wrapper to security show a photo without exposing externally
+    wrapper to securely show a photo without exposing externally
     We must ensure the security of photo.filename, because if this can be messed with our whole filesystem could be vulnerable
     :param request:
     :param uid: id of user profile that uploaded photo
@@ -107,7 +106,9 @@ def return_photo_file_http(request, photoid):
     albumcontrol = albumcontroller(request.user.id)
     photo = albumcontrol.return_photo(photoid)
 
-    # todo: add in permissions check
+    # permission check
+    if not albumcontrol.has_permission_to_view(photo.album):
+        raise PermissionException
 
     try:
         # this scares me from a memory perspective

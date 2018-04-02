@@ -15,6 +15,7 @@ User login and home page
 
 def index(request):
     if request.method == "POST":
+        # do we need to use is_valid() here?
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(username=username, password=password)
