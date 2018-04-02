@@ -83,6 +83,7 @@ class groupcontroller(genericcontroller):
 
         return groups
 
+
 def is_in_group(group, profile):
     """
     Wrapper to check if profile is in group
@@ -90,7 +91,11 @@ def is_in_group(group, profile):
     :param profile: profile to test membership of
     :return: boolean, True is profile is in group, False if not
     """
-    return group.members.all().filter(id=profile.id).exists()
+    if profile:
+        return group.members.all().filter(id=profile.id).exists()
+    # if the user is not logged in profile is None
+    else:
+        return False
 
 def return_group_from_id(id):
     # todo: unit test

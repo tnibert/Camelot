@@ -111,7 +111,6 @@ class AlbumViewPermissionsTest(TestCase):
 
         self.albumcontrol.set_accesstype(self.testalbum, ALBUM_GROUPS)
 
-        # we don't match at this line
         self.assertRaises(PermissionException, album.display_album, request, self.testalbum.id)
 
         self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PRIVATE)
