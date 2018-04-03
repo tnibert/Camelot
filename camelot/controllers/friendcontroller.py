@@ -48,6 +48,7 @@ class friendcontroller(genericcontroller):
             return False
 
         # check that the friendship is unconfirmed and that the current user is the valid requestee
+        # this second clause is probably redundant
         if not relation.confirmed and relation.requestee == self.uprofile:
             relation.confirmed = True
             relation.save()
@@ -56,8 +57,22 @@ class friendcontroller(genericcontroller):
         else:
             return False
 
-    def delete(self):
-        pass
+    def remove(self, profile):
+        """
+        Delete a friend friendship, also deny friend request
+        :param profile: the requester of the friendship to deny
+        :return: boolean, True if friendship does not exist anymore
+        """
+        try:
+            relation = Friendship.objects.get(requester=profile, requestee=self.uprofile)
+        except Friendship.DoesNotExist:
+            return True
+
+        status = relation.delete()
+        if status[0] == 1:
+            return True
+        elif status[0] == 0:
+            return False
 
     def return_friendship_list(self, profile):
         """

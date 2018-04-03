@@ -1,6 +1,8 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 
+from .helperfunctions import complete_add_friends
+
 class FriendGroupControllerTests(TestCase):
 
     """
@@ -66,8 +68,21 @@ class FriendshipTests(FriendGroupControllerTests):
         assert len(myquery) == 1
         # expand this coverage, check that we properly return false
 
+    def test_deny_friend(self):
+        self.friendcontrol.add(self.friend.profile)
+
+        assert self.otherfriendcontrol.remove(self.u.profile)
+
+        self.assertRaises(Friendship.DoesNotExist, Friendship.objects.get, requester=self.friend.profile,
+                          requestee=self.u.profile)
+
     def test_delete_friend(self):
-        pass
+        complete_add_friends(self.u.id, self.friend.id)
+
+        assert self.otherfriendcontrol.remove(self.u.profile)
+
+        self.assertRaises(Friendship.DoesNotExist, Friendship.objects.get, requester=self.friend.profile,
+                          requestee=self.u.profile)
 
     def test_return_friend_list(self):
         # TODO: Expand these unit tests on the train in the morning
