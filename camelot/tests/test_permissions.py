@@ -126,6 +126,17 @@ class AlbumViewPermissionsTest(TestCase):
         self.assertRaises(PermissionException, album.display_album, request, self.testalbum.id)
 
         # show_photo
+        # can't view manage page
+        # can't edit album access type
+        # can't edit contributors to album
+        # can't add photos to album
+        request = self.factory.get(reverse("upload_photos", kwargs={'id': self.testalbum.id}))
+        request.user = AnonymousUser()
+        response = album.add_photo( request, self.testalbum.id)
+        # since we are not logged in, redirects to login page
+        assert response.status_code == 302
+        # may be good to add a post test for upload_photos, even though we have login_required decorator
+        # just to have complete coverage
 
     def test_logged_in_not_friend(self):
         """

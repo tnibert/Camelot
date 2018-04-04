@@ -2,8 +2,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404
 from django.forms import MultipleChoiceField
-from ..controllers.albumcontroller import albumcontroller
+from ..controllers.albumcontroller import albumcontroller, collate_owner_and_contrib
 from ..controllers.friendcontroller import are_friends
+from ..controllers.utilities import PermissionException
 from ..forms import AlbumCreateForm, UploadPhotoForm, EditAlbumAccesstypeForm, MyGroupSelectForm, AddContributorForm
 from ..constants import *
 from ..controllers.utilities import *
@@ -70,23 +71,32 @@ def display_album(request, id):
 @login_required
 def add_photo(request, id):
     """
-    Need to check if user has permission to access this view
+    Add a photo to an album
+    Presents form or processes on POST
     :param request:
     :param id: id of the album to add photo to
     :return:
     """
 
     # https://docs.djangoproject.com/en/2.0/topics/http/file-uploads/
-    # check that user actually has permission to add to this album
+    albumcontrol = albumcontroller(request.user.id)
+    # will raise PermissionException if user does not have permission to view
+    album = albumcontrol.return_album(id)
+    uploaders = collate_owner_and_contrib(album)
+    # check that user actually has permission to add to this album before showing view
+    # this collation and check may be best in its own function
+    if albumcontrol.uprofile not in uploaders or albumcontrol.uprofile is None:
+        raise PermissionException
+
     if request.method == 'POST':
-        albumcontrol = albumcontroller(request.user.id)     # there has to be a better way than redeclaring this every time
-                                                            # probably with class views and sessions?
+
         form = UploadPhotoForm(request.POST, request.FILES)
 
         if form.is_valid():
             photodescription = form.cleaned_data['description']
             for fname, fdat in request.FILES.items():
                 # need to sort out multiple file upload and association with description
+                # this method will check permission
                 albumcontrol.add_photo_to_album(id, photodescription, fdat)
             return redirect("show_album", id)
     else:

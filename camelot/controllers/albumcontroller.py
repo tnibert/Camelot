@@ -122,6 +122,8 @@ class albumcontroller(genericcontroller):
         newphoto.save()
 
         # create filename with primary key
+        # todo: this naming system may create clashes when we start deleting db entries?
+        # will it reuse ids?  I think it will.  But does that matter?  Maybe not..
         fname = 'userphotos/{}/{}/{}'.format(self.uprofile.user.id, album.id, newphoto.id)
 
         # update filename in db now that we have our primary key
