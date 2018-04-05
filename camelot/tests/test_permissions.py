@@ -61,6 +61,8 @@ class AlbumViewPermissionsTest(TestCase):
     Need to:
     - check access rights for edit and manage endpoints
     - check access rights for viewing and uploading photos
+
+    This testcase might need to be split up in the future
     """
     def setUp(self):
         self.credentials = {
@@ -94,11 +96,14 @@ class AlbumViewPermissionsTest(TestCase):
         self.albumcontrol.add_group_to_album(self.testalbum, self.testgroup)
 
         # add photo to album
+        with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
+            self.photo = self.albumcontrol.add_photo_to_album(self.testalbum.id, "our test album", fi)
 
     def test_not_logged_in(self):
         """
         Can view public album only
-        todo: test can view public photo
+        test can view public photo, todo: other permission levels
+        - Photo view inherits permission from album
         Cannot view other access types
         cannot edit album or upload photos
         Cannot add non logged in user to group
@@ -106,11 +111,19 @@ class AlbumViewPermissionsTest(TestCase):
         :return:
         """
         self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PUBLIC)
+
+        # create initial request objects
         request = self.factory.get(reverse("show_album", kwargs={'id': self.testalbum.id}))
         request.user = AnonymousUser()
+        photorequest = self.factory.get(reverse("show_photo", kwargs={'photoid': self.photo.id}))
+        photorequest.user = AnonymousUser()
 
         response = album.display_album(request, self.testalbum.id)
 
+        self.assertEqual(response.status_code, 200)
+
+        # test photo access, public album will be accessible
+        response = album.return_photo_file_http(photorequest, self.photo.id)
         self.assertEqual(response.status_code, 200)
 
         self.albumcontrol.set_accesstype(self.testalbum, ALBUM_ALLFRIENDS)
