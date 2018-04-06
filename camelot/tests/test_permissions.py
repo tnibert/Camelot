@@ -115,7 +115,7 @@ class AlbumViewPermissionsTest(TestCase):
     def test_not_logged_in(self):
         """
         Can view public album only
-        test can view public photo, todo: other permission levels
+        test can view public photo
         - Photo view inherits permission from album
         Cannot view other access types
         cannot edit album or upload photos
@@ -142,16 +142,18 @@ class AlbumViewPermissionsTest(TestCase):
         self.albumcontrol.set_accesstype(self.testalbum, ALBUM_ALLFRIENDS)
 
         self.assertRaises(PermissionException, album.display_album, request, self.testalbum.id)
+        self.assertRaises(PermissionException, album.return_photo_file_http, photorequest, self.photo.id)
 
         self.albumcontrol.set_accesstype(self.testalbum, ALBUM_GROUPS)
 
         self.assertRaises(PermissionException, album.display_album, request, self.testalbum.id)
+        self.assertRaises(PermissionException, album.return_photo_file_http, photorequest, self.photo.id)
 
         self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PRIVATE)
 
         self.assertRaises(PermissionException, album.display_album, request, self.testalbum.id)
+        self.assertRaises(PermissionException, album.return_photo_file_http, photorequest, self.photo.id)
 
-        # show_photo
         # can't view manage page
         # can't edit album access type
         # can't edit contributors to album
