@@ -3,6 +3,9 @@ from django.test.client import RequestFactory
 from django.contrib.auth.models import User, AnonymousUser
 from django.shortcuts import reverse
 
+import os
+import shutil
+
 from ..controllers.albumcontroller import albumcontroller
 from ..controllers.groupcontroller import groupcontroller
 from ..controllers.utilities import PermissionException
@@ -95,9 +98,19 @@ class AlbumViewPermissionsTest(TestCase):
         # add group to album
         self.albumcontrol.add_group_to_album(self.testalbum, self.testgroup)
 
+        self.testdir = "testdir"
+
         # add photo to album
+        if not os.path.exists(self.testdir):
+            os.makedirs(self.testdir)
+        os.chdir(self.testdir)
+
         with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
             self.photo = self.albumcontrol.add_photo_to_album(self.testalbum.id, "our test album", fi)
+
+    def tearDown(self):
+        os.chdir("..")
+        shutil.rmtree(self.testdir)
 
     def test_not_logged_in(self):
         """
