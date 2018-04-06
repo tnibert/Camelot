@@ -112,6 +112,7 @@ class AlbumViewPermissionsTest(TestCase):
         self.showalbumrequest = self.factory.get(reverse("show_album", kwargs={'id': self.testalbum.id}))
         self.photorequest = self.factory.get(reverse("show_photo", kwargs={'photoid': self.photo.id}))
         self.uploadphotorequest = self.factory.get(reverse("upload_photos", kwargs={'id': self.testalbum.id}))
+        # todo: add post upload photo request
 
     def tearDown(self):
         os.chdir("..")
@@ -128,15 +129,15 @@ class AlbumViewPermissionsTest(TestCase):
         :param self:
         :return:
         """
-        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PUBLIC)
 
-        # create initial request objects
-
+        # assign anonymous user to requests
         self.showalbumrequest.user = AnonymousUser()
         self.photorequest.user = AnonymousUser()
+        self.uploadphotorequest.user = AnonymousUser()
+
+        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PUBLIC)
 
         response = album.display_album(self.showalbumrequest, self.testalbum.id)
-
         self.assertEqual(response.status_code, 200)
 
         # test photo access, public album will be accessible
@@ -163,8 +164,7 @@ class AlbumViewPermissionsTest(TestCase):
         # can't edit contributors to album
         # can't add photos to album
 
-        self.uploadphotorequest.user = AnonymousUser()
-        response = album.add_photo( self.uploadphotorequest, self.testalbum.id)
+        response = album.add_photo(self.uploadphotorequest, self.testalbum.id)
         # since we are not logged in, redirects to login page
         assert response.status_code == 302
         # may be good to add a post test for upload_photos, even though we have login_required decorator
@@ -178,24 +178,34 @@ class AlbumViewPermissionsTest(TestCase):
         response = self.client.post('', self.credentials2, follow=True)
 
         self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PUBLIC)
-        request = self.factory.get(reverse("show_album", kwargs={'id': self.testalbum.id}))
-        request.user = self.u2
 
-        response = album.display_album(request, self.testalbum.id)
+        self.showalbumrequest.user = self.u2
+        self.photorequest.user = self.u2
+        self.uploadphotorequest.user = self.u2
 
+        response = album.display_album(self.showalbumrequest, self.testalbum.id)
+        self.assertEqual(response.status_code, 200)
+
+        response = album.return_photo_file_http(self.photorequest, self.photo.id)
         self.assertEqual(response.status_code, 200)
 
         self.albumcontrol.set_accesstype(self.testalbum, ALBUM_ALLFRIENDS)
 
-        self.assertRaises(PermissionException, album.display_album, request, self.testalbum.id)
+        self.assertRaises(PermissionException, album.display_album, self.showalbumrequest, self.testalbum.id)
+        self.assertRaises(PermissionException, album.return_photo_file_http, self.photorequest, self.photo.id)
 
         self.albumcontrol.set_accesstype(self.testalbum, ALBUM_GROUPS)
 
-        self.assertRaises(PermissionException, album.display_album, request, self.testalbum.id)
+        self.assertRaises(PermissionException, album.display_album, self.showalbumrequest, self.testalbum.id)
+        self.assertRaises(PermissionException, album.return_photo_file_http, self.photorequest, self.photo.id)
 
         self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PRIVATE)
 
-        self.assertRaises(PermissionException, album.display_album, request, self.testalbum.id)
+        self.assertRaises(PermissionException, album.display_album, self.showalbumrequest, self.testalbum.id)
+        self.assertRaises(PermissionException, album.return_photo_file_http, self.photorequest, self.photo.id)
+
+        # test get upload photo page
+        self.assertRaises(PermissionException, album.add_photo, self.uploadphotorequest, self.testalbum.id)
 
     def test_logged_in_friend_not_in_group(self):
 
