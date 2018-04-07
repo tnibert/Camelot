@@ -77,12 +77,47 @@ class FriendshipTests(FriendGroupControllerTests):
                           requestee=self.u.profile)
 
     def test_delete_friend(self):
+        # try all combinations of requester and requestee
+        
+        complete_add_friends(self.friend.id, self.u.id)
+
+        assert self.otherfriendcontrol.remove(self.u.profile)
+
+        self.assertRaises(Friendship.DoesNotExist, Friendship.objects.get, requester=self.friend.profile,
+                          requestee=self.u.profile)
+
+        self.assertRaises(Friendship.DoesNotExist, Friendship.objects.get, requester=self.u.profile,
+                          requestee=self.friend.profile)
+
+        complete_add_friends(self.friend.id, self.u.id)
+
+        assert self.friendcontrol.remove(self.friend.profile)
+
+        self.assertRaises(Friendship.DoesNotExist, Friendship.objects.get, requester=self.friend.profile,
+                          requestee=self.u.profile)
+
+        self.assertRaises(Friendship.DoesNotExist, Friendship.objects.get, requester=self.u.profile,
+                          requestee=self.friend.profile)
+
+        complete_add_friends(self.u.id, self.friend.id)
+
+        assert self.friendcontrol.remove(self.friend.profile)
+
+        self.assertRaises(Friendship.DoesNotExist, Friendship.objects.get, requester=self.friend.profile,
+                          requestee=self.u.profile)
+
+        self.assertRaises(Friendship.DoesNotExist, Friendship.objects.get, requester=self.u.profile,
+                          requestee=self.friend.profile)
+
         complete_add_friends(self.u.id, self.friend.id)
 
         assert self.otherfriendcontrol.remove(self.u.profile)
 
         self.assertRaises(Friendship.DoesNotExist, Friendship.objects.get, requester=self.friend.profile,
                           requestee=self.u.profile)
+
+        self.assertRaises(Friendship.DoesNotExist, Friendship.objects.get, requester=self.u.profile,
+                          requestee=self.friend.profile)
 
     def test_return_friend_list(self):
         # TODO: Expand these unit tests on the train in the morning

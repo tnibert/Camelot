@@ -66,7 +66,11 @@ class friendcontroller(genericcontroller):
         try:
             relation = Friendship.objects.get(requester=profile, requestee=self.uprofile)
         except Friendship.DoesNotExist:
-            return True
+            # if that doesn't work, try reverse before deciding friendship doesn't exist
+            try:
+                relation = Friendship.objects.get(requester=self.uprofile, requestee=profile)
+            except Friendship.DoesNotExist:
+                return True
 
         status = relation.delete()
         if status[0] == 1:
@@ -119,6 +123,7 @@ class friendcontroller(genericcontroller):
         :return: list of profiles
         """
         return self.filter_friendships(self.return_friendship_list(profile), profile)
+
 
 def are_friends(profile1, profile2, confirmed=True):
     """
