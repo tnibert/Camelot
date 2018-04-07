@@ -53,6 +53,7 @@ def display_albums(request, userid):
     return render(request, 'camelot/showalbums.html', {'albums': albums})
     # showalbums.html might be able to be made more generic, may repeat in showalbum.html
 
+
 def display_album(request, id):
     """
 
@@ -67,6 +68,35 @@ def display_album(request, id):
     photos = albumcontrol.get_photos_for_album(album)
 
     return render(request, 'camelot/showalbum.html', {'photos': photos, 'album': album})
+
+
+def display_photo(request, photoid):
+    """
+    Display an individual photo in UI
+    Allow circular navigation through all photos in album, so must generate previous and next photo ids
+    :param request:
+    :param photoid:
+    :return:
+    """
+    albumcontrol = albumcontroller(request.user.id)
+    photo = albumcontrol.return_photo(photoid)
+
+    # permission check
+    if not albumcontrol.has_permission_to_view(photo.album):
+        raise PermissionException
+
+    albumphotos = albumcontrol.get_photos_for_album(photo.album)
+
+    # find index of our photo in the queryset
+    i = list(albumphotos.values_list('id', flat=True)).index(int(photoid))
+
+    retdict = {
+        'next': albumphotos[i+1].id if i < (len(albumphotos) - 1) else albumphotos[0].id,
+        'previous': albumphotos[i-1].id if i > 0 else albumphotos[(len(albumphotos)-1)].id,
+        'photo': photo
+    }
+
+    return render(request, 'camelot/presentphoto.html', retdict)
 
 @login_required
 def add_photo(request, id):

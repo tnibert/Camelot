@@ -1,0 +1,18 @@
+{% extends 'camelot/baseloggedin.html' %}
+
+{% block content2 %}
+    <a href="{% url 'show_album' photo.album.id %}">Back To Album</a>
+    <table>
+        <tr>
+            <td><a href="{% url 'present_photo' previous %}">Previous</a></td>
+            <td><img src="{% url 'show_photo' photo.id %}" alt="{{ photo.description }}" ></img></td>
+            <td><a href="{% url 'present_photo' next %}">Next</a></td>
+        </tr>
+        <br>
+        <tr>
+            <td></td>
+            <td class="centerText">{{ photo.description }}</td>
+            <td></td>
+        </tr>
+    </table>
+{% endblock %}

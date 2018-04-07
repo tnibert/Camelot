@@ -149,8 +149,10 @@ class albumcontroller(genericcontroller):
         :param album: album model object, can feed straight from return_album()
         :return: queryset of photos
         Need to add unit test
-        Need to add permissions check?
         """
+        if not self.has_permission_to_view(album):
+            raise PermissionException
+
         try:
             photos = Photo.objects.filter(album=album)
             return photos

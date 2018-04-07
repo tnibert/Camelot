@@ -29,4 +29,5 @@ urlpatterns = [
     url(r'^album/(?P<id>\d+)/update_access_type$', album.update_access_type, name="update_album_access"),
     url(r'^album/(?P<albumid>\d+)/add_groups$', album.add_groups, name="add_album_groups"),
     url(r'^album/(?P<albumid>\d+)/add_contributor$', album.add_contrib, name="add_album_contrib"),
+    url(r'^album/(?P<photoid>\d+)/show_photo$', album.display_photo, name="present_photo"),
 ]
