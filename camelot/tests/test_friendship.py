@@ -204,3 +204,30 @@ class FriendViewTests(TestCase):
 
         self.assertRaises(Friendship.DoesNotExist, Friendship.objects.get, requester=self.u.profile,
                           requestee=self.u2.profile)
+
+    def test_delete_friend(self):
+        complete_add_friends(self.u.id, self.u2.id)
+
+        request = self.client.get(reverse('remove_friend', kwargs={'userid': self.u.id}))
+        request.user = self.u2
+
+        response = friend.delete_friend(request, self.u.id)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRaises(Friendship.DoesNotExist, Friendship.objects.get, requester=self.u.profile,
+                          requestee=self.u2.profile)
+        self.assertRaises(Friendship.DoesNotExist, Friendship.objects.get, requester=self.u2.profile,
+                          requestee=self.u.profile)
+
+        # test the same for the other friend
+        complete_add_friends(self.u.id, self.u2.id)
+
+        request = self.client.get(reverse('remove_friend', kwargs={'userid': self.u2.id}))
+        request.user = self.u
+        response = friend.delete_friend(request, self.u2.id)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRaises(Friendship.DoesNotExist, Friendship.objects.get, requester=self.u.profile,
+                          requestee=self.u2.profile)
+        self.assertRaises(Friendship.DoesNotExist, Friendship.objects.get, requester=self.u2.profile,
+                          requestee=self.u.profile)
