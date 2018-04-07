@@ -7,6 +7,9 @@
         <form action="{% url 'confirm_friend' fship.requester.user.id %}">
             <input type="submit" value="Confirm" />
         </form>
+        <form action="{% url 'remove_friend' fship.requester.user.id %}">
+            <input type="submit" value="Deny" />
+        </form>
         <br><br>
     {% endfor %}
 {% endblock %}

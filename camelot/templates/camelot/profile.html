@@ -3,7 +3,7 @@
 {% if friendstatus == "not friends" %}
 <a href="{% url 'add_friend' uid %}">Add Friend</a><br>
 {% elif friendstatus == "friends" %}
-<a href="">Unfriend</a><br>
+<a href="{% url 'remove_friend' uid %}">Unfriend</a><br>
 {% elif friendstatus == "pending" %}
 Friend request pending<br>
 {% endif %}

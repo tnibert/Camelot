@@ -23,8 +23,14 @@ def confirm_friend(request, userid):
     return redirect("add_friend_to_groups", userid)
 
 @login_required
-def delete_friend(request):
-    pass
+def delete_friend(request, userid):
+    # todo; perhaps add some sort of confirmation
+    friendcontrol = friendcontroller(request.user.id)
+    p = get_profile_from_uid(userid)
+    friendcontrol.remove(p)
+    # todo: remove contributor relationships?
+    # todo: this redirect needs to be made dynamic
+    return redirect("show_pending_requests")
 
 @login_required
 def view_friend_list(request, userid):

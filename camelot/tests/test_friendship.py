@@ -78,7 +78,7 @@ class FriendshipTests(FriendGroupControllerTests):
 
     def test_delete_friend(self):
         # try all combinations of requester and requestee
-        
+
         complete_add_friends(self.friend.id, self.u.id)
 
         assert self.otherfriendcontrol.remove(self.u.profile)
@@ -165,4 +165,7 @@ class FriendshipTests(FriendGroupControllerTests):
         # now we are friends
         assert are_friends(self.friend.profile, self.u.profile)
         assert are_friends(self.u.profile, self.friend.profile)
+
+class FriendViewTests(TestCase):
+    pass
 
