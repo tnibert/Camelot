@@ -1,5 +1,7 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
+from django.test.client import RequestFactory
+from django.shortcuts import reverse
 
 from .helperfunctions import complete_add_friends
 
@@ -166,6 +168,39 @@ class FriendshipTests(FriendGroupControllerTests):
         assert are_friends(self.friend.profile, self.u.profile)
         assert are_friends(self.u.profile, self.friend.profile)
 
-class FriendViewTests(TestCase):
-    pass
+from ..view import friend
 
+class FriendViewTests(TestCase):
+
+    def setUp(self):
+        self.credentials = {
+            'username': 'testuser',
+            'email': 'user@test.com',
+            'password': 'secret'}
+        self.u = User.objects.create_user(**self.credentials)
+        self.u.save()
+
+        self.credentials2 = {
+            'username': 'testuser2',
+            'email': 'user2@test.com',
+            'password': 'secret'}
+        self.u2 = User.objects.create_user(**self.credentials2)
+        self.u2.save()
+
+        self.factory = RequestFactory()
+
+        self.friendcontrol = friendcontroller(self.u.id)
+
+        # login
+        response = self.client.post('', self.credentials2, follow=True)
+
+    def test_deny_friend(self):
+        self.friendcontrol.add(self.u2.profile)
+
+        request = self.client.get(reverse('remove_friend', kwargs={'userid': self.u.id}))
+        request.user = self.u2
+        response = friend.delete_friend(request, self.u.id)
+        self.assertEqual(response.status_code, 302)
+
+        self.assertRaises(Friendship.DoesNotExist, Friendship.objects.get, requester=self.u.profile,
+                          requestee=self.u2.profile)
