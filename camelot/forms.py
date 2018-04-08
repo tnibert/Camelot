@@ -22,15 +22,13 @@ class UploadPhotoForm(forms.Form):
     file = forms.ImageField()        # read django security doc regarding this
                                     # https://docs.djangoproject.com/en/2.0/topics/security/#user-uploaded-content-security
     description = forms.CharField(max_length=MAXPHOTODESC)
-    extra_file_count = forms.CharField(widget=forms.HiddenInput())
-    extra_desc_count = forms.CharField(widget=forms.HiddenInput())
+    extra_field_count = forms.CharField(widget=forms.HiddenInput())
 
     def __init__(self, *args, **kwargs):
         extra_fields = kwargs.pop('extra', 0)
 
         super(UploadPhotoForm, self).__init__(*args, **kwargs)
-        self.fields['extra_file_count'].initial = extra_fields
-        self.fields['extra_desc_count'].initial = extra_fields
+        self.fields['extra_field_count'].initial = extra_fields
 
         for index in range(int(extra_fields)):
             # generate extra fields in the number specified via extra_fields

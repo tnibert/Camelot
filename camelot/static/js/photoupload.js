@@ -7,8 +7,12 @@ $(document).ready(function(){
     $("#add-another").click(function() {
         form_count ++;
 
+        element = $('<input type="file"/>');
+        element.attr('name', 'extra_file_' + form_count);
+        #("#forms").append(element);
+
         element = $('<input type="text"/>');
-        element.attr('name', 'extra_field_' + form_count);
+        element.attr('name', 'extra_desc_' + form_count);
         $("#forms").append(element);
         // build element and append it to our forms container
 
@@ -17,6 +21,15 @@ $(document).ready(function(){
         // that many fields for validation
     })
 });
+
+/*
+<p>
+        <label for="id_file">File:</label><br>
+        <input type="file" name="file" required id="id_file" />
+
+
+      </p>
+*/
 
 // probably wont use this but keeping for now
 function DuplicateIn() {
