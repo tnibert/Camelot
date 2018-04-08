@@ -9,8 +9,8 @@
         <!-- we'll need to limit the number of tds -->
         <tr>
         {% for photo in photos %}
-        <!-- maybe need to somehow proportion width and height -->
-            <td><a href="{% url 'present_photo' photo.id %}"><img src="{% url 'show_photo' photo.id %}" alt="{{ photo.description }}" width="150" height="150"></img></a></td>
+        <!-- need to add more space between photos -->
+            <td><a href="{% url 'present_photo' photo.id %}"><img src="{% url 'show_photo' photo.id %}" alt="{{ photo.description }}" height="150"></img></a></td>
         {% endfor %}
         </tr>
         <tr>
