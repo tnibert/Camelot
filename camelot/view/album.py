@@ -120,7 +120,7 @@ def add_photo(request, id):
 
     if request.method == 'POST':
 
-        form = UploadPhotoForm(request.POST, request.FILES)
+        form = UploadPhotoForm(request.POST, request.FILES, extra=request.POST.get('extra_field_count'))
 
         if form.is_valid():
             photodescription = form.cleaned_data['description']

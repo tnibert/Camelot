@@ -1,7 +1,7 @@
 {% extends 'camelot/baseloggedin.html' %}
 
 {% block content2 %}
-<form action="{% url 'upload_photos' albumid %}" method="post" enctype='multipart/form-data'>
+<form id="uploadphotosform" action="{% url 'upload_photos' albumid %}" method="post" enctype='multipart/form-data'>
     <!-- this following bit is repetitive and will need to be put in a separate file and imported in -->
     <!-- description field will need to be way bigger -->
     {% csrf_token %}
@@ -20,4 +20,7 @@
 
     <input type="submit" value="Submit" />
 </form>
+
+<button id="add-another">add another</button>
+<input type="submit" />
 {% endblock %}
