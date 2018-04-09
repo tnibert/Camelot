@@ -7,14 +7,20 @@ $(document).ready(function(){
     $("#add-another").click(function() {
         form_count ++;
 
+        // build elements and append to our forms container
         element = $('<input type="file"/>');
         element.attr('name', 'extra_file_' + form_count);
-        #("#forms").append(element);
+        $("#forms").append(element);
+
+        element = $('<br>')
+        $("#forms").append(element);
 
         element = $('<input type="text"/>');
         element.attr('name', 'extra_desc_' + form_count);
         $("#forms").append(element);
-        // build element and append it to our forms container
+
+        element = $('<br>')
+        $("#forms").append(element);
 
         $("[name=extra_field_count]").val(form_count);
         // increment form count so our view knows to populate
