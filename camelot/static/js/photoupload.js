@@ -1,28 +1,28 @@
 //https://stackoverflow.com/questions/6142025/dynamically-add-field-to-a-form
 
 $(document).ready(function(){
-    form_count = Number($("[name=extra_field_count]").val());
+    form_count = Number($("[name=field_count]").val())-1;
     // get extra form count so we know what index to use for the next item.
 
     $("#add-another").click(function() {
         form_count ++;
-
+        console.log(form_count)
         // build elements and append to our forms container
         element = $('<input type="file"/>');
-        element.attr('name', 'extra_file_' + form_count);
+        element.attr('name', 'file_' + form_count);
         $("#forms").append(element);
 
         element = $('<br>')
         $("#forms").append(element);
 
         element = $('<input type="text"/>');
-        element.attr('name', 'extra_desc_' + form_count);
+        element.attr('name', 'desc_' + form_count);
         $("#forms").append(element);
 
         element = $('<br>')
         $("#forms").append(element);
 
-        $("[name=extra_field_count]").val(form_count);
+        $("[name=field_count]").val(form_count);
         // increment form count so our view knows to populate
         // that many fields for validation
     })

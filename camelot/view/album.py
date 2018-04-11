@@ -98,6 +98,28 @@ def display_photo(request, photoid):
 
     return render(request, 'camelot/presentphoto.html', retdict)
 
+def pretty_request(request):
+    headers = ''
+    for header, value in request.META.items():
+        if not header.startswith('HTTP'):
+            continue
+        header = '-'.join([h.capitalize() for h in header[5:].lower().split('_')])
+        headers += '{}: {}\n'.format(header, value)
+
+    return (
+        '{method} HTTP/1.1\n'
+        'Content-Length: {content_length}\n'
+        'Content-Type: {content_type}\n'
+        '{headers}\n\n'
+        '{body}'
+    ).format(
+        method=request.method,
+        content_length=request.META['CONTENT_LENGTH'],
+        content_type=request.META['CONTENT_TYPE'],
+        headers=headers,
+        body=None,
+    )
+
 @login_required
 def add_photo(request, id):
     """
@@ -107,7 +129,8 @@ def add_photo(request, id):
     :param id: id of the album to add photo to
     :return:
     """
-
+    #print(pretty_request(request))
+    #print(request.body)
     # https://docs.djangoproject.com/en/2.0/topics/http/file-uploads/
     albumcontrol = albumcontroller(request.user.id)
     # will raise PermissionException if user does not have permission to view
@@ -120,14 +143,23 @@ def add_photo(request, id):
 
     if request.method == 'POST':
 
-        form = UploadPhotoForm(request.POST, request.FILES, extra=request.POST.get('extra_field_count'))
+        form = UploadPhotoForm(request.POST, request.FILES, extra=request.POST.get('field_count'))
 
         if form.is_valid():
-            photodescription = form.cleaned_data['description']
+            # so... right now we always have one less form.num_fields than files O_o
+            photodesc = []
+            for i in range(int(form.num_fields)):
+                print(i)
+                photodesc.append(form.cleaned_data['desc_' + str(i)])
+            print(photodesc)
+            #photodescription = form.cleaned_data['description']
             for fname, fdat in request.FILES.items():
                 # need to sort out multiple file upload and association with description
                 # this method will check permission
-                albumcontrol.add_photo_to_album(id, photodescription, fdat)
+                print(fname)
+                #albumcontrol.add_photo_to_album(id, photodescription, fdat)
+            for index in range(int(form.num_fields)):
+                pass
             return redirect("show_album", id)
     else:
         form = UploadPhotoForm()
