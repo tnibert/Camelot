@@ -136,6 +136,7 @@ def add_photo(request, id):
 
     # todo: add ability to select multiple files in file picker and auto fill form
 
+    print("In View")
     # https://docs.djangoproject.com/en/2.0/topics/http/file-uploads/
     albumcontrol = albumcontroller(request.user.id)
     # will raise PermissionException if user does not have permission to view
@@ -147,15 +148,18 @@ def add_photo(request, id):
         raise PermissionException
 
     if request.method == 'POST':
-
+        print("In View Post")
         form = UploadPhotoForm(request.POST, request.FILES, extra=request.POST.get('field_count'))
-
+        print("Created post form")
+        print("in post, form.num_fields is " + str(form.num_fields))
         if form.is_valid():
+            print("Form valid")
             photodesc = []
             for i in range(int(form.num_fields)+1):
                 photodesc.append(form.cleaned_data['desc_' + str(i)])
-
+            print(photodesc)
             for fname, fdat in request.FILES.items():
+                print(fname)
                 # figure out our index to match description to file
                 index = int(fname.split('_')[1])
                 # this method will check permission

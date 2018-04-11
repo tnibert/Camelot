@@ -25,12 +25,14 @@ class UploadPhotoForm(forms.Form):
     field_count = forms.CharField(widget=forms.HiddenInput())
 
     def __init__(self, *args, **kwargs):
+        print("In Form Init")
         self.num_fields = int(kwargs.pop('extra', 0))
 
         super(UploadPhotoForm, self).__init__(*args, **kwargs)
         self.fields['field_count'].initial = self.num_fields+1
 
         for index in range(int(self.num_fields)+1):
+            print("In form for loop index " + str(index))
             # generate extra fields in the number specified via extra_fields
             self.fields['file_{index}'.format(index=index)] = \
                 forms.ImageField()

@@ -3,6 +3,7 @@
 $(document).ready(function(){
     form_count = Number($("[name=field_count]").val())-1;
     // get extra form count so we know what index to use for the next item.
+    console.log(form_count)
 
     $("#add-another").click(function() {
         form_count ++;
