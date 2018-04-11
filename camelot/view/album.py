@@ -148,7 +148,7 @@ def add_photo(request, id):
         if form.is_valid():
             # so... right now we always have one less form.num_fields than files O_o
             photodesc = []
-            for i in range(int(form.num_fields)):
+            for i in range(int(form.num_fields)+1):
                 print(i)
                 photodesc.append(form.cleaned_data['desc_' + str(i)])
             print(photodesc)
