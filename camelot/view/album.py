@@ -117,7 +117,7 @@ def pretty_request(request):
         content_length=request.META['CONTENT_LENGTH'],
         content_type=request.META['CONTENT_TYPE'],
         headers=headers,
-        body=None,
+        body=request.body,
     )
 
 @login_required
@@ -129,8 +129,13 @@ def add_photo(request, id):
     :param id: id of the album to add photo to
     :return:
     """
-    #print(pretty_request(request))
-    #print(request.body)
+    # todo: add more checking for correct values,
+    # descriptions and files need to have same number of elements
+    # fname needs to be of correct format
+    # confirm all possible ways the js can be messed with
+
+    # todo: add ability to select multiple files in file picker and auto fill form
+
     # https://docs.djangoproject.com/en/2.0/topics/http/file-uploads/
     albumcontrol = albumcontroller(request.user.id)
     # will raise PermissionException if user does not have permission to view
@@ -146,20 +151,16 @@ def add_photo(request, id):
         form = UploadPhotoForm(request.POST, request.FILES, extra=request.POST.get('field_count'))
 
         if form.is_valid():
-            # so... right now we always have one less form.num_fields than files O_o
             photodesc = []
             for i in range(int(form.num_fields)+1):
-                print(i)
                 photodesc.append(form.cleaned_data['desc_' + str(i)])
-            print(photodesc)
-            #photodescription = form.cleaned_data['description']
+
             for fname, fdat in request.FILES.items():
-                # need to sort out multiple file upload and association with description
+                # figure out our index to match description to file
+                index = int(fname.split('_')[1])
                 # this method will check permission
-                print(fname)
-                #albumcontrol.add_photo_to_album(id, photodescription, fdat)
-            for index in range(int(form.num_fields)):
-                pass
+                albumcontrol.add_photo_to_album(id, photodesc[index], fdat)
+
             return redirect("show_album", id)
     else:
         form = UploadPhotoForm()
