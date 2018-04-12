@@ -3,11 +3,11 @@
 $(document).ready(function(){
     form_count = Number($("[name=extra_field_count]").val());
     // get extra form count so we know what index to use for the next item.
-    console.log(form_count)
+    //console.log(form_count)
 
     $("#add-another").click(function() {
         form_count ++;
-        console.log(form_count)
+        //console.log(form_count)
         // build elements and append to our forms container
         element = $('<input type="file"/>');
         element.attr('name', 'file_' + form_count);
