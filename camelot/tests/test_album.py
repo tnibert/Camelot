@@ -323,3 +323,9 @@ class AlbumViewTests(TestCase):
         response = create_album(request)
 
         self.assertEqual(response.status_code, 200)
+
+    def test_add_photos(self):
+        # test add one photo
+        # test add two
+        # test add three
+        pass
