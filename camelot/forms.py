@@ -22,21 +22,25 @@ class UploadPhotoForm(forms.Form):
     #file = forms.ImageField()        # read django security doc regarding this
                                     # https://docs.djangoproject.com/en/2.0/topics/security/#user-uploaded-content-security
     #description = forms.CharField(max_length=MAXPHOTODESC)
-    field_count = forms.CharField(widget=forms.HiddenInput())
+    extra_field_count = forms.CharField(widget=forms.HiddenInput())
 
     def __init__(self, *args, **kwargs):
         print("In Form Init")
-        self.num_fields = int(kwargs.pop('extra', 0))
+        self.extra_fields = int(kwargs.pop('extra', 0))
 
         super(UploadPhotoForm, self).__init__(*args, **kwargs)
-        self.fields['field_count'].initial = self.num_fields+1
+        self.fields['extra_field_count'].initial = self.extra_fields
 
-        for index in range(int(self.num_fields)+1):
+        self.fields['file_0'] = forms.ImageField()
+        self.fields['desc_0'] = forms.CharField(max_length=MAXPHOTODESC)
+
+        # this loop should only be entered after a post with extra fields
+        for index in range(int(self.extra_fields)):
             print("In form for loop index " + str(index))
             # generate extra fields in the number specified via extra_fields
-            self.fields['file_{index}'.format(index=index)] = \
+            self.fields['file_{index}'.format(index=index+1)] = \
                 forms.ImageField()
-            self.fields['desc_{index}'.format(index=index)] = \
+            self.fields['desc_{index}'.format(index=index+1)] = \
                 forms.CharField(max_length=MAXPHOTODESC)
 
 class EditProfileForm(forms.Form):

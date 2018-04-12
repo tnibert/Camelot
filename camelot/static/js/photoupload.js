@@ -1,7 +1,7 @@
 //https://stackoverflow.com/questions/6142025/dynamically-add-field-to-a-form
 
 $(document).ready(function(){
-    form_count = Number($("[name=field_count]").val())-1;
+    form_count = Number($("[name=extra_field_count]").val());
     // get extra form count so we know what index to use for the next item.
     console.log(form_count)
 
@@ -23,7 +23,7 @@ $(document).ready(function(){
         element = $('<br>')
         $("#forms").append(element);
 
-        $("[name=field_count]").val(form_count);
+        $("[name=extra_field_count]").val(form_count);
         // increment form count so our view knows to populate
         // that many fields for validation
     })

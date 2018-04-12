@@ -149,14 +149,18 @@ def add_photo(request, id):
 
     if request.method == 'POST':
         print("In View Post")
-        form = UploadPhotoForm(request.POST, request.FILES, extra=request.POST.get('field_count'))
+        form = UploadPhotoForm(request.POST, request.FILES, extra=request.POST.get('extra_field_count'))
         print("Created post form")
-        print("in post, form.num_fields is " + str(form.num_fields))
+        print("in post, form.extra_fields is " + str(form.extra_fields))
         if form.is_valid():
             print("Form valid")
+            for i, j in form.cleaned_data.items():
+                print(str(i) + " = " + str(j))
             photodesc = []
-            for i in range(int(form.num_fields)+1):
-                photodesc.append(form.cleaned_data['desc_' + str(i)])
+            photodesc.append(form.cleaned_data['desc_0'])
+            for i in range(int(form.extra_fields)):
+                print(i)
+                photodesc.append(form.cleaned_data['desc_' + str(i+1)])
             print(photodesc)
             for fname, fdat in request.FILES.items():
                 print(fname)
