@@ -78,6 +78,8 @@ def display_photo(request, photoid):
     :param photoid:
     :return:
     """
+    # todo: verify what happens if you have only 0, 1, or 2 photos in album
+
     albumcontrol = albumcontroller(request.user.id)
     photo = albumcontrol.return_photo(photoid)
 

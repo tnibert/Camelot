@@ -37,6 +37,8 @@ Check if accessing user is in album's groups
 
 class AlbumViewPermissionsTest(TestCase):
     """
+    OK this test has waaaay too much going on, we need to split this up
+
     This test will go through all possible access cases
     - not logged in
         - can view public album
@@ -113,6 +115,17 @@ class AlbumViewPermissionsTest(TestCase):
         self.photorequest = self.factory.get(reverse("show_photo", kwargs={'photoid': self.photo.id}))
         self.uploadphotorequest = self.factory.get(reverse("upload_photos", kwargs={'id': self.testalbum.id}))
         # todo: add post upload photo request
+        # view manage page
+        self.managepagerequest = self.factory.get(reverse("manage_album", kwargs={'albumid': self.testalbum.id}))
+        # todo: add post
+        # edit album access type
+        #self.updateaccesstyperequest = self.factory.post(reverse("update_album_access"))
+        # edit contributors to album
+        #self.addcontribrequest = self.factory.post(reverse("add_album_contrib"))
+        # edit album groups
+        #self.addgrouprequest = self.factory.post(reverse("add_album_groups"))
+        # individual photo view
+        self.indivphotorequest = self.factory.get(reverse("present_photo", kwargs={'photoid': self.photo.id}))
 
     def tearDown(self):
         os.chdir("..")
@@ -162,8 +175,8 @@ class AlbumViewPermissionsTest(TestCase):
         # can't view manage page
         # can't edit album access type
         # can't edit contributors to album
-        # can't add photos to album
 
+        # can't add photos to album
         response = album.add_photo(self.uploadphotorequest, self.testalbum.id)
         # since we are not logged in, redirects to login page
         assert response.status_code == 302
