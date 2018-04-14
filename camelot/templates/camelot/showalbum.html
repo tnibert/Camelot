@@ -1,10 +1,14 @@
 {% extends 'camelot/baseloggedin.html' %}
 
 {% block content2 %}
-    {% if request.user.profile == album.owner or request.user.profile in album.contributors.all %}
-    <a href="{% url 'upload_photos' album.id %}">Add New Photos</a><br>
-    <a href="{% url 'manage_album' album.id %}">Manage Album Access</a>
-    {% endif %}
+    <ul>
+        {# need to add back nav for album contributors? #}
+        <li><a href="{% url 'show_albums' album.owner.id %}">Back To Albums</a></li>
+        {% if request.user.profile == album.owner or request.user.profile in album.contributors.all %}
+        <li><a href="{% url 'upload_photos' album.id %}">Add New Photos</a></li>
+        <li><a href="{% url 'manage_album' album.id %}">Manage Album Access</a></li>
+        {% endif %}
+    </ul>
         <div>
         {% for photo in photos %}
         <!-- need to add more space between photos -->
