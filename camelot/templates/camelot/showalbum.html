@@ -5,19 +5,15 @@
     <a href="{% url 'upload_photos' album.id %}">Add New Photos</a><br>
     <a href="{% url 'manage_album' album.id %}">Manage Album Access</a>
     {% endif %}
-    <table>
-        <!-- we'll need to limit the number of tds -->
-        <tr>
+        <div>
         {% for photo in photos %}
         <!-- need to add more space between photos -->
-            <td><a href="{% url 'present_photo' photo.id %}"><img src="{% url 'show_photo' photo.id %}" alt="{{ photo.description }}" height="150"></img></a></td>
+            <div class="gallery">
+                <a href="{% url 'present_photo' photo.id %}">
+                    <img src="{% url 'show_photo' photo.id %}" alt="{{ photo.description }}">
+                </a>
+                <div class="desc">{{ photo.description }}</div>
+            </div>
         {% endfor %}
-        </tr>
-        <tr>
-        {% for photo in photos %}
-        <!-- hopefully this is right, test after adding photo upload -->
-        <td>{{ photo.description }}</td>
-        {% endfor %}
-        </tr>
-    </table>
+        </div>
 {% endblock %}
