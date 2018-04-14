@@ -3,7 +3,7 @@
 {% block content2 %}
 {% load staticfiles %}
     <a href="{% url 'show_album' photo.album.id %}">Back To Album</a>
-    <table>
+    <table class="gal-img">
         <tr>
             {# https://www.iconfinder.com/icons/186410/arrow_left_previous_icon#size=256 - free for commercial use #}
             <td><a href="{% url 'present_photo' previous %}"><img src="{% static 'img/arrowleft.svg' %}" alt="Previous"></img></a></td>
