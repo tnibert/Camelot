@@ -63,8 +63,10 @@ Requirements:
 
 class AlbumViewPermissionsTest(TestCase):
     """
-    OK this test has waaaay too much going on, we need to split this up
-    We will only test album viewing here, album management will be in another test
+    OK this test has waaaay too much going on, we need to split this up.
+    We will only test album viewing here, album management will be in another test.
+    We will make a helper function that we pass a request and a view function reference, it then escalates privileges
+    with asserts against the request and function.
 
     This test will go through all possible access cases
 

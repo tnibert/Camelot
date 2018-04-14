@@ -231,3 +231,9 @@ class FriendViewTests(TestCase):
                           requestee=self.u2.profile)
         self.assertRaises(Friendship.DoesNotExist, Friendship.objects.get, requester=self.u2.profile,
                           requestee=self.u.profile)
+
+    def test_delete_friend_groups_removed(self):
+        """
+        Test that when we delete a friend, that friend is no longer in any groups
+        """
+        pass
