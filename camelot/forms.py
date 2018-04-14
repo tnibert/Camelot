@@ -32,6 +32,8 @@ class UploadPhotoForm(forms.Form):
 
         self.fields['file_0'] = forms.ImageField()
         self.fields['desc_0'] = forms.CharField(max_length=MAXPHOTODESC)
+        self.fields['file_0'].label = "File"
+        self.fields['desc_0'].label = "Description"
 
         # this loop should only be entered after a post with extra fields
         for index in range(int(self.extra_fields)):

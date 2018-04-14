@@ -8,12 +8,21 @@ $(document).ready(function(){
     $("#add-another").click(function() {
         form_count ++;
         //console.log(form_count)
+
         // build elements and append to our forms container
+        //enclose = document.create_Element('p')
+
+        element = $('<label>File: </label>');
+        $("#forms").append(element);
+
         element = $('<input type="file"/>');
         element.attr('name', 'file_' + form_count);
         $("#forms").append(element);
 
         element = $('<br>')
+        $("#forms").append(element);
+
+        element = $('<label>Description: </label>');
         $("#forms").append(element);
 
         element = $('<input type="text"/>');
@@ -22,6 +31,8 @@ $(document).ready(function(){
 
         element = $('<br>')
         $("#forms").append(element);
+
+        $("#forms").append($('</p>'));
 
         $("[name=extra_field_count]").val(form_count);
         // increment form count so our view knows to populate
