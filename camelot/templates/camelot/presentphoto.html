@@ -7,7 +7,7 @@
         <tr>
             {# https://www.iconfinder.com/icons/186410/arrow_left_previous_icon#size=256 - free for commercial use #}
             <td><a href="{% url 'present_photo' previous %}"><img src="{% static 'img/arrowleft.svg' %}" alt="Previous"></img></a></td>
-            <td><img src="{% url 'show_photo' photo.id %}" alt="{{ photo.description }}" ></img></td>
+            <td><img id="imgpresent" src="{% url 'show_photo' photo.id %}" alt="{{ photo.description }}" ></img></td>
             <td><a href="{% url 'present_photo' next %}"><img src="{% static 'img/arrowright.svg' %}" alt="Next"></img></a></td>
         </tr>
         <br>
