@@ -31,7 +31,7 @@ class UploadPhotoForm(forms.Form):
         self.fields['extra_field_count'].initial = self.extra_fields
 
         self.fields['file_0'] = forms.ImageField()
-        self.fields['desc_0'] = forms.CharField(max_length=MAXPHOTODESC)
+        self.fields['desc_0'] = forms.CharField(max_length=MAXPHOTODESC, required=False)
         self.fields['file_0'].label = "File"
         self.fields['desc_0'].label = "Description"
 
@@ -42,7 +42,7 @@ class UploadPhotoForm(forms.Form):
             self.fields['file_{index}'.format(index=index+1)] = \
                 forms.ImageField()
             self.fields['desc_{index}'.format(index=index+1)] = \
-                forms.CharField(max_length=MAXPHOTODESC)
+                forms.CharField(max_length=MAXPHOTODESC, required=False)
 
 class EditProfileForm(forms.Form):
     # need to have existing description filled in by default on form display
