@@ -9,12 +9,32 @@ h1 {
 /* these are used in presentphoto.html */
 
 #imgpresent{
-    max-width:100%;
+    max-width:90%;
     max-height:70%;
 }
 
 table.gal-img {
     margin:auto;
+}
+
+#prev{
+    float: left;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 5%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+
+#next{
+    float: right;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    right: 5%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
 }
 
 /* these are used in showalbum.html */

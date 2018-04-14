@@ -3,18 +3,18 @@
 {% block content2 %}
 {% load staticfiles %}
     <a href="{% url 'show_album' photo.album.id %}">Back To Album</a>
-    <table class="gal-img">
-        <tr>
-            {# https://www.iconfinder.com/icons/186410/arrow_left_previous_icon#size=256 - free for commercial use #}
-            <td><a href="{% url 'present_photo' previous %}"><img src="{% static 'img/arrowleft.svg' %}" alt="Previous"></img></a></td>
-            <td><img id="imgpresent" src="{% url 'show_photo' photo.id %}" alt="{{ photo.description }}" ></img></td>
-            <td><a href="{% url 'present_photo' next %}"><img src="{% static 'img/arrowright.svg' %}" alt="Next"></img></a></td>
-        </tr>
-        <br>
-        <tr>
-            <td></td>
-            <td class="centerText">{{ photo.description }}</td>
-            <td></td>
-        </tr>
-    </table>
+    <div>
+        <a id="prev" href="{% url 'present_photo' previous %}"><img src="{% static 'img/arrowleft.svg' %}" alt="Previous"></a>
+        <table class="gal-img">
+            <tr>
+                {# https://www.iconfinder.com/icons/186410/arrow_left_previous_icon#size=256 - free for commercial use #}
+                <td><img id="imgpresent" src="{% url 'show_photo' photo.id %}" alt="{{ photo.description }}" ></td>
+            </tr>
+            <br>
+            <tr>
+                <td class="centerText">{{ photo.description }}</td>
+            </tr>
+        </table>
+        <a id="next" href="{% url 'present_photo' next %}"><img src="{% static 'img/arrowright.svg' %}" alt="Next"></a>
+    </div>
 {% endblock %}
