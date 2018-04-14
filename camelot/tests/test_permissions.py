@@ -30,16 +30,12 @@ Contributor can always view album
 
 To validate an album:
 Check if accessing user is in album's groups
-"""
 
-#class test_controller_permissions(TestCase):
-#    pass
+Todo:
+    - check access rights for edit and manage endpoints
+    - check access rights for viewing and uploading photos
 
-class AlbumViewPermissionsTest(TestCase):
-    """
-    OK this test has waaaay too much going on, we need to split this up
-
-    This test will go through all possible access cases
+Requirements:
     - not logged in
         - can view public album
     - logged in not friend
@@ -60,14 +56,20 @@ class AlbumViewPermissionsTest(TestCase):
         - can add/remove own groups
         - can add/remove contributors
         - can add photos to album
+"""
+
+#class test_controller_permissions(TestCase):
+#    pass
+
+class AlbumViewPermissionsTest(TestCase):
+    """
+    OK this test has waaaay too much going on, we need to split this up
+    We will only test album viewing here, album management will be in another test
+
+    This test will go through all possible access cases
 
     Implemented:
     - check all view album calls
-    Need to:
-    - check access rights for edit and manage endpoints
-    - check access rights for viewing and uploading photos
-
-    This testcase might need to be split up in the future
     """
     def setUp(self):
         self.credentials = {
@@ -111,6 +113,7 @@ class AlbumViewPermissionsTest(TestCase):
             self.photo = self.albumcontrol.add_photo_to_album(self.testalbum.id, "our test album", fi)
 
         # define requests to test
+        # todo: move not album viewing requests to other unit tests
         self.showalbumrequest = self.factory.get(reverse("show_album", kwargs={'id': self.testalbum.id}))
         self.photorequest = self.factory.get(reverse("show_photo", kwargs={'photoid': self.photo.id}))
         self.uploadphotorequest = self.factory.get(reverse("upload_photos", kwargs={'id': self.testalbum.id}))

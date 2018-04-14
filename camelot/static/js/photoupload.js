@@ -32,7 +32,7 @@ $(document).ready(function(){
         element = $('<br>')
         $("#forms").append(element);
 
-        $("#forms").append($('</p>'));
+        //$("#forms").append($('</p>'));
 
         $("[name=extra_field_count]").val(form_count);
         // increment form count so our view knows to populate
