@@ -10,27 +10,28 @@ $(document).ready(function(){
         //console.log(form_count)
 
         // build elements and append to our forms container
-        //enclose = document.create_Element('p')
+        enclose = $('<p>')
 
         element = $('<label>File: </label>');
-        $("#forms").append(element);
+        enclose.append(element);
 
         element = $('<input type="file"/>');
         element.attr('name', 'file_' + form_count);
-        $("#forms").append(element);
+        enclose.append(element);
 
-        element = $('<br>')
-        $("#forms").append(element);
+        $("#forms").append(enclose);
+
+        // create new p element
+        enclose = $('<p>')
 
         element = $('<label>Description: </label>');
-        $("#forms").append(element);
+        enclose.append(element);
 
         element = $('<input type="text"/>');
         element.attr('name', 'desc_' + form_count);
-        $("#forms").append(element);
+        enclose.append(element);
 
-        element = $('<br>')
-        $("#forms").append(element);
+        $("#forms").append(enclose);
 
         //$("#forms").append($('</p>'));
 
