@@ -63,6 +63,20 @@ class AlbumControllerTests(TestCase):
         assert albums[0].name == "a test title"
         assert albums[0].description == "test description"
 
+    def test_return_contrib_albums(self):
+        """
+        Return a list of albums that the profile contributes to
+        This is currently broken
+        """
+        testalbum = self.albumcontrol.create_album("a test title", "test description")
+        self.albumcontrol.add_contributor_to_album(testalbum, self.u2.profile)
+
+        albums = self.albumcontrol2.return_albums(contrib=True)
+
+        # there's probably some string compare assert for this
+        assert albums[0].name == "a test title"
+        assert albums[0].description == "test description"
+
     def test_return_album(self):
         newalbum = self.albumcontrol.create_album("return album test", "lalala")
         testalbum = self.albumcontrol.return_album(newalbum.id)

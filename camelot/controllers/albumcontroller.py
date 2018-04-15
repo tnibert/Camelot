@@ -65,17 +65,24 @@ class albumcontroller(genericcontroller):
         # if we have not returned True, no access
         return False
 
-    def return_albums(self, profile=None):
+    def return_albums(self, profile=None, contrib=False):
         """
-        Return albums for a given profile, verifying permissions for albums to return
+        Return albums owned or contributed to by a given profile, verifying permissions for albums to return
         Eventually we will want to return albums the profile contributes to as well
+        :param profile: profile to find albums of
+        :param contrib: If true, return albums contributed to, if false, owned
         :return: list of albums
         """
         if profile is None:
             profile = self.uprofile
 
         try:
-            albumset = Album.objects.filter(owner=profile)
+            if contrib:
+                # this is broken right now
+                # need to figure out the right queryset
+                albumset = Album.objects.filter(contributors__in=[profile])
+            else:
+                albumset = Album.objects.filter(owner=profile)
         except Exception as e:
             raise e
 
