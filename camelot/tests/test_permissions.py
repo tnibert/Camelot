@@ -232,6 +232,10 @@ class AlbumPhotoViewPermissionsTest(PermissionTestCase):
         self.perm_escalate_helper(self.albumcontrol, self.photorequest, self.testalbum, self.photo.id,
                                   AnonymousUser(), album.return_photo_file_http, ALBUM_PUBLIC)
 
+        # test individual photo view page
+        self.perm_escalate_helper(self.albumcontrol, self.indivphotorequest, self.testalbum, self.photo.id,
+                                  AnonymousUser(), album.display_photo, ALBUM_PUBLIC)
+
     def test_logged_in_not_friend(self):
         """
         Logged in not friend has same permissions as non logged in user
@@ -248,7 +252,9 @@ class AlbumPhotoViewPermissionsTest(PermissionTestCase):
         self.perm_escalate_helper(self.albumcontrol, self.photorequest, self.testalbum, self.photo.id,
                                   self.u2, album.return_photo_file_http, ALBUM_PUBLIC)
 
-
+        # test individual photo view page
+        self.perm_escalate_helper(self.albumcontrol, self.indivphotorequest, self.testalbum, self.photo.id,
+                                  self.u2, album.display_photo, ALBUM_PUBLIC)
 
     def test_logged_in_friend_not_in_group(self):
         """
@@ -265,6 +271,10 @@ class AlbumPhotoViewPermissionsTest(PermissionTestCase):
         self.perm_escalate_helper(self.albumcontrol, self.photorequest, self.testalbum, self.photo.id,
                                   self.u2, album.return_photo_file_http, ALBUM_ALLFRIENDS)
 
+        # test individual photo view page
+        self.perm_escalate_helper(self.albumcontrol, self.indivphotorequest, self.testalbum, self.photo.id,
+                                  self.u2, album.display_photo, ALBUM_ALLFRIENDS)
+
     def test_logged_in_friend_in_group(self):
         """
         Logged in friend in group should be able to access GROUPS permission
@@ -278,6 +288,10 @@ class AlbumPhotoViewPermissionsTest(PermissionTestCase):
         # test photo view
         self.perm_escalate_helper(self.albumcontrol, self.photorequest, self.testalbum, self.photo.id,
                                   self.u2, album.return_photo_file_http, ALBUM_GROUPS)
+
+        # test individual photo view page
+        self.perm_escalate_helper(self.albumcontrol, self.indivphotorequest, self.testalbum, self.photo.id,
+                                  self.u2, album.display_photo, ALBUM_GROUPS)
 
     def test_logged_in_contributor(self):
         """
@@ -293,6 +307,10 @@ class AlbumPhotoViewPermissionsTest(PermissionTestCase):
         self.perm_escalate_helper(self.albumcontrol, self.photorequest, self.testalbum, self.photo.id,
                                   self.u2, album.return_photo_file_http, ALBUM_PRIVATE)
 
+        # test individual photo view page
+        self.perm_escalate_helper(self.albumcontrol, self.indivphotorequest, self.testalbum, self.photo.id,
+                                  self.u2, album.display_photo, ALBUM_PRIVATE)
+
     def test_logged_in_owner(self):
         """
         Login as album creator (owner) and access all access types
@@ -306,6 +324,10 @@ class AlbumPhotoViewPermissionsTest(PermissionTestCase):
         # test photo view
         self.perm_escalate_helper(self.albumcontrol, self.photorequest, self.testalbum, self.photo.id,
                                   self.u, album.return_photo_file_http, ALBUM_PRIVATE)
+
+        # test individual photo view page
+        self.perm_escalate_helper(self.albumcontrol, self.indivphotorequest, self.testalbum, self.photo.id,
+                                  self.u, album.display_photo, ALBUM_PRIVATE)
 
 
 class test_manage_page_permissions(PermissionTestCase):
