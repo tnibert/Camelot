@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.contrib.auth.models import User, AnonymousUser
 from django.shortcuts import reverse
+from django.http import Http404
 
 import os
 import shutil
@@ -387,9 +388,18 @@ class test_add_remove_album_contrib(PermissionTestCase):
     Only owner can edit contributors
     """
     def setUp(self):
-        #self.addcontribrequest = self.factory.post(reverse("add_album_contrib"))
-        pass
+        super(test_add_remove_album_contrib, self).setUp()
+        self.addcontribpostrequest = self.factory.post(reverse("add_album_contrib", kwargs={"albumid": self.testalbum.id}))
 
+    def test_get(self):
+        """
+        Get will return a 404 under all conditions
+        """
+        self.addcontribgetrequest = self.factory.get(
+            reverse("add_album_contrib", kwargs={"albumid": self.testalbum.id}))
+        self.addcontribgetrequest.user = self.u
+
+        assert album.add_contrib(self.addcontribgetrequest, self.testalbum.id) == Http404
 
 class test_add_remove_groups(PermissionTestCase):
     """
