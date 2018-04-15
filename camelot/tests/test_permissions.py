@@ -220,8 +220,6 @@ class AlbumPhotoViewPermissionsTest(PermissionTestCase):
         Cannot view other access types
         cannot edit album or upload photos
         Cannot add non logged in user to group
-        :param self:
-        :return:
         """
 
         # test show album
@@ -341,6 +339,7 @@ class test_manage_page_permissions(PermissionTestCase):
     def test_post_(self):
         pass
 
+
 class test_upload_photo_permissions(PermissionTestCase):
     def setUp(self):
         super(test_upload_photo_permissions, self).setUp()
@@ -374,10 +373,30 @@ class test_upload_photo_permissions(PermissionTestCase):
         self.make_logged_in_friend_not_in_group()
 
 
-# edit album access type
-#self.updateaccesstyperequest = self.factory.post(reverse("update_album_access"))
-# edit contributors to album
-#self.addcontribrequest = self.factory.post(reverse("add_album_contrib"))
-# edit album groups
-#self.addgrouprequest = self.factory.post(reverse("add_album_groups"))
-# individual photo view
+class test_change_album_accesstype(PermissionTestCase):
+    """
+    Only owner can edit album access type
+    """
+    def setUp(self):
+        #self.updateaccesstyperequest = self.factory.post(reverse("update_album_access"))
+        pass
+
+
+class test_add_remove_album_contrib(PermissionTestCase):
+    """
+    Only owner can edit contributors
+    """
+    def setUp(self):
+        #self.addcontribrequest = self.factory.post(reverse("add_album_contrib"))
+        pass
+
+
+class test_add_remove_groups(PermissionTestCase):
+    """
+    Contributor can add/remove own groups if access type is groups
+    Owner can add/remove own groups
+    """
+    # todo: think about what if owner doesn't want contributors to add groups
+    def setUp(self):
+        #self.addgrouprequest = self.factory.post(reverse("add_album_groups"))
+        pass
