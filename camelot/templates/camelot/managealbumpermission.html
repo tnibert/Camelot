@@ -2,6 +2,7 @@
 {% block content2 %}
 
 <!-- display info -->
+<a href="{% url 'show_album' albumid %}">Back To Album</a><br><br>
 Owner: {{ owner }}<br>
 Contributors: {% for c in contributors %}{{ c }} {% endfor %}<br>
 Who can view: {{ accesstype }}<br>

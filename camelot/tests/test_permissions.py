@@ -186,6 +186,7 @@ class PermissionTestCase(TestCase):
 class AlbumPhotoViewPermissionsTest(PermissionTestCase):
     """
     Test album view and photo view permissions
+    Covers show_album, show_photo, and present_photo
     """
     def setUp(self):
 
@@ -204,7 +205,6 @@ class AlbumPhotoViewPermissionsTest(PermissionTestCase):
         # define requests to test
         self.showalbumrequest = self.factory.get(reverse("show_album", kwargs={'id': self.testalbum.id}))
         self.photorequest = self.factory.get(reverse("show_photo", kwargs={'photoid': self.photo.id}))
-        # todo: add tests for this one
         self.indivphotorequest = self.factory.get(reverse("present_photo", kwargs={'photoid': self.photo.id}))
 
 
