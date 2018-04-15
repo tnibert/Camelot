@@ -61,7 +61,60 @@ Requirements:
 #class test_controller_permissions(TestCase):
 #    pass
 
-class AlbumViewPermissionsTest(TestCase):
+class PermissionTestCase(TestCase):
+
+    def perm_escalate_helper(self, albumcontrol, request, testalbum, id, user, func, level):
+        """
+        Incrementally tighten permissions for album
+        :param albumcontrol: albumcontroller object
+        :param request: request to test against
+        :param id: function arg to test against
+        :param user: user to test against
+        :param func: function matching request
+        :param level: level of access user should have
+                1: public
+                2: all friends
+                3: groups
+                4: private
+                -- defined in constants --
+        """
+        # assign anonymous user to requests
+        request.user = user
+
+        albumcontrol.set_accesstype(testalbum, ALBUM_PUBLIC)
+
+        if level >= ALBUM_PUBLIC:
+            response = func(request, id)
+            self.assertEqual(response.status_code, 200)
+        else:
+            self.assertRaises(PermissionException, func, request, id)
+
+        albumcontrol.set_accesstype(testalbum, ALBUM_ALLFRIENDS)
+
+        if level >= ALBUM_ALLFRIENDS:
+            response = func(request, id)
+            self.assertEqual(response.status_code, 200)
+        else:
+            self.assertRaises(PermissionException, func, request, id)
+
+        albumcontrol.set_accesstype(testalbum, ALBUM_GROUPS)
+
+        if level >= ALBUM_GROUPS:
+            response = func(request, id)
+            self.assertEqual(response.status_code, 200)
+        else:
+            self.assertRaises(PermissionException, func, request, id)
+
+        albumcontrol.set_accesstype(testalbum, ALBUM_PRIVATE)
+
+        if level >= ALBUM_PRIVATE:
+            response = func(request, id)
+            self.assertEqual(response.status_code, 200)
+        else:
+            self.assertRaises(PermissionException, func, request, id)
+
+
+class AlbumViewPermissionsTest(PermissionTestCase):
     """
     OK this test has waaaay too much going on, we need to split this up.
     We will only test album viewing here, album management will be in another test.
@@ -148,40 +201,20 @@ class AlbumViewPermissionsTest(TestCase):
         :return:
         """
 
-        # assign anonymous user to requests
-        self.showalbumrequest.user = AnonymousUser()
-        self.photorequest.user = AnonymousUser()
+        # test show album
+        self.perm_escalate_helper(self.albumcontrol, self.showalbumrequest, self.testalbum, self.testalbum.id,
+                                  AnonymousUser(), album.display_album, ALBUM_PUBLIC)
+
+        # test photo view
+        self.perm_escalate_helper(self.albumcontrol, self.photorequest, self.testalbum, self.photo.id,
+                                  AnonymousUser(), album.return_photo_file_http, ALBUM_PUBLIC)
+
+        # can't add photos to album
+        # assign anonymous user to request
         self.uploadphotorequest.user = AnonymousUser()
 
         self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PUBLIC)
 
-        response = album.display_album(self.showalbumrequest, self.testalbum.id)
-        self.assertEqual(response.status_code, 200)
-
-        # test photo access, public album will be accessible
-        response = album.return_photo_file_http(self.photorequest, self.photo.id)
-        self.assertEqual(response.status_code, 200)
-
-        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_ALLFRIENDS)
-
-        self.assertRaises(PermissionException, album.display_album, self.showalbumrequest, self.testalbum.id)
-        self.assertRaises(PermissionException, album.return_photo_file_http, self.photorequest, self.photo.id)
-
-        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_GROUPS)
-
-        self.assertRaises(PermissionException, album.display_album, self.showalbumrequest, self.testalbum.id)
-        self.assertRaises(PermissionException, album.return_photo_file_http, self.photorequest, self.photo.id)
-
-        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PRIVATE)
-
-        self.assertRaises(PermissionException, album.display_album, self.showalbumrequest, self.testalbum.id)
-        self.assertRaises(PermissionException, album.return_photo_file_http, self.photorequest, self.photo.id)
-
-        # can't view manage page
-        # can't edit album access type
-        # can't edit contributors to album
-
-        # can't add photos to album
         response = album.add_photo(self.uploadphotorequest, self.testalbum.id)
         # since we are not logged in, redirects to login page
         assert response.status_code == 302
@@ -193,97 +226,61 @@ class AlbumViewPermissionsTest(TestCase):
         Logged in not friend has same permissions as non logged in user
         """
 
+        # log in
         response = self.client.post('', self.credentials2, follow=True)
 
-        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PUBLIC)
+        # test show album
+        self.perm_escalate_helper(self.albumcontrol, self.showalbumrequest, self.testalbum, self.testalbum.id,
+                                  self.u2, album.display_album, ALBUM_PUBLIC)
 
-        self.showalbumrequest.user = self.u2
-        self.photorequest.user = self.u2
-        self.uploadphotorequest.user = self.u2
-
-        response = album.display_album(self.showalbumrequest, self.testalbum.id)
-        self.assertEqual(response.status_code, 200)
-
-        response = album.return_photo_file_http(self.photorequest, self.photo.id)
-        self.assertEqual(response.status_code, 200)
-
-        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_ALLFRIENDS)
-
-        self.assertRaises(PermissionException, album.display_album, self.showalbumrequest, self.testalbum.id)
-        self.assertRaises(PermissionException, album.return_photo_file_http, self.photorequest, self.photo.id)
-
-        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_GROUPS)
-
-        self.assertRaises(PermissionException, album.display_album, self.showalbumrequest, self.testalbum.id)
-        self.assertRaises(PermissionException, album.return_photo_file_http, self.photorequest, self.photo.id)
-
-        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PRIVATE)
-
-        self.assertRaises(PermissionException, album.display_album, self.showalbumrequest, self.testalbum.id)
-        self.assertRaises(PermissionException, album.return_photo_file_http, self.photorequest, self.photo.id)
+        # test photo view
+        self.perm_escalate_helper(self.albumcontrol, self.photorequest, self.testalbum, self.photo.id,
+                                  self.u2, album.return_photo_file_http, ALBUM_PUBLIC)
 
         # test get upload photo page
+        self.uploadphotorequest.user = self.u2
+        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PUBLIC)
+
         self.assertRaises(PermissionException, album.add_photo, self.uploadphotorequest, self.testalbum.id)
 
     def test_logged_in_friend_not_in_group(self):
+        """
+        Logged in friend not in group should be able to access ALL_FRIENDS permission
+        """
 
         complete_add_friends(self.u.id, self.u2.id)
 
         response = self.client.post('', self.credentials2, follow=True)
 
-        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PUBLIC)
-        request = self.factory.get(reverse("show_album", kwargs={'id': self.testalbum.id}))
-        request.user = self.u2
+        # test show album
+        self.perm_escalate_helper(self.albumcontrol, self.showalbumrequest, self.testalbum, self.testalbum.id,
+                                  self.u2, album.display_album, ALBUM_ALLFRIENDS)
 
-        response = album.display_album(request, self.testalbum.id)
-
-        self.assertEqual(response.status_code, 200)
-
-        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_ALLFRIENDS)
-
-        response = album.display_album(request, self.testalbum.id)
-
-        self.assertEqual(response.status_code, 200)
-
-        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_GROUPS)
-
-        self.assertRaises(PermissionException, album.display_album, request, self.testalbum.id)
-
-        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PRIVATE)
-
-        self.assertRaises(PermissionException, album.display_album, request, self.testalbum.id)
+        # test photo view
+        self.perm_escalate_helper(self.albumcontrol, self.photorequest, self.testalbum, self.photo.id,
+                                  self.u2, album.return_photo_file_http, ALBUM_ALLFRIENDS)
 
     def test_logged_in_friend_in_group(self):
+        """
+        Logged in friend in group should be able to access GROUPS permission
+        """
         complete_add_friends(self.u.id, self.u2.id)
         self.groupcontrol.add_member(self.testgroup.id, self.u2.profile)
 
         response = self.client.post('', self.credentials2, follow=True)
 
-        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PUBLIC)
-        request = self.factory.get(reverse("show_album", kwargs={'id': self.testalbum.id}))
-        request.user = self.u2
+        # test show album
+        self.perm_escalate_helper(self.albumcontrol, self.showalbumrequest, self.testalbum, self.testalbum.id,
+                                  self.u2, album.display_album, ALBUM_GROUPS)
 
-        response = album.display_album(request, self.testalbum.id)
-
-        self.assertEqual(response.status_code, 200)
-
-        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_ALLFRIENDS)
-
-        response = album.display_album(request, self.testalbum.id)
-
-        self.assertEqual(response.status_code, 200)
-
-        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_GROUPS)
-
-        response = album.display_album(request, self.testalbum.id)
-
-        self.assertEqual(response.status_code, 200)
-
-        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PRIVATE)
-
-        self.assertRaises(PermissionException, album.display_album, request, self.testalbum.id)
+        # test photo view
+        self.perm_escalate_helper(self.albumcontrol, self.photorequest, self.testalbum, self.photo.id,
+                                  self.u2, album.return_photo_file_http, ALBUM_GROUPS)
 
     def test_logged_in_contributor(self):
+        """
+        Contributor can access PRIVATE permission
+        """
         # add as contributor before adding friend
         assert not self.albumcontrol.add_contributor_to_album(self.testalbum, self.u2.profile)
 
@@ -293,31 +290,13 @@ class AlbumViewPermissionsTest(TestCase):
 
         response = self.client.post('', self.credentials2, follow=True)
 
-        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PUBLIC)
-        request = self.factory.get(reverse("show_album", kwargs={'id': self.testalbum.id}))
-        request.user = self.u2
+        # test show album
+        self.perm_escalate_helper(self.albumcontrol, self.showalbumrequest, self.testalbum, self.testalbum.id,
+                                  self.u2, album.display_album, ALBUM_PRIVATE)
 
-        response = album.display_album(request, self.testalbum.id)
-
-        self.assertEqual(response.status_code, 200)
-
-        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_ALLFRIENDS)
-
-        response = album.display_album(request, self.testalbum.id)
-
-        self.assertEqual(response.status_code, 200)
-
-        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_GROUPS)
-
-        response = album.display_album(request, self.testalbum.id)
-
-        self.assertEqual(response.status_code, 200)
-
-        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PRIVATE)
-
-        response = album.display_album(request, self.testalbum.id)
-
-        self.assertEqual(response.status_code, 200)
+        # test photo view
+        self.perm_escalate_helper(self.albumcontrol, self.photorequest, self.testalbum, self.photo.id,
+                                  self.u2, album.return_photo_file_http, ALBUM_PRIVATE)
 
     def test_logged_in_owner(self):
         """
@@ -325,28 +304,11 @@ class AlbumViewPermissionsTest(TestCase):
         """
         response = self.client.post('', self.credentials, follow=True)
 
-        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PUBLIC)
-        request = self.factory.get(reverse("show_album", kwargs={'id': self.testalbum.id}))
-        request.user = self.u
+        # test show album
+        self.perm_escalate_helper(self.albumcontrol, self.showalbumrequest, self.testalbum, self.testalbum.id,
+                                  self.u, album.display_album, ALBUM_PRIVATE)
 
-        response = album.display_album(request, self.testalbum.id)
+        # test photo view
+        self.perm_escalate_helper(self.albumcontrol, self.photorequest, self.testalbum, self.photo.id,
+                                  self.u, album.return_photo_file_http, ALBUM_PRIVATE)
 
-        self.assertEqual(response.status_code, 200)
-
-        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_ALLFRIENDS)
-
-        response = album.display_album(request, self.testalbum.id)
-
-        self.assertEqual(response.status_code, 200)
-
-        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_GROUPS)
-
-        response = album.display_album(request, self.testalbum.id)
-
-        self.assertEqual(response.status_code, 200)
-
-        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PRIVATE)
-
-        response = album.display_album(request, self.testalbum.id)
-
-        self.assertEqual(response.status_code, 200)
