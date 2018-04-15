@@ -62,6 +62,9 @@ Requirements:
 #    pass
 
 class PermissionTestCase(TestCase):
+    """
+    Scaffolding for permissions tests
+    """
     def setUp(self):
         self.credentials = {
             'username': 'testuser',
@@ -93,9 +96,40 @@ class PermissionTestCase(TestCase):
         # add group to album
         self.albumcontrol.add_group_to_album(self.testalbum, self.testgroup)
 
-    def test_logged_in_not_friend(self):
+    def make_logged_in_not_friend(self):
         # log in
         response = self.client.post('', self.credentials2, follow=True)
+
+    def make_logged_in_friend_not_in_group(self):
+
+        complete_add_friends(self.u.id, self.u2.id)
+
+        response = self.client.post('', self.credentials2, follow=True)
+
+    def make_logged_in_friend_in_group(self):
+
+        complete_add_friends(self.u.id, self.u2.id)
+        self.groupcontrol.add_member(self.testgroup.id, self.u2.profile)
+
+        response = self.client.post('', self.credentials2, follow=True)
+
+    def make_logged_in_contributor(self):
+
+        # add as contributor before adding friend
+        # this unit test should be elsewhere
+        assert not self.albumcontrol.add_contributor_to_album(self.testalbum, self.u2.profile)
+
+        complete_add_friends(self.u.id, self.u2.id)
+
+        assert self.albumcontrol.add_contributor_to_album(self.testalbum, self.u2.profile)
+
+        response = self.client.post('', self.credentials2, follow=True)
+
+    def make_logged_in_owner(self):
+        """
+        Login as album creator (owner) and access all access types
+        """
+        response = self.client.post('', self.credentials, follow=True)
 
     def perm_escalate_helper(self, albumcontrol, request, testalbum, id, user, func, level):
         """
@@ -168,20 +202,11 @@ class AlbumPhotoViewPermissionsTest(PermissionTestCase):
             self.photo = self.albumcontrol.add_photo_to_album(self.testalbum.id, "our test album", fi)
 
         # define requests to test
-        # todo: move not album viewing requests to other unit tests
         self.showalbumrequest = self.factory.get(reverse("show_album", kwargs={'id': self.testalbum.id}))
         self.photorequest = self.factory.get(reverse("show_photo", kwargs={'photoid': self.photo.id}))
-
-
-        # todo: add post
-        # edit album access type
-        #self.updateaccesstyperequest = self.factory.post(reverse("update_album_access"))
-        # edit contributors to album
-        #self.addcontribrequest = self.factory.post(reverse("add_album_contrib"))
-        # edit album groups
-        #self.addgrouprequest = self.factory.post(reverse("add_album_groups"))
-        # individual photo view
+        # todo: add tests for this one
         self.indivphotorequest = self.factory.get(reverse("present_photo", kwargs={'photoid': self.photo.id}))
+
 
     def tearDown(self):
         os.chdir("..")
@@ -213,7 +238,7 @@ class AlbumPhotoViewPermissionsTest(PermissionTestCase):
         """
 
         # log in
-        super(AlbumPhotoViewPermissionsTest, self).test_logged_in_not_friend()
+        self.make_logged_in_not_friend()
 
         # test show album
         self.perm_escalate_helper(self.albumcontrol, self.showalbumrequest, self.testalbum, self.testalbum.id,
@@ -230,9 +255,7 @@ class AlbumPhotoViewPermissionsTest(PermissionTestCase):
         Logged in friend not in group should be able to access ALL_FRIENDS permission
         """
 
-        complete_add_friends(self.u.id, self.u2.id)
-
-        response = self.client.post('', self.credentials2, follow=True)
+        self.make_logged_in_friend_not_in_group()
 
         # test show album
         self.perm_escalate_helper(self.albumcontrol, self.showalbumrequest, self.testalbum, self.testalbum.id,
@@ -246,10 +269,7 @@ class AlbumPhotoViewPermissionsTest(PermissionTestCase):
         """
         Logged in friend in group should be able to access GROUPS permission
         """
-        complete_add_friends(self.u.id, self.u2.id)
-        self.groupcontrol.add_member(self.testgroup.id, self.u2.profile)
-
-        response = self.client.post('', self.credentials2, follow=True)
+        self.make_logged_in_friend_in_group()
 
         # test show album
         self.perm_escalate_helper(self.albumcontrol, self.showalbumrequest, self.testalbum, self.testalbum.id,
@@ -263,14 +283,7 @@ class AlbumPhotoViewPermissionsTest(PermissionTestCase):
         """
         Contributor can access PRIVATE permission
         """
-        # add as contributor before adding friend
-        assert not self.albumcontrol.add_contributor_to_album(self.testalbum, self.u2.profile)
-
-        complete_add_friends(self.u.id, self.u2.id)
-
-        assert self.albumcontrol.add_contributor_to_album(self.testalbum, self.u2.profile)
-
-        response = self.client.post('', self.credentials2, follow=True)
+        self.make_logged_in_contributor()
 
         # test show album
         self.perm_escalate_helper(self.albumcontrol, self.showalbumrequest, self.testalbum, self.testalbum.id,
@@ -284,7 +297,7 @@ class AlbumPhotoViewPermissionsTest(PermissionTestCase):
         """
         Login as album creator (owner) and access all access types
         """
-        response = self.client.post('', self.credentials, follow=True)
+        self.make_logged_in_owner()
 
         # test show album
         self.perm_escalate_helper(self.albumcontrol, self.showalbumrequest, self.testalbum, self.testalbum.id,
@@ -327,10 +340,22 @@ class test_upload_photo_permissions(PermissionTestCase):
         # just to have complete coverage
 
     def test_logged_in_not_friend(self):
-        super(test_upload_photo_permissions, self).test_logged_in_not_friend()
+        self.make_logged_in_not_friend()
 
         # test get upload photo page
         self.uploadphotorequest.user = self.u2
         self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PUBLIC)
 
         self.assertRaises(PermissionException, album.add_photo, self.uploadphotorequest, self.testalbum.id)
+
+    def test_logged_in_friend_not_in_group(self):
+        self.make_logged_in_friend_not_in_group()
+
+
+# edit album access type
+#self.updateaccesstyperequest = self.factory.post(reverse("update_album_access"))
+# edit contributors to album
+#self.addcontribrequest = self.factory.post(reverse("add_album_contrib"))
+# edit album groups
+#self.addgrouprequest = self.factory.post(reverse("add_album_groups"))
+# individual photo view
