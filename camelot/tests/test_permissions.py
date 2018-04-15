@@ -62,12 +62,47 @@ Requirements:
 #    pass
 
 class PermissionTestCase(TestCase):
+    def setUp(self):
+        self.credentials = {
+            'username': 'testuser',
+            'email': 'user@test.com',
+            'password': 'secret'}
+        self.u = User.objects.create_user(**self.credentials)
+        self.u.save()
+
+        self.credentials2 = {
+            'username': 'testuser2',
+            'email': 'user2@test.com',
+            'password': 'secret'}
+        self.u2 = User.objects.create_user(**self.credentials2)
+        self.u2.save()
+
+        # send login data
+        # response = self.client.post('', self.credentials, follow=True)
+
+        self.factory = RequestFactory()
+
+        # create album for self.u
+        self.albumcontrol = albumcontroller(self.u.id)
+        self.testalbum = self.albumcontrol.create_album("test name", "test description")
+
+        # create a group for self.u
+        self.groupcontrol = groupcontroller(self.u.id)
+        self.testgroup = self.groupcontrol.create("test group")
+
+        # add group to album
+        self.albumcontrol.add_group_to_album(self.testalbum, self.testgroup)
+
+    def test_logged_in_not_friend(self):
+        # log in
+        response = self.client.post('', self.credentials2, follow=True)
 
     def perm_escalate_helper(self, albumcontrol, request, testalbum, id, user, func, level):
         """
         Incrementally tighten permissions for album
         :param albumcontrol: albumcontroller object
         :param request: request to test against
+        :param testalbum: album to raise permissions of
         :param id: function arg to test against
         :param user: user to test against
         :param func: function matching request
@@ -114,48 +149,13 @@ class PermissionTestCase(TestCase):
             self.assertRaises(PermissionException, func, request, id)
 
 
-class AlbumViewPermissionsTest(PermissionTestCase):
+class AlbumPhotoViewPermissionsTest(PermissionTestCase):
     """
-    OK this test has waaaay too much going on, we need to split this up.
-    We will only test album viewing here, album management will be in another test.
-    We will make a helper function that we pass a request and a view function reference, it then escalates privileges
-    with asserts against the request and function.
-
-    This test will go through all possible access cases
-
-    Implemented:
-    - check all view album calls
+    Test album view and photo view permissions
     """
     def setUp(self):
-        self.credentials = {
-            'username': 'testuser',
-            'email': 'user@test.com',
-            'password': 'secret'}
-        self.u = User.objects.create_user(**self.credentials)
-        self.u.save()
 
-        self.credentials2 = {
-            'username': 'testuser2',
-            'email': 'user2@test.com',
-            'password': 'secret'}
-        self.u2 = User.objects.create_user(**self.credentials2)
-        self.u2.save()
-
-        # send login data
-        #response = self.client.post('', self.credentials, follow=True)
-
-        self.factory = RequestFactory()
-
-        # create album for self.u
-        self.albumcontrol = albumcontroller(self.u.id)
-        self.testalbum = self.albumcontrol.create_album("test name", "test description")
-
-        # create a group for self.u
-        self.groupcontrol = groupcontroller(self.u.id)
-        self.testgroup = self.groupcontrol.create("test group")
-
-        # add group to album
-        self.albumcontrol.add_group_to_album(self.testalbum, self.testgroup)
+        super(AlbumPhotoViewPermissionsTest, self).setUp()
 
         self.testdir = "testdir"
 
@@ -171,10 +171,8 @@ class AlbumViewPermissionsTest(PermissionTestCase):
         # todo: move not album viewing requests to other unit tests
         self.showalbumrequest = self.factory.get(reverse("show_album", kwargs={'id': self.testalbum.id}))
         self.photorequest = self.factory.get(reverse("show_photo", kwargs={'photoid': self.photo.id}))
-        self.uploadphotorequest = self.factory.get(reverse("upload_photos", kwargs={'id': self.testalbum.id}))
-        # todo: add post upload photo request
-        # view manage page
-        self.managepagerequest = self.factory.get(reverse("manage_album", kwargs={'albumid': self.testalbum.id}))
+
+
         # todo: add post
         # edit album access type
         #self.updateaccesstyperequest = self.factory.post(reverse("update_album_access"))
@@ -209,25 +207,13 @@ class AlbumViewPermissionsTest(PermissionTestCase):
         self.perm_escalate_helper(self.albumcontrol, self.photorequest, self.testalbum, self.photo.id,
                                   AnonymousUser(), album.return_photo_file_http, ALBUM_PUBLIC)
 
-        # can't add photos to album
-        # assign anonymous user to request
-        self.uploadphotorequest.user = AnonymousUser()
-
-        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PUBLIC)
-
-        response = album.add_photo(self.uploadphotorequest, self.testalbum.id)
-        # since we are not logged in, redirects to login page
-        assert response.status_code == 302
-        # may be good to add a post test for upload_photos, even though we have login_required decorator
-        # just to have complete coverage
-
     def test_logged_in_not_friend(self):
         """
         Logged in not friend has same permissions as non logged in user
         """
 
         # log in
-        response = self.client.post('', self.credentials2, follow=True)
+        super(AlbumPhotoViewPermissionsTest, self).test_logged_in_not_friend()
 
         # test show album
         self.perm_escalate_helper(self.albumcontrol, self.showalbumrequest, self.testalbum, self.testalbum.id,
@@ -237,11 +223,7 @@ class AlbumViewPermissionsTest(PermissionTestCase):
         self.perm_escalate_helper(self.albumcontrol, self.photorequest, self.testalbum, self.photo.id,
                                   self.u2, album.return_photo_file_http, ALBUM_PUBLIC)
 
-        # test get upload photo page
-        self.uploadphotorequest.user = self.u2
-        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PUBLIC)
 
-        self.assertRaises(PermissionException, album.add_photo, self.uploadphotorequest, self.testalbum.id)
 
     def test_logged_in_friend_not_in_group(self):
         """
@@ -312,3 +294,43 @@ class AlbumViewPermissionsTest(PermissionTestCase):
         self.perm_escalate_helper(self.albumcontrol, self.photorequest, self.testalbum, self.photo.id,
                                   self.u, album.return_photo_file_http, ALBUM_PRIVATE)
 
+
+class test_manage_page_permissions(PermissionTestCase):
+    def setUp(self):
+        super(test_manage_page_permissions, self).setUp()
+        # view manage page
+        self.managepagerequest = self.factory.get(reverse("manage_album", kwargs={'albumid': self.testalbum.id}))
+
+    def test_get_(self):
+        pass
+    def test_post_(self):
+        pass
+
+class test_upload_photo_permissions(PermissionTestCase):
+    def setUp(self):
+        super(test_upload_photo_permissions, self).setUp()
+
+        self.uploadphotorequest = self.factory.get(reverse("upload_photos", kwargs={'id': self.testalbum.id}))
+        # todo: add post upload photo request
+
+    def test_not_logged_in(self):
+        # can't add photos to album
+        # assign anonymous user to request
+        self.uploadphotorequest.user = AnonymousUser()
+
+        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PUBLIC)
+
+        response = album.add_photo(self.uploadphotorequest, self.testalbum.id)
+        # since we are not logged in, redirects to login page
+        assert response.status_code == 302
+        # may be good to add a post test for upload_photos, even though we have login_required decorator
+        # just to have complete coverage
+
+    def test_logged_in_not_friend(self):
+        super(test_upload_photo_permissions, self).test_logged_in_not_friend()
+
+        # test get upload photo page
+        self.uploadphotorequest.user = self.u2
+        self.albumcontrol.set_accesstype(self.testalbum, ALBUM_PUBLIC)
+
+        self.assertRaises(PermissionException, album.add_photo, self.uploadphotorequest, self.testalbum.id)
