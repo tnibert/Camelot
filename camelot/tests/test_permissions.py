@@ -351,7 +351,7 @@ class test_manage_page_permissions(PermissionTestCase):
         # add u2 as contributor
         self.make_logged_in_contributor()
 
-        # test show album
+        # todo: add in a test for correct fields for contributor
         self.perm_escalate_helper(self.albumcontrol, self.managepagerequest, self.testalbum, self.testalbum.id,
                                   self.u2, album.manage_album_permissions, ALBUM_PRIVATE)
         # use u3 as control, not owner or contributor, pass 0 as permission, no access
