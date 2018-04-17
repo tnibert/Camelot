@@ -335,8 +335,29 @@ class test_manage_page_permissions(PermissionTestCase):
         # view manage page
         self.managepagerequest = self.factory.get(reverse("manage_album", kwargs={'albumid': self.testalbum.id}))
 
-    def test_get_(self):
-        pass
+        self.credentials3 = {
+            'username': 'testuser3',
+            'email': 'user3@test.com',
+            'password': 'secret'}
+        self.u3 = User.objects.create_user(**self.credentials3)
+        self.u3.save()
+
+    def test_get(self):
+        """
+        Owner and contributors can access manage page
+        """
+        self.perm_escalate_helper(self.albumcontrol, self.managepagerequest, self.testalbum, self.testalbum.id,
+                                  self.u, album.manage_album_permissions, ALBUM_PRIVATE)
+        # add u2 as contributor
+        self.make_logged_in_contributor()
+
+        # test show album
+        self.perm_escalate_helper(self.albumcontrol, self.managepagerequest, self.testalbum, self.testalbum.id,
+                                  self.u2, album.manage_album_permissions, ALBUM_PRIVATE)
+        # use u3 as control, not owner or contributor, pass 0 as permission, no access
+        self.perm_escalate_helper(self.albumcontrol, self.managepagerequest, self.testalbum, self.testalbum.id,
+                                  self.u3, album.manage_album_permissions, 0)
+
     def test_post_(self):
         pass
 
@@ -390,6 +411,22 @@ class test_add_remove_album_contrib(PermissionTestCase):
     def setUp(self):
         super(test_add_remove_album_contrib, self).setUp()
         self.addcontribpostrequest = self.factory.post(reverse("add_album_contrib", kwargs={"albumid": self.testalbum.id}))
+
+    def test_post(self):
+        """
+        Only owner
+
+        response = self.client.get(reverse('update_profile'))
+
+        myform = response.context['form']
+
+        description = "I am a pumpkin"
+        data = myform.initial
+        data['description'] = description
+
+        response = self.client.post(reverse('update_profile'), data, follow=True)
+        """
+        pass
 
     def test_get(self):
         """
