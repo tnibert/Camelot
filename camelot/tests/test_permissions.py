@@ -358,8 +358,51 @@ class test_manage_page_permissions(PermissionTestCase):
         self.perm_escalate_helper(self.albumcontrol, self.managepagerequest, self.testalbum, self.testalbum.id,
                                   self.u3, album.manage_album_permissions, 0)
 
-    def test_post_(self):
+    def test_post_add_remove_album_contrib(self):
+        """
+        Only owner
+        Example of post test:
+                response = self.client.get(reverse('update_profile'))
+
+                myform = response.context['form']
+
+                description = "I am a pumpkin"
+                data = myform.initial
+                data['description'] = description
+
+                response = self.client.post(reverse('update_profile'), data, follow=True)
+        """
+        self.addcontribpostrequest = self.factory.post(
+            reverse("add_album_contrib", kwargs={"albumid": self.testalbum.id}))
         pass
+
+    def test_post_add_remove_group(self):
+        """
+        Contributor can add/remove own groups if access type is groups
+        Owner can add/remove own groups
+        """
+        # todo: think about what if owner doesn't want contributors to add groups
+        # self.addgrouprequest = self.factory.post(reverse("add_album_groups"))
+        pass
+
+    def test_post_change_access_type(self):
+        """
+        Only owner can edit album access type
+        """
+        # self.updateaccesstyperequest = self.factory.post(reverse("update_album_access"))
+        pass
+
+    def test_get_post_endpoints(self):
+        """
+        Get will return a 404 under all conditions
+        """
+        self.addcontribgetrequest = self.factory.get(
+            reverse("add_album_contrib", kwargs={"albumid": self.testalbum.id}))
+        self.addcontribgetrequest.user = self.u
+
+        assert album.add_contrib(self.addcontribgetrequest, self.testalbum.id) == Http404
+
+        # todo: add gets for change access type and change album groups
 
 
 class test_upload_photo_permissions(PermissionTestCase):
@@ -393,57 +436,3 @@ class test_upload_photo_permissions(PermissionTestCase):
 
     def test_logged_in_friend_not_in_group(self):
         self.make_logged_in_friend_not_in_group()
-
-
-class test_change_album_accesstype(PermissionTestCase):
-    """
-    Only owner can edit album access type
-    """
-    def setUp(self):
-        #self.updateaccesstyperequest = self.factory.post(reverse("update_album_access"))
-        pass
-
-
-class test_add_remove_album_contrib(PermissionTestCase):
-    """
-    Only owner can edit contributors
-    """
-    def setUp(self):
-        super(test_add_remove_album_contrib, self).setUp()
-        self.addcontribpostrequest = self.factory.post(reverse("add_album_contrib", kwargs={"albumid": self.testalbum.id}))
-
-    def test_post(self):
-        """
-        Only owner
-
-        response = self.client.get(reverse('update_profile'))
-
-        myform = response.context['form']
-
-        description = "I am a pumpkin"
-        data = myform.initial
-        data['description'] = description
-
-        response = self.client.post(reverse('update_profile'), data, follow=True)
-        """
-        pass
-
-    def test_get(self):
-        """
-        Get will return a 404 under all conditions
-        """
-        self.addcontribgetrequest = self.factory.get(
-            reverse("add_album_contrib", kwargs={"albumid": self.testalbum.id}))
-        self.addcontribgetrequest.user = self.u
-
-        assert album.add_contrib(self.addcontribgetrequest, self.testalbum.id) == Http404
-
-class test_add_remove_groups(PermissionTestCase):
-    """
-    Contributor can add/remove own groups if access type is groups
-    Owner can add/remove own groups
-    """
-    # todo: think about what if owner doesn't want contributors to add groups
-    def setUp(self):
-        #self.addgrouprequest = self.factory.post(reverse("add_album_groups"))
-        pass
