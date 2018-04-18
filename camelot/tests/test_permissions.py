@@ -7,7 +7,7 @@ from django.http import Http404
 import os
 import shutil
 
-from ..controllers.albumcontroller import albumcontroller
+from ..controllers.albumcontroller import albumcontroller, collate_owner_and_contrib
 from ..controllers.groupcontroller import groupcontroller
 from ..controllers.utilities import PermissionException
 from ..constants import *
@@ -330,6 +330,51 @@ class AlbumPhotoViewPermissionsTest(PermissionTestCase):
 
 
 class test_manage_page_permissions(PermissionTestCase):
+    def manageposttesthelper(self, request, id, user, formname, postdict, func, level):
+        """
+        Test a post endpoint at a given access level
+        :param request: request to test against
+        :param id: function arg to test against
+        :param user: user to test against
+        :param formname: the form to create
+        :param postdict: the data to post
+        :param func: function matching request
+        :param level: level of access user should have
+                1: public
+                2: all friends
+                3: groups
+                4: private
+                -- defined in constants --
+                owner
+
+        Example of post test:
+                response = self.client.get(reverse('update_profile'))
+
+                myform = response.context['form']
+
+                description = "I am a pumpkin"
+                data = myform.initial
+                data['description'] = description
+
+                response = self.client.post(reverse('update_profile'), data, follow=True)
+
+        resp = self.client.get(self.managepagerequest)
+
+        myform = resp.context[formname]
+        data = myform.initial
+        for k,v in postdict.items():
+            data[k] = v
+
+        # apply data to request
+        request.
+
+        if level >= ALBUM_ALLFRIENDS:
+            response = func(request, id)
+            self.assertEqual(response.status_code, 200)
+        else:
+            self.assertRaises(PermissionException, func, request, id)
+        """
+
     def setUp(self):
         super(test_manage_page_permissions, self).setUp()
         # view manage page
@@ -358,22 +403,45 @@ class test_manage_page_permissions(PermissionTestCase):
         self.perm_escalate_helper(self.albumcontrol, self.managepagerequest, self.testalbum, self.testalbum.id,
                                   self.u3, album.manage_album_permissions, 0)
 
-    def test_post_add_remove_album_contrib(self):
+    def test_post_add_album_contrib_as_owner(self):
         """
-        Only owner
-        Example of post test:
-                response = self.client.get(reverse('update_profile'))
-
-                myform = response.context['form']
-
-                description = "I am a pumpkin"
-                data = myform.initial
-                data['description'] = description
-
-                response = self.client.post(reverse('update_profile'), data, follow=True)
+        Owner can add and remove contributors
         """
+        self.make_logged_in_owner()
+
+        # get our manage page with form
+        resp = self.client.get(reverse('manage_album', kwargs={'albumid': self.testalbum.id}))
+
+        # get and populate form
+        myform = resp.context['addcontributorsform']
+        data = myform.initial
+        data['idname'] = self.u2.id
+
+        # construct our post
         self.addcontribpostrequest = self.factory.post(
-            reverse("add_album_contrib", kwargs={"albumid": self.testalbum.id}))
+            reverse("add_album_contrib", kwargs={"albumid": self.testalbum.id}), data=data)
+        self.addcontribpostrequest.user = self.u
+
+        # we do not successfully add because not friends, but still redirect
+        # todo: why did this not raise?
+        resp = album.add_contrib(self.addcontribpostrequest, self.testalbum.id)
+        assert resp.status_code == 302
+        assert not self.u2.profile in collate_owner_and_contrib(self.testalbum)
+
+        # make friends and we will succeed in adding
+        complete_add_friends(self.u.id, self.u2.id)
+
+        resp = album.add_contrib(self.addcontribpostrequest, self.testalbum.id)
+        assert resp.status_code == 302
+        assert self.u2.profile in collate_owner_and_contrib(self.testalbum)
+
+    def test_post_add_album_contrib_as_contrib(self):
+        """
+        Contributor CAN'T add and remove contributors
+        """
+        complete_add_friends(self.u2.id, self.u3.id)
+        self.make_logged_in_contributor()
+        # todo: complete this test
         pass
 
     def test_post_add_remove_group(self):

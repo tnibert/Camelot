@@ -224,7 +224,7 @@ def manage_album_permissions(request, albumid):
         retdict["addcontributorsform"] = AddContributorForm(request.user.id, album)
 
     if album.accesstype == ALBUM_GROUPS:
-        retdict["groups"] = list(album.groups.all())        # todo: this needs to be changed to only show for current user
+        retdict["groups"] = list(album.groups.all())        # todo: specify which user with group
         retdict["groupform"] = MyGroupSelectForm(request.user.id, MultipleChoiceField)
 
     return render(request, "camelot/managealbumpermission.html", retdict)
