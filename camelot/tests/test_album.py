@@ -68,14 +68,20 @@ class AlbumControllerTests(TestCase):
         Return a list of albums that the profile contributes to
         This is currently broken
         """
+        complete_add_friends(self.u.id, self.u2.id)
         testalbum = self.albumcontrol.create_album("a test title", "test description")
-        self.albumcontrol.add_contributor_to_album(testalbum, self.u2.profile)
+        assert self.albumcontrol.add_contributor_to_album(testalbum, self.u2.profile)
+
+        testalbum2 = self.albumcontrol.create_album("another test title", "another test description")
+        assert self.albumcontrol.add_contributor_to_album(testalbum2, self.u2.profile)
 
         albums = self.albumcontrol2.return_albums(contrib=True)
 
         # there's probably some string compare assert for this
         assert albums[0].name == "a test title"
         assert albums[0].description == "test description"
+        assert albums[1].name == "another test title"
+        assert albums[1].description == "another test description"
 
     def test_return_album(self):
         newalbum = self.albumcontrol.create_album("return album test", "lalala")

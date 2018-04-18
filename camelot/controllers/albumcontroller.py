@@ -1,4 +1,4 @@
-from ..models import Album, Photo
+from ..models import Album, Photo, Profile
 from .utilities import *
 from .friendcontroller import are_friends
 from .genericcontroller import genericcontroller
@@ -78,9 +78,7 @@ class albumcontroller(genericcontroller):
 
         try:
             if contrib:
-                # this is broken right now
-                # need to figure out the right queryset
-                albumset = Album.objects.filter(contributors__in=[profile])
+                albumset = Album.objects.filter(contributors__id=profile.id)
             else:
                 albumset = Album.objects.filter(owner=profile)
         except Exception as e:
@@ -206,6 +204,7 @@ class albumcontroller(genericcontroller):
         # check if users are friends?
         if not are_friends(album.owner, contributor):
             return False
+        # todo: what happens if we add a contributor twice?
         album.contributors.add(contributor)
         return True
 
