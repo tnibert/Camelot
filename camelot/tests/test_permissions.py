@@ -330,50 +330,54 @@ class AlbumPhotoViewPermissionsTest(PermissionTestCase):
 
 
 class test_manage_page_permissions(PermissionTestCase):
-    def manageposttesthelper(self, request, id, user, formname, postdict, func, level):
+    def user_escalate_post_test_helper(self, request, user, alb, id, func, level):
         """
-        Test a post endpoint at a given access level
-        :param request: request to test against
-        :param id: function arg to test against
-        :param user: user to test against
-        :param formname: the form to create
-        :param postdict: the data to post
-        :param func: function matching request
-        :param level: level of access user should have
-                1: public
-                2: all friends
-                3: groups
-                4: private
-                -- defined in constants --
-                owner
+        This will be used with manage page post endpoints
+        Maybe pass another function in for additional testing
+        :param request:
+        :param user:
+        :param alb:
+        :param id:
+        :param func:
+        :param level: access level that page should be, private means contributors can access,
+                above that means only owner, below ALBUM_PUBLIC means no access to anyone
+        """
+        # user is not logged in
+        request.user = AnonymousUser()
 
-        Example of post test:
-                response = self.client.get(reverse('update_profile'))
-
-                myform = response.context['form']
-
-                description = "I am a pumpkin"
-                data = myform.initial
-                data['description'] = description
-
-                response = self.client.post(reverse('update_profile'), data, follow=True)
-
-        resp = self.client.get(self.managepagerequest)
-
-        myform = resp.context[formname]
-        data = myform.initial
-        for k,v in postdict.items():
-            data[k] = v
-
-        # apply data to request
-        request.
-
-        if level >= ALBUM_ALLFRIENDS:
+        if ALBUM_PRIVATE >= level >= ALBUM_PUBLIC:
             response = func(request, id)
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 302)
         else:
             self.assertRaises(PermissionException, func, request, id)
-        """
+
+        # user is logged in not friend
+        request.user = user
+        if ALBUM_PRIVATE >= level >= ALBUM_PUBLIC:
+            response = func(request, id)
+            self.assertEqual(response.status_code, 302)
+        else:
+            self.assertRaises(PermissionException, func, request, id)
+
+        # user is logged in friend
+        complete_add_friends(user, alb.owner)
+        if ALBUM_PRIVATE >= level >= ALBUM_ALLFRIENDS:
+            response = func(request, id)
+            self.assertEqual(response.status_code, 302)
+        else:
+            self.assertRaises(PermissionException, func, request, id)
+
+        # user is in group
+
+        # user is logged in contributor
+        assert albumcontroller(alb.owner.user.id).add_contributor_to_album(alb, user.profile)
+        if level == ALBUM_PRIVATE:
+            response = func(request, id)
+            self.assertEqual(response.status_code, 302)
+        else:
+            self.assertRaises(PermissionException, func, request, id)
+
+        # user is owner - won't test in this fixture
 
     def setUp(self):
         super(test_manage_page_permissions, self).setUp()
