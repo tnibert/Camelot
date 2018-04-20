@@ -411,7 +411,8 @@ class test_manage_page_permissions(PermissionTestCase):
         # contributor does not obtain addcontributorsform from get
         resp = self.client.get(reverse('manage_album', kwargs={'albumid': self.testalbum.id}))
         assert 'addcontributorsform' not in resp.context.keys()
-        # todo: add tests for additional owner only form fields
+        assert 'accesstypeform' not in resp.context.keys()
+        # todo: elsewhere we need to add testing for group form if the access type is or is not groups
 
         # use u3 as control, not owner or contributor, pass 0 as permission, no access
         self.perm_escalate_helper(self.albumcontrol, self.managepagerequest, self.testalbum, self.testalbum.id,
@@ -459,6 +460,7 @@ class test_manage_page_permissions(PermissionTestCase):
         self.make_logged_in_owner()
 
         # get our manage page with form (use self.u as self.u2 will not obtain the form)
+        # using self.u will not affect our test later because we aren't using the client later
         resp = self.client.get(reverse('manage_album', kwargs={'albumid': self.testalbum.id}))
 
         # get and populate form
