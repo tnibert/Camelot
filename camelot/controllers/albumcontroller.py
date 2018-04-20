@@ -78,7 +78,7 @@ class albumcontroller(genericcontroller):
 
         try:
             if contrib:
-                albumset = Album.objects.filter(contributors__id=profile.id)
+                albumset = Album.objects.filter(contributors=profile)
             else:
                 albumset = Album.objects.filter(owner=profile)
         except Exception as e:

@@ -50,7 +50,14 @@ def create_album(request):
 def display_albums(request, userid):
     albumcontrol = albumcontroller(request.user.id)
     albums = albumcontrol.return_albums(userid)
-    return render(request, 'camelot/showalbums.html', {'albums': albums})
+    contrib = albumcontrol.return_albums(userid, contrib=True)
+    retdict = {}
+    retdict['albums'] = albums
+    # todo: BUG if we go to a contributed album, and then click back to albums,
+    # then the user will navigate to the album owner's page rather than the contributor's
+    if len(contrib) > 0:
+        retdict['contrib'] = contrib
+    return render(request, 'camelot/showalbums.html', retdict)
     # showalbums.html might be able to be made more generic, may repeat in showalbum.html
 
 

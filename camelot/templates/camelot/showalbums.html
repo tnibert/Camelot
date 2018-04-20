@@ -2,17 +2,31 @@
 
 {% block content2 %}
     <table>
-        <!-- we'll need to limit the number of tds -->
         <tr>
         {% for album in albums %}
-            <!-- need to reference url correctly -->
             <td><a href="{% url 'show_album' album.id %}">{{ album.name }}</a></td>
         {% endfor %}
         </tr>
         <tr>
         {% for album in albums %}
-        <td>{{ album.description }}</td>
+            <td>{{ album.description }}</td>
         {% endfor %}
         </tr>
      </table>
+{% if contrib %}
+<br>
+<p>Contributed Albums:</p>
+<table>
+    <tr>
+        {% for album in contrib %}
+            <td><a href="{% url 'show_album' album.id %}">{{ album.name }}</a></td>
+        {% endfor %}
+        </tr>
+        <tr>
+        {% for album in contrib %}
+            <td>{{ album.description }}</td>
+        {% endfor %}
+        </tr>
+</table>
+{% endif %}
 {% endblock %}
