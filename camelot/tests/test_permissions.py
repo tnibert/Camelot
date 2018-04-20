@@ -343,13 +343,18 @@ class test_manage_page_permissions(PermissionTestCase):
                 above that means only owner, below ALBUM_PUBLIC means no access to anyone
         """
         # user is not logged in
+        # all post endpoints should have login_required decorator
         request.user = AnonymousUser()
 
         if ALBUM_PRIVATE >= level >= ALBUM_PUBLIC:
             response = func(request, id)
             self.assertEqual(response.status_code, 302)
         else:
-            self.assertRaises(PermissionException, func, request, id)
+            # this is caught by the login_required decorator
+            response = func(request, id)
+            # confirm redirect to login page
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(response.url[:7], "/?next=")
 
         # user is logged in not friend
         request.user = user
@@ -360,14 +365,14 @@ class test_manage_page_permissions(PermissionTestCase):
             self.assertRaises(PermissionException, func, request, id)
 
         # user is logged in friend
-        complete_add_friends(user, alb.owner)
+        complete_add_friends(user.id, alb.owner.id)
         if ALBUM_PRIVATE >= level >= ALBUM_ALLFRIENDS:
             response = func(request, id)
             self.assertEqual(response.status_code, 302)
         else:
             self.assertRaises(PermissionException, func, request, id)
 
-        # user is in group
+        # todo: user is in group
 
         # user is logged in contributor
         assert albumcontroller(alb.owner.user.id).add_contributor_to_album(alb, user.profile)
@@ -400,12 +405,18 @@ class test_manage_page_permissions(PermissionTestCase):
         # add u2 as contributor
         self.make_logged_in_contributor()
 
-        # todo: add in a test for correct fields for contributor
         self.perm_escalate_helper(self.albumcontrol, self.managepagerequest, self.testalbum, self.testalbum.id,
                                   self.u2, album.manage_album_permissions, ALBUM_PRIVATE)
+
+        # contributor does not obtain addcontributorsform from get
+        resp = self.client.get(reverse('manage_album', kwargs={'albumid': self.testalbum.id}))
+        assert 'addcontributorsform' not in resp.context.keys()
+        # todo: add tests for additional owner only form fields
+
         # use u3 as control, not owner or contributor, pass 0 as permission, no access
         self.perm_escalate_helper(self.albumcontrol, self.managepagerequest, self.testalbum, self.testalbum.id,
                                   self.u3, album.manage_album_permissions, 0)
+
 
     def test_post_add_album_contrib_as_owner(self):
         """
@@ -444,9 +455,25 @@ class test_manage_page_permissions(PermissionTestCase):
         Contributor CAN'T add and remove contributors
         """
         complete_add_friends(self.u2.id, self.u3.id)
-        self.make_logged_in_contributor()
-        # todo: complete this test
-        pass
+
+        self.make_logged_in_owner()
+
+        # get our manage page with form (use self.u as self.u2 will not obtain the form)
+        resp = self.client.get(reverse('manage_album', kwargs={'albumid': self.testalbum.id}))
+
+        # get and populate form
+        myform = resp.context['addcontributorsform']
+        data = myform.initial
+        data['idname'] = self.u3.id
+
+        # construct our post
+        self.addcontribpostrequest = self.factory.post(
+            reverse("add_album_contrib", kwargs={"albumid": self.testalbum.id}), data=data)
+
+        self.user_escalate_post_test_helper(self.addcontribpostrequest, self.u2, self.testalbum, self.testalbum.id,
+                                            album.add_contrib, ALBUM_PRIVATE+1)
+
+
 
     def test_post_add_remove_group(self):
         """
