@@ -475,8 +475,6 @@ class test_manage_page_permissions(PermissionTestCase):
         self.user_escalate_post_test_helper(self.addcontribpostrequest, self.u2, self.testalbum, self.testalbum.id,
                                             album.add_contrib, ALBUM_PRIVATE+1)
 
-
-
     def test_post_add_remove_group(self):
         """
         Contributor can add/remove own groups if access type is groups
@@ -486,11 +484,33 @@ class test_manage_page_permissions(PermissionTestCase):
         # self.addgrouprequest = self.factory.post(reverse("add_album_groups"))
         pass
 
-    def test_post_change_access_type(self):
+    def test_post_change_access_type_as_owner(self):
         """
         Only owner can edit album access type
         """
-        # self.updateaccesstyperequest = self.factory.post(reverse("update_album_access"))
+        assert self.testalbum.accesstype != ALBUM_GROUPS
+        self.make_logged_in_owner()
+
+        # get our manage page with form
+        resp = self.client.get(reverse('manage_album', kwargs={'albumid': self.testalbum.id}))
+
+        # get and populate form
+        myform = resp.context['accesstypeform']
+        data = myform.initial
+        data['mytype'] = ALBUM_GROUPS
+
+        # construct our post
+        self.updateaccesspostrequest = self.factory.post(
+            reverse("update_album_access", kwargs={"id": self.testalbum.id}), data=data)
+        self.updateaccesspostrequest.user = self.u
+
+        # change access type
+        resp = album.update_access_type(self.updateaccesspostrequest, self.testalbum.id)
+        assert resp.status_code == 302
+        self.testalbum.refresh_from_db()
+        assert self.testalbum.accesstype == ALBUM_GROUPS
+
+    def test_post_change_access_type_as_not_owner(self):
         pass
 
     def test_get_post_endpoints(self):

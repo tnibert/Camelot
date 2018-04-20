@@ -234,7 +234,7 @@ def update_access_type(request, id):
             if album.owner != albumcontrol.uprofile:
                 raise PermissionException
             atype = int(form.cleaned_data["mytype"])
-            print(atype)
+
             assert atype in ACCESSTYPES.keys()
             albumcontrol.set_accesstype(album, atype)
             return redirect("manage_album", id)
