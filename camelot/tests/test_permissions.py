@@ -540,10 +540,16 @@ class test_manage_page_permissions(PermissionTestCase):
         self.addcontribgetrequest = self.factory.get(
             reverse("add_album_contrib", kwargs={"albumid": self.testalbum.id}))
         self.addcontribgetrequest.user = self.u
+        self.updateaccessgetrequest = self.factory.get(
+            reverse("update_album_access", kwargs={"id": self.testalbum.id}))
+        self.updateaccessgetrequest.user = self.u
+        self.addgroupgetrequest = self.factory.get(reverse("add_album_groups", kwargs={"albumid":self.testalbum.id}))
+        self.addgroupgetrequest.user = self.u
 
         assert album.add_contrib(self.addcontribgetrequest, self.testalbum.id) == Http404
-
-        # todo: add gets for change access type and change album groups
+        assert album.update_access_type(self.updateaccessgetrequest, self.testalbum.id) == Http404
+        assert album.add_groups(self.addgroupgetrequest, self.testalbum.id) == Http404
+        # todo: maybe make this a loop
 
 
 class test_upload_photo_permissions(PermissionTestCase):
