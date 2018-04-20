@@ -451,7 +451,7 @@ class test_manage_page_permissions(PermissionTestCase):
         assert resp.status_code == 302
         assert self.u2.profile in collate_owner_and_contrib(self.testalbum)
 
-    def test_post_add_album_contrib_as_contrib(self):
+    def test_post_add_album_contrib_as_not_owner(self):
         """
         Contributor CAN'T add and remove contributors
         """
@@ -511,7 +511,27 @@ class test_manage_page_permissions(PermissionTestCase):
         assert self.testalbum.accesstype == ALBUM_GROUPS
 
     def test_post_change_access_type_as_not_owner(self):
-        pass
+        """
+        Non owner can't change access type
+        :return:
+        """
+        self.make_logged_in_owner()
+
+        # get our manage page with form (use self.u as self.u2 will not obtain the form)
+        # using self.u will not affect our test later because we aren't using the client later
+        resp = self.client.get(reverse('manage_album', kwargs={'albumid': self.testalbum.id}))
+
+        # get and populate form
+        myform = resp.context['accesstypeform']
+        data = myform.initial
+        data['mytype'] = ALBUM_GROUPS
+
+        # construct our post
+        self.updateaccesspostrequest = self.factory.post(
+            reverse("update_album_access", kwargs={"id": self.testalbum.id}), data=data)
+
+        self.user_escalate_post_test_helper(self.updateaccesspostrequest, self.u2, self.testalbum, self.testalbum.id,
+                                            album.update_access_type, ALBUM_PRIVATE + 1)
 
     def test_get_post_endpoints(self):
         """
