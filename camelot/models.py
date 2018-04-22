@@ -13,10 +13,7 @@ class Profile(models.Model):
     description = models.CharField(max_length=1000, default="")
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     email_confirmed = models.BooleanField(default=False)
-    #profile_picture = models.ForeignKey(Photo, default=None)
-    # beware of this symmetrical thing, test well
-    # ok, we've probably been overcomplicating this, friends are a one to many and we will access them through friendship
-    #friends = models.Many #('self', through='Friendship', symmetrical=False)
+    profile_pic = models.ForeignKey('Photo', default=None, on_delete=models.SET_DEFAULT, null=True, blank=True)
 
     def __str__(self):
         return "Profile " + str(self.id) + ": " + str(self.user.username)

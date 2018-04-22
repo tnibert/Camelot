@@ -61,3 +61,13 @@ class profilecontroller(genericcontroller):
         except Exception as e:
             raise(e)
         return True
+
+    def set_profile_pic(self, photo):
+        """
+        Set profile picture of current user
+        Must check that photo is a valid profile picture
+        A valid profile picture must belong to an owned or contributed album
+        :param photo: photo to set as profile picturs
+        :return:
+        """
+        pass

@@ -54,6 +54,9 @@ class ProfileControllerTests(TestCase):
     def test_update_profile_data(self):
         pass
 
+    def test_set_profile_pic(self):
+        pass
+
 from ..view.profile import *
 
 class ProfileViewTestsLoggedIn(TestCase):
