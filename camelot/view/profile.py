@@ -51,8 +51,6 @@ def return_raw_profile_pic(request, userid):
     else:
         fname = "userphotos/defaultprofile.png"
 
-    # be careful to not hide errors
-    # this try will return an empty response if the user doesn't have a profile picture
     with open(fname, "rb") as f:
         return HttpResponse(f.read(), content_type="image/*")
 
