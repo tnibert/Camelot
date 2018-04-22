@@ -3,6 +3,7 @@ from .utilities import get_profile_from_uid, PermissionException
 from .friendcontroller import are_friends
 from .groupcontroller import groupcontroller
 from .albumcontroller import collate_owner_and_contrib
+from ..models import Photo
 
 class profilecontroller(genericcontroller):
 
@@ -63,7 +64,7 @@ class profilecontroller(genericcontroller):
             raise(e)
         return True
 
-    def set_profile_pic(self, photo):
+    def set_profile_pic(self, photoid):
         """
         Set profile picture of current user
         Must check that photo is a valid profile picture
@@ -71,6 +72,9 @@ class profilecontroller(genericcontroller):
         :param photo: photo to set as profile picturs
         :return: True if valid photo and success, else False
         """
+
+        photo = Photo.objects.get(id=photoid)
+
         if self.uprofile in collate_owner_and_contrib(photo.album):
             self.uprofile.profile_pic = photo
             self.uprofile.save()

@@ -7,6 +7,7 @@
 {% elif friendstatus == "pending" %}
 Friend request pending<br>
 {% endif %}
+<img src="{% url 'profile_pic' uid %}" height="150">
 <p>{{ name }}</p>
 <p>Description:</p>
 <p>{{ description }}</p>

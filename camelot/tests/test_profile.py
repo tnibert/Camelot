@@ -81,12 +81,12 @@ class ProfileControllerTests(TestCase):
             raise
 
         # add profile pic
-        assert self.profilecontrol1.set_profile_pic(myphoto)
+        assert self.profilecontrol1.set_profile_pic(myphoto.id)
         self.u.profile.refresh_from_db()
         assert self.u.profile.profile_pic == myphoto
 
         # u2 doesn't own or contrib, so can't make profile pic
-        assert not self.profilecontrol2.set_profile_pic(myphoto)
+        assert not self.profilecontrol2.set_profile_pic(myphoto.id)
         self.u2.profile.refresh_from_db()
         assert self.u2.profile.profile_pic != myphoto
 

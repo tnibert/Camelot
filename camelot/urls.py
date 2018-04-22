@@ -32,6 +32,8 @@ urlpatterns = [
     url(r'^album/(?P<albumid>\d+)/add_groups$', album.add_groups, name="add_album_groups"),
     url(r'^album/(?P<albumid>\d+)/add_contributor$', album.add_contrib, name="add_album_contrib"),
     url(r'^album/(?P<photoid>\d+)/show_photo$', album.display_photo, name="present_photo"),
+    url(r'^profile/(?P<userid>\d+)/profilepic$', profile.return_raw_profile_pic, name="profile_pic"),
+    url(r'^profile/photo/(?P<photoid>\d+)/set_profilepic$', profile.make_profile_pic, name="set_profile_pic"),
 ]
 
 if settings.DEBUG:
