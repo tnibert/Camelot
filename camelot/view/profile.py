@@ -46,14 +46,15 @@ def return_raw_profile_pic(request, userid):
     """
     # todo: add unit test
     photo = get_profile_from_uid(userid).profile_pic
+    if photo:
+        fname = photo.filename
+    else:
+        fname = "userphotos/defaultprofile.png"
 
     # be careful to not hide errors
-    # this try will return an emty response if the user doesn't have a profile picture
-    try:
-        with open(photo.filename, "rb") as f:
-            return HttpResponse(f.read(), content_type="image/*")
-    except Exception as e:
-        return HttpResponse('')
+    # this try will return an empty response if the user doesn't have a profile picture
+    with open(fname, "rb") as f:
+        return HttpResponse(f.read(), content_type="image/*")
 
 
 @login_required
