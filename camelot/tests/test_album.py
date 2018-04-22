@@ -91,7 +91,7 @@ class AlbumControllerTests(TestCase):
 
 
     def test_add_image_to_album_controller(self):
-
+        # todo: this needs some sort of assert
         if not os.path.exists(self.testdir):
             os.makedirs(self.testdir)
         os.chdir(self.testdir)

@@ -2,6 +2,7 @@ from .genericcontroller import genericcontroller
 from .utilities import get_profile_from_uid, PermissionException
 from .friendcontroller import are_friends
 from .groupcontroller import groupcontroller
+from .albumcontroller import collate_owner_and_contrib
 
 class profilecontroller(genericcontroller):
 
@@ -68,6 +69,11 @@ class profilecontroller(genericcontroller):
         Must check that photo is a valid profile picture
         A valid profile picture must belong to an owned or contributed album
         :param photo: photo to set as profile picturs
-        :return:
+        :return: True if valid photo and success, else False
         """
-        pass
+        if self.uprofile in collate_owner_and_contrib(photo.album):
+            self.uprofile.profile_pic = photo
+            self.uprofile.save()
+            return True
+        else:
+            return False

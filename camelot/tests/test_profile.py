@@ -3,7 +3,11 @@ from django.test.client import RequestFactory
 from django.contrib.auth.models import User
 from django.shortcuts import reverse
 
-from ..controllers import profilecontroller
+import os
+import shutil
+
+from ..controllers import profilecontroller                 # I don't know why this import works...
+from ..controllers.albumcontroller import albumcontroller
 
 class ProfileControllerTests(TestCase):
     def setUp(self):
@@ -55,7 +59,40 @@ class ProfileControllerTests(TestCase):
         pass
 
     def test_set_profile_pic(self):
-        pass
+
+        # set up pre conditions
+        self.testdir = "testdir"
+        if not os.path.exists(self.testdir):
+            os.makedirs(self.testdir)
+        os.chdir(self.testdir)
+        self.albumcontrol = albumcontroller(self.u.id)
+        myalbum = self.albumcontrol.create_album("test album", "lalala")
+
+        try:
+            # double check that our test is sending the right type for fi and that django will sent in rb mode
+            with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
+                myphoto = self.albumcontrol.add_photo_to_album(myalbum.id, "generic description", fi)
+                # need to add checks for file existence and db existence
+
+        # clean up
+        except:
+            os.chdir("..")
+            shutil.rmtree(self.testdir)
+            raise
+
+        # add profile pic
+        assert self.profilecontrol1.set_profile_pic(myphoto)
+        self.u.profile.refresh_from_db()
+        assert self.u.profile.profile_pic == myphoto
+
+        # u2 doesn't own or contrib, so can't make profile pic
+        assert not self.profilecontrol2.set_profile_pic(myphoto)
+        self.u2.profile.refresh_from_db()
+        assert self.u2.profile.profile_pic != myphoto
+
+        # clean up
+        os.chdir("..")
+        shutil.rmtree(self.testdir)
 
 from ..view.profile import *
 
