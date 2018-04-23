@@ -185,6 +185,7 @@ class albumcontroller(genericcontroller):
         :param photo: photo to delete
         :return: true if success, false if failure, raise on access violation
         """
+
         # check permission
         if self.uprofile == photo.album.owner or self.uprofile == photo.uploader:
 

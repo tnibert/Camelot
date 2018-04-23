@@ -8,7 +8,7 @@
         <li><a href="{% url 'set_profile_pic' photo.id %}">Set As Profile Picture</a></li>
         {% endif %}
         {% if request.user.profile == photo.album.owner or request.user.profile == photo.uploader %}
-        <li>Delete Photo</li>
+        <li><a href="{% url 'delete_photo' photo.id %}">Delete Photo</a></li>
         {% endif %}
     </ul>
     <div>

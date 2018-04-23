@@ -183,6 +183,25 @@ def return_photo_file_http(request, photoid):
         return HttpResponse(f.read(), content_type="image/*")
 
 
+def delete_photo(request, photoid):
+    """
+    For now this is a GET, may need to reconsider
+    Delete a photo
+    :param request:
+    :param photoid: id of photo to delete
+    :return: redirect to album
+    """
+    albumcontrol = albumcontroller(request.user.id)
+    photo = albumcontrol.return_photo(photoid)
+    album = photo.album
+    # controller method will check permission
+    if albumcontrol.delete_photo(photo):
+        return redirect("show_album", album.id)
+    else:
+        # todo: add some kind of failure notification
+        return redirect("present_photo", photo.id)
+
+
 @login_required
 def manage_album_permissions(request, albumid):
     """
