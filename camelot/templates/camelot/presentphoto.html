@@ -2,10 +2,15 @@
 
 {% block content2 %}
 {% load staticfiles %}
-    <a href="{% url 'show_album' photo.album.id %}">Back To Album</a>
-    {% if request.user.profile == photo.album.owner or request.user.profile in photo.album.contributors.all %}
-    <a href="{% url 'set_profile_pic' photo.id %}">Set As Profile Picture</a>
-    {% endif %}
+    <ul>
+        <li><a href="{% url 'show_album' photo.album.id %}">Back To Album</a></li>
+        {% if request.user.profile == photo.album.owner or request.user.profile in photo.album.contributors.all %}
+        <li><a href="{% url 'set_profile_pic' photo.id %}">Set As Profile Picture</a></li>
+        {% endif %}
+        {% if request.user.profile == photo.album.owner or request.user.profile == photo.uploader %}
+        <li>Delete Photo</li>
+        {% endif %}
+    </ul>
     <div>
         <a id="prev" href="{% url 'present_photo' previous %}"><img src="{% static 'img/arrowleft.svg' %}" alt="Previous"></a>
         <table class="gal-img">

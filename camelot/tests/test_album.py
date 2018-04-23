@@ -89,9 +89,8 @@ class AlbumControllerTests(TestCase):
         assert newalbum == testalbum
         self.assertRaises(PermissionException, self.albumcontrol2.return_album, newalbum.id)
 
-
     def test_add_image_to_album_controller(self):
-        # todo: this needs some sort of assert
+
         if not os.path.exists(self.testdir):
             os.makedirs(self.testdir)
         os.chdir(self.testdir)
@@ -101,7 +100,7 @@ class AlbumControllerTests(TestCase):
         try:
             # double check that our test is sending the right type for fi and that django will sent in rb mode
             with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
-                self.albumcontrol.add_photo_to_album(myalbum.id, "generic description", fi)
+                myphoto = self.albumcontrol.add_photo_to_album(myalbum.id, "generic description", fi)
                 # need to add checks for file existence and db existence
 
         # clean up
@@ -109,12 +108,20 @@ class AlbumControllerTests(TestCase):
             os.chdir("..")
             shutil.rmtree(self.testdir)
             raise
+
+        # asserts
+        assert myphoto.uploader == self.u.profile
+        assert myphoto.album == myalbum
+        assert myphoto.description == "generic description"
+        assert myphoto.filename == "userphotos/1/1/1"
+
+        # clean up
         os.chdir("..")
         shutil.rmtree(self.testdir)
         # example (for view):
         #c = Client()
         #with open('wishlist.doc') as fp:
-        #    c.post('/customers/wishes/', {'name': 'fred', 'attachment': fp})
+        #    c.post('/customers/wishes/', {'name': 'fred', 'attachment
 
     def test_add_image_to_other_user_album_controller(self):
         """

@@ -123,7 +123,7 @@ class albumcontroller(genericcontroller):
             raise PermissionException("User is not album owner or contributor")
 
         # add file to database
-        newphoto = Photo(description=description, album=album)
+        newphoto = Photo(description=description, album=album, uploader=self.uprofile)
         newphoto.save()
 
         # create filename with primary key

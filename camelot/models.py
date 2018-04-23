@@ -72,4 +72,5 @@ class Photo(models.Model):
     description = models.CharField(max_length=150)      # these length values should be defined elsewhere
     # foreign key - album
     album = models.ForeignKey(Album, on_delete=models.CASCADE)
-    #uploader = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    # set default on delete may not be appropriate
+    uploader = models.ForeignKey(Profile, default=None, on_delete=models.SET_DEFAULT, null=True, blank=True)
