@@ -5,7 +5,7 @@ from .genericcontroller import genericcontroller
 from .groupcontroller import is_in_group
 from ..constants import *
 from django.utils import timezone
-from os import makedirs
+from os import makedirs, unlink
 
 class albumcontroller(genericcontroller):
     """
@@ -179,6 +179,27 @@ class albumcontroller(genericcontroller):
     def delete_album(self):
         pass
 
+    def delete_photo(self, photo):
+        """
+        Dekete a photo, checking permission
+        :param photo: photo to delete
+        :return: true if success, false if failure, raise on access violation
+        """
+        # check permission
+        if self.uprofile == photo.album.owner or self.uprofile == photo.uploader:
+
+            # remove from disk
+            unlink(photo.filename)
+
+            # remove from db
+            status = photo.delete()
+            if status[0] == 1:
+                return True
+            elif status[0] == 0:
+                return False
+
+        else:
+            raise PermissionException
 
     def set_accesstype(self, album, type):
         """
@@ -192,7 +213,6 @@ class albumcontroller(genericcontroller):
             return True
         else:
             return False
-
 
     def add_contributor_to_album(self, album, contributor):
         """

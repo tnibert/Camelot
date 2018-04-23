@@ -101,7 +101,7 @@ class AlbumControllerTests(TestCase):
             # double check that our test is sending the right type for fi and that django will sent in rb mode
             with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
                 myphoto = self.albumcontrol.add_photo_to_album(myalbum.id, "generic description", fi)
-                # need to add checks for file existence and db existence
+                # need to add checks for file existence
 
         # clean up
         except:
@@ -139,6 +139,53 @@ class AlbumControllerTests(TestCase):
 
         os.chdir("..")
         shutil.rmtree(self.testdir)
+
+    def test_delete_photo(self):
+        # set up dir
+        if not os.path.exists(self.testdir):
+            os.makedirs(self.testdir)
+        os.chdir(self.testdir)
+
+        # create album
+        myalbum = self.albumcontrol.create_album("delete photo test", "lalala")
+
+        complete_add_friends(self.u.id, self.u2.id)
+
+        # add contributor
+        assert self.albumcontrol.add_contributor_to_album(myalbum, self.u2.profile)
+
+        # add photos - one as owner, two as contrib
+        try:
+            with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
+                ownerphoto = self.albumcontrol.add_photo_to_album(myalbum.id, "owner uploaded", fi)
+                contribphoto1 = self.albumcontrol2.add_photo_to_album(myalbum.id, "contrib uploaded 1", fi)
+                contribphoto2 = self.albumcontrol2.add_photo_to_album(myalbum.id, "contrib uploaded 2", fi)
+        # clean up on error
+        except:
+            os.chdir("..")
+            shutil.rmtree(self.testdir)
+            raise
+
+        # cannot delete any photo as non logged in user
+        # todo: add user privilege escalation
+        self.assertRaises(PermissionException, self.albumcontrol3.delete_photo, ownerphoto)
+        self.assertRaises(PermissionException, self.albumcontrol3.delete_photo, contribphoto1)
+
+        # cannot delete owner photo as contributor
+        self.assertRaises(PermissionException, self.albumcontrol2.delete_photo, ownerphoto)
+
+        # can delete contributor photo as contributor
+        assert self.albumcontrol2.delete_photo(contribphoto1)
+
+        # can delete contributor photo as owner
+        assert self.albumcontrol.delete_photo(contribphoto2)
+
+        # can delete owner photo as owner
+        assert self.albumcontrol.delete_photo(ownerphoto)
+
+        assert (ownerphoto, contribphoto1, contribphoto2) not in self.albumcontrol.get_photos_for_album(myalbum)
+
+        # todo: check that files have actually been deleted on disk
 
     def test_get_images_for_album(self):
         # implemented
