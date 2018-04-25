@@ -176,12 +176,30 @@ class albumcontroller(genericcontroller):
         except:
             raise
 
-    def delete_album(self):
-        pass
+    def delete_album(self, album):
+        if self.uprofile == album.owner:
+            # delete photo files from disk
+            for photo in self.get_photos_for_album(album):
+                # might be best to attach a listener to deletion of photo model
+                unlink(photo.filename)
+
+            # delete album from db (cascades to photos, contributor manytomany table, group manytomany table, etc)
+            status = album.delete()
+            #print(status[0])
+            #print(status[1])
+
+            # this must be greater than or equal to 1 because we are deleting files as well as album
+            if status[0] >= 1:
+                return True
+            elif status[0] == 0:
+                return False
+        else:
+            raise PermissionException("Must be album owner to delete album")
+        print("End - we should never reach this")
 
     def delete_photo(self, photo):
         """
-        Dekete a photo, checking permission
+        Delete a photo, checking permission
         :param photo: photo to delete
         :return: true if success, false if failure, raise on access violation
         """

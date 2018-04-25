@@ -4,6 +4,7 @@ from django.shortcuts import reverse
 
 from django.contrib.auth.models import User
 
+from ..models import Album
 from ..controllers.albumcontroller import albumcontroller, collate_owner_and_contrib
 from ..controllers.groupcontroller import groupcontroller
 from ..controllers.utilities import *
@@ -156,7 +157,7 @@ class AlbumControllerTests(TestCase):
 
         # add photos - one as owner, two as contrib
         try:
-            with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
+            with open('../camelot/tests/resources/testimage2.jpg', 'rb') as fi:
                 ownerphoto = self.albumcontrol.add_photo_to_album(myalbum.id, "owner uploaded", fi)
                 contribphoto1 = self.albumcontrol2.add_photo_to_album(myalbum.id, "contrib uploaded 1", fi)
                 contribphoto2 = self.albumcontrol2.add_photo_to_album(myalbum.id, "contrib uploaded 2", fi)
@@ -186,6 +187,56 @@ class AlbumControllerTests(TestCase):
         assert (ownerphoto, contribphoto1, contribphoto2) not in self.albumcontrol.get_photos_for_album(myalbum)
 
         # todo: check that files have actually been deleted on disk
+
+        # clean up
+        os.chdir("..")
+        shutil.rmtree(self.testdir)
+
+    def test_delete_album(self):
+        # set up dir
+        if not os.path.exists(self.testdir):
+            os.makedirs(self.testdir)
+        os.chdir(self.testdir)
+        #print(os.getcwd())
+
+        # create album
+        myalbum = self.albumcontrol.create_album("delete album test", "lalala")
+
+        complete_add_friends(self.u.id, self.u2.id)
+
+        # add contributor
+        assert self.albumcontrol.add_contributor_to_album(myalbum, self.u2.profile)
+
+        # add photos - one as owner, two as contrib
+        try:
+            with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
+                ownerphoto = self.albumcontrol.add_photo_to_album(myalbum.id, "owner uploaded", fi)
+                contribphoto1 = self.albumcontrol2.add_photo_to_album(myalbum.id, "contrib uploaded 1", fi)
+                contribphoto2 = self.albumcontrol2.add_photo_to_album(myalbum.id, "contrib uploaded 2", fi)
+
+            # image files exist
+            assert os.path.isfile('userphotos/1/1/1')
+            assert os.path.isfile('userphotos/2/1/2')
+            assert os.path.isfile('userphotos/2/1/3')
+
+            # non owner cannot delete
+            self.assertRaises(PermissionException, self.albumcontrol2.delete_album, myalbum)
+            # owner can delete
+            assert self.albumcontrol.delete_album(myalbum)
+
+            # myalbum no longer exists
+            self.assertRaises(Album.DoesNotExist, myalbum.refresh_from_db)
+
+            # image files no longer exist
+            assert not os.path.isfile('userphotos/1/1/1')
+            assert not os.path.isfile('userphotos/2/1/2')
+            assert not os.path.isfile('userphotos/2/1/3')
+
+        # todo: apply this finally pattern to other file opening unit tests
+        finally:
+            # clean up
+            os.chdir("..")
+            shutil.rmtree(self.testdir)
 
     def test_get_images_for_album(self):
         # implemented
