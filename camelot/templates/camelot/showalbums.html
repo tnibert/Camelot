@@ -1,6 +1,9 @@
 {% extends 'camelot/baseloggedin.html' %}
 
 {% block content2 %}
+<ul>
+    <li><a href="{% url 'show_profile' userid %}">Back To Profile</a></li>
+</ul>
     <table>
         <tr>
         {% for album in albums %}
