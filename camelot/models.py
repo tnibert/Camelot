@@ -1,8 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-
+from os import unlink
 from .constants import *
 
 
@@ -17,6 +17,7 @@ class Profile(models.Model):
 
     def __str__(self):
         return "Profile " + str(self.id) + ": " + str(self.user.username)
+
 
 @receiver(post_save, sender=User)
 def update_user_profile(sender, instance, created, **kwargs):
@@ -44,6 +45,7 @@ class Friendship(models.Model):
     def __str__(self):
         return str(self.requester) + "->" + str(self.requestee) + " : " + str(self.confirmed)
 
+
 class FriendGroup(models.Model):
     name = models.CharField(max_length=GROUPNAMELEN)
     owner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="groupowner")
@@ -52,6 +54,7 @@ class FriendGroup(models.Model):
 
     def __str__(self):
         return str(self.name)
+
 
 class Album(models.Model):
     name = models.CharField(max_length=70)
@@ -67,6 +70,7 @@ class Album(models.Model):
     def __str__(self):
         return self.name
 
+
 class Photo(models.Model):
     filename = models.CharField(max_length=200, default='')
     description = models.CharField(max_length=150)      # these length values should be defined elsewhere
@@ -74,3 +78,9 @@ class Photo(models.Model):
     album = models.ForeignKey(Album, on_delete=models.CASCADE)
     # set default on delete may not be appropriate
     uploader = models.ForeignKey(Profile, default=None, on_delete=models.SET_DEFAULT, null=True, blank=True)
+
+
+# receiver to delete the file on disk when we delete a photo from database
+@receiver(post_delete, sender=Photo)
+def delete_photo_file(sender, instance, *args, **kwargs):
+    unlink(instance.filename)

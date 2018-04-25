@@ -178,10 +178,6 @@ class albumcontroller(genericcontroller):
 
     def delete_album(self, album):
         if self.uprofile == album.owner:
-            # delete photo files from disk
-            for photo in self.get_photos_for_album(album):
-                # might be best to attach a listener to deletion of photo model
-                unlink(photo.filename)
 
             # delete album from db (cascades to photos, contributor manytomany table, group manytomany table, etc)
             status = album.delete()
@@ -206,9 +202,6 @@ class albumcontroller(genericcontroller):
 
         # check permission
         if self.uprofile == photo.album.owner or self.uprofile == photo.uploader:
-
-            # remove from disk
-            unlink(photo.filename)
 
             # remove from db
             status = photo.delete()
