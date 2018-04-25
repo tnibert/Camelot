@@ -182,7 +182,7 @@ def return_photo_file_http(request, photoid):
     with open(photo.filename, "rb") as f:
         return HttpResponse(f.read(), content_type="image/*")
 
-
+@login_required
 def delete_photo(request, photoid):
     """
     For now this is a GET, may need to reconsider
@@ -191,6 +191,7 @@ def delete_photo(request, photoid):
     :param photoid: id of photo to delete
     :return: redirect to album
     """
+    # todo: add confirmation dialog
     albumcontrol = albumcontroller(request.user.id)
     photo = albumcontrol.return_photo(photoid)
     album = photo.album
@@ -200,6 +201,29 @@ def delete_photo(request, photoid):
     else:
         # todo: add some kind of failure notification
         return redirect("present_photo", photo.id)
+
+
+# I don't like how similar the code between show albums and show album is
+@login_required
+def delete_album(request, albumid):
+    """
+    For now this is a GET, may need to reconsider
+    ... you know what?  No, fuck that, a GET is the simplest implementation
+    and simplicity trumps paradigm dogma, this and delete_photo stay GETs
+    Delete an album
+    :param request:
+    :param albumid: id of album to delete
+    :return:
+    """
+    # todo: add confirmation dialog
+    albumcontrol = albumcontroller(request.user.id)
+    album = albumcontrol.return_album(albumid)
+
+    if albumcontrol.delete_album(album):
+        return redirect("show_albums", albumcontrol.uprofile.id)
+    else:
+        # todo: add failure notification
+        return redirect("show_album", album.id)
 
 
 @login_required

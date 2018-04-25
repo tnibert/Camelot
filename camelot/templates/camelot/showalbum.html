@@ -8,6 +8,9 @@
         <li><a href="{% url 'upload_photos' album.id %}">Add New Photos</a></li>
         <li><a href="{% url 'manage_album' album.id %}">Manage Album Access</a></li>
         {% endif %}
+        {% if request.user.profile == album.owner %}
+        <li><a href="{% url 'delete_album' album.id %}">Delete Album</a></li>
+        {% endif %}
     </ul>
         <div>
         {% for photo in photos %}
