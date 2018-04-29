@@ -64,7 +64,7 @@ def display_albums(request, userid):
 
     # create dictionary to render
     retdict = {}
-    retdict['userid'] = userid
+    retdict['userid'] = int(userid)
     retdict['albums'] = albums
     # todo: BUG if we go to a contributed album, and then click back to albums,
     # then the user will navigate to the album owner's page rather than the contributor's
