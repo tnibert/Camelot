@@ -61,12 +61,36 @@ class groupcontroller(genericcontroller):
         group.save()
         return True
 
+    def delete_group(self, group):
+        """
+        IN PROGRESS
+        :return:
+        """
+        # check permission
+        if group.owner == self.uprofile:
+            status = group.delete()
+            # does anything cascade?
+            print(status)
+            if status[0] == 1:
+                return True
+            elif status[0] == 0:
+                return False
+        raise PermissionException("Must own group to delete it")
 
-    def delete_group(self):
-        pass
-
-    def delete_member(self):
-        pass
+    def delete_member(self, group, member):
+        """
+        Remove a member from a group
+        Must own the group to delete a member
+        :param group:
+        :param member:
+        :return:
+        """
+        # check permission
+        if group.owner == self.uprofile and member in group.members.all():
+            group.members.remove(member)
+            group.save()
+            return True
+        raise PermissionException("Must own group to remove member, member must be in group")
 
     def return_groups(self, profile=None):
         """

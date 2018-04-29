@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import reverse
 from .test_friendship import FriendGroupControllerTests
 from ..controllers.groupcontroller import groupcontroller, is_in_group
+from ..controllers.utilities import PermissionException
 from .helperfunctions import complete_add_friends
 from ..models import FriendGroup
 
@@ -33,7 +34,26 @@ class GroupControllerTests(FriendGroupControllerTests):
         pass
 
     def test_delete_group(self):
-        pass
+        name = "Test Delete"
+        newgroup = self.groupcontrol.create(name)
+
+    def test_delete_member(self):
+        name = "Test Delete Member"
+        newgroup = self.groupcontrol.create(name)
+
+        complete_add_friends(self.u.id, self.friend.id)
+
+        # owner can delete members
+        assert self.groupcontrol.add_member(newgroup.id, self.friend.profile)
+        assert len(newgroup.members.all()) == 1
+        assert self.groupcontrol.delete_member(newgroup, self.friend.profile)
+        assert len(newgroup.members.all()) == 0
+
+        # friend cannot delete member from group
+        assert self.groupcontrol.add_member(newgroup.id, self.friend.profile)
+        assert len(newgroup.members.all()) == 1
+        self.assertRaises(PermissionException, self.groupcontrol2.delete_member, newgroup, self.friend.profile)
+        assert len(newgroup.members.all()) == 1
 
     def test_add_member(self):
         name = "Test Add Member"
@@ -67,12 +87,6 @@ class GroupControllerTests(FriendGroupControllerTests):
         assert len(newgroup.members.all()) == 2
 
         # add coverage for if we try to add to another user's group
-
-    def test_delete_member(self):
-        pass
-
-    def test_are_friends_check(self):
-        pass
 
     def test_return_groups(self):
         """
