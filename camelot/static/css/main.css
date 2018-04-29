@@ -43,7 +43,7 @@ table.gal-img img {
     transform: translate(-50%, -50%);
 }
 
-/* these are used in showalbum.html */
+/* these are used in showalbum.html and showalbums.html */
 
 div.gallery {
     margin: 5px;
@@ -54,6 +54,11 @@ div.gallery {
 
 div.gallery:hover {
     border: 1px solid #777;
+}
+
+div.gallery a {
+   color: #000000;
+   text-decoration: none;
 }
 
 div.gallery img {

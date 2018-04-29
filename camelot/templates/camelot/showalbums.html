@@ -7,44 +7,38 @@
         <li><a href="{% url 'create_album' %}">Create Album</a></li>
     {% endif %}
 </ul>
-    <table>
-        <tr>
-        {% for album in albums %}
-            <td><a href="{% url 'show_album' album.id %}">
+
+<div>
+    {% for album in albums %}
+        <div class="gallery">
+            <a href="{% url 'show_album' album.id %}">
                 {% if album.temp %}
                     <img src="{% url 'show_photo' album.temp %}" alt="{{ album.name }}" height="150">
                 {% else %}
                     <img src="{% static 'img/defaultalbum.png' %}" alt="{{ album.name }}" height="150">
                 {% endif %}
-                <br>{{ album.name }}</a></td>
-        {% endfor %}
-        </tr>
-        <tr>
-        {% for album in albums %}
-            <td>{{ album.description }}</td>
-        {% endfor %}
-        </tr>
-     </table>
+                <div class="desc">{{ album.name }}<br>{{ album.description }}</div>
+            </a>
+        </div>
+    {% endfor %}
+</div>
 {% if contrib %}
-<br>
-<p>Contributed Albums:</p>
-<table>
-    <tr>
-        {% for album in contrib %}
-            <td><a href="{% url 'show_album' album.id %}">
+<div style="clear:both;">
+    <br>
+    <h3>Contributed Albums:</h3>
+
+    {% for album in contrib %}
+        <div class="gallery">
+            <a href="{% url 'show_album' album.id %}">
                 {% if album.temp %}
                     <img src="{% url 'show_photo' album.temp %}" alt="{{ album.name }}" height="150">
                 {% else %}
                     <img src="{% static 'img/defaultalbum.png' %}" alt="{{ album.name }}" height="150">
                 {% endif %}
-                <br>{{ album.name }}</a></td>
-        {% endfor %}
-        </tr>
-        <tr>
-        {% for album in contrib %}
-            <td>{{ album.description }}</td>
-        {% endfor %}
-        </tr>
-</table>
+                <div class="desc">{{ album.name }}<br>{{ album.description }}</div>
+            </a>
+        </div>
+    {% endfor %}
+</div>
 {% endif %}
 {% endblock %}
