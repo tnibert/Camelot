@@ -37,6 +37,34 @@ class GroupControllerTests(FriendGroupControllerTests):
         name = "Test Delete"
         newgroup = self.groupcontrol.create(name)
 
+        # some rando can't delete
+        self.assertRaises(PermissionException, self.groupcontrol2.delete_group, newgroup)
+        newgroup.refresh_from_db()
+
+        # friend can't delete
+        complete_add_friends(self.u.id, self.friend.id)
+        self.assertRaises(PermissionException, self.groupcontrol2.delete_group, newgroup)
+        newgroup.refresh_from_db()
+
+        # delete empty group
+        assert self.groupcontrol.delete_group(newgroup)
+        self.assertRaises(FriendGroup.DoesNotExist, newgroup.refresh_from_db)
+
+        # reset
+        newgroup = self.groupcontrol.create(name)
+
+        # group member can't delete
+        assert self.groupcontrol.add_member(newgroup.id, self.friend.profile)
+        self.assertRaises(PermissionException, self.groupcontrol2.delete_group, newgroup)
+        newgroup.refresh_from_db()
+
+        # delete group with member
+        assert self.groupcontrol.delete_group(newgroup)
+        self.assertRaises(FriendGroup.DoesNotExist, newgroup.refresh_from_db)
+
+        # confirm that friend still exists
+        self.friend.profile.refresh_from_db()
+
     def test_delete_member(self):
         name = "Test Delete Member"
         newgroup = self.groupcontrol.create(name)
