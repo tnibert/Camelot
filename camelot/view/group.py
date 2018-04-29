@@ -39,9 +39,29 @@ def create_group(request):
     # always redirect the same regardless of request type
     return redirect("manage_groups")
 
+
 @login_required
 def delete_group(request):
-    pass
+    """
+    Delete a group
+    :param request: receive a post request with field idname of the group id
+    :return: redirect to manage groups page
+    """
+    # todo: unit test
+    if request.method == 'POST':
+        groupcontrol = groupcontroller(request.user.id)
+
+        form = MyGroupSelectForm(request.user.id, ChoiceField, request.POST)
+
+        if form.is_valid():
+
+            # list of group ids
+            groupid = form.cleaned_data['idname']
+            group = return_group_from_id(groupid)
+
+            groupcontrol.delete_group(group)
+
+    return redirect("manage_groups")
 
 @login_required
 def manage_groups(request):
@@ -61,11 +81,12 @@ def manage_groups(request):
 @login_required
 def manage_group(request, id):
     """
-    View to manage an inidividual group
+    View to manage an individual group
     :param request:
     :param id: id of the group to manage
     :return:
     """
+    pass
 
 @login_required
 def add_friend_to_group(request, userid):

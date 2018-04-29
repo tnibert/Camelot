@@ -23,7 +23,7 @@
 </form>
 <!-- add buton for deleting group -->
 <h2>Delete Group</h2>
-<form action="" method="post">
+<form action="{% url 'delete_group' %}" method="post">
     {% include 'camelot/genericformtemp.html' with form=delform %}
     <input type="submit" value="Delete" />
 </form>
