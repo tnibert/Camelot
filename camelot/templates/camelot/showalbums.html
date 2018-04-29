@@ -29,7 +29,7 @@
 
     {% for album in contrib %}
         <div class="gallery">
-            <a href="{% url 'show_album' album.id %}">
+            <a href="{% url 'show_album' id=album.id contribid=userid %}">
                 {% if album.temp %}
                     <img src="{% url 'show_photo' album.temp %}" alt="{{ album.name }}" height="150">
                 {% else %}

@@ -74,20 +74,28 @@ def display_albums(request, userid):
     # showalbums.html might be able to be made more generic, may repeat in showalbum.html
 
 
-def display_album(request, id):
+def display_album(request, id, contribid=None):
     """
 
     :param request:
     :param id: id of album (need to validate permissions)
+    :param contribid: if we reached the page from a contributor's show albums page, back nav to contributor
     :return:
     """
-    # todo: add check for permission exception raised
+
     albumcontrol = albumcontroller(request.user.id)
     album = albumcontrol.return_album(id)
     # query db for photos in album
     photos = albumcontrol.get_photos_for_album(album)
 
-    return render(request, 'camelot/showalbum.html', {'photos': photos, 'album': album})
+    # for back link navigation to contributors
+    # if the id provided is not valid, set to the album owner
+    if not contribid or int(contribid) not in [x.id for x in collate_owner_and_contrib(album)]:
+        contribid = album.owner.id
+
+    retdict = {'photos': photos, 'album': album, 'contribid': contribid}
+
+    return render(request, 'camelot/showalbum.html', retdict)
 
 
 def display_photo(request, photoid):

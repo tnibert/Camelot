@@ -2,8 +2,7 @@
 
 {% block content2 %}
     <ul>
-        {# need to add back nav for album contributors? #}
-        <li><a href="{% url 'show_albums' album.owner.id %}">Back To Albums</a></li>
+        <li><a href="{% url 'show_albums' contribid %}">Back To Albums</a></li>
         {% if request.user.profile == album.owner or request.user.profile in album.contributors.all %}
         <li><a href="{% url 'upload_photos' album.id %}">Add New Photos</a></li>
         <li><a href="{% url 'manage_album' album.id %}">Manage Album Access</a></li>
