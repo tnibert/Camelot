@@ -2,13 +2,14 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404
 from django.forms import MultipleChoiceField
+from random import randint
 from ..controllers.albumcontroller import albumcontroller, collate_owner_and_contrib
 from ..controllers.friendcontroller import are_friends
 from ..controllers.utilities import PermissionException
 from ..forms import AlbumCreateForm, UploadPhotoForm, EditAlbumAccesstypeForm, MyGroupSelectForm, AddContributorForm
 from ..constants import *
 from ..controllers.utilities import *
-from ..models import Profile, FriendGroup
+from ..models import Profile, FriendGroup, Photo
 
 """
 Album views
@@ -49,8 +50,19 @@ def create_album(request):
 @login_required
 def display_albums(request, userid):
     albumcontrol = albumcontroller(request.user.id)
+
+    # get albums
     albums = albumcontrol.return_albums(userid)
     contrib = albumcontrol.return_albums(userid, contrib=True)
+
+    # get an image for each album
+    for album in (albums+contrib):
+        photos = albumcontrol.get_photos_for_album(album)
+        if len(photos) > 0:
+            # we check if this exists in the template and if not, render a default image
+            album.temp = photos[randint(0, len(photos)-1)].id
+
+    # create dictionary to render
     retdict = {}
     retdict['userid'] = userid
     retdict['albums'] = albums

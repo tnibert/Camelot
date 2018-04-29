@@ -1,13 +1,20 @@
 {% extends 'camelot/baseloggedin.html' %}
-
+{% load staticfiles %}
 {% block content2 %}
 <ul>
     <li><a href="{% url 'show_profile' userid %}">Back To Profile</a></li>
+    {# might be good to add a create album link here for user #}
 </ul>
     <table>
         <tr>
         {% for album in albums %}
-            <td><a href="{% url 'show_album' album.id %}">{{ album.name }}</a></td>
+            <td><a href="{% url 'show_album' album.id %}">
+                {% if album.temp %}
+                    <img src="{% url 'show_photo' album.temp %}" alt="{{ album.name }}" height="150">
+                {% else %}
+                    <img src="{% static 'img/defaultalbum.png' %}" alt="{{ album.name }}" height="150">
+                {% endif %}
+                <br>{{ album.name }}</a></td>
         {% endfor %}
         </tr>
         <tr>
@@ -22,7 +29,13 @@
 <table>
     <tr>
         {% for album in contrib %}
-            <td><a href="{% url 'show_album' album.id %}">{{ album.name }}</a></td>
+            <td><a href="{% url 'show_album' album.id %}">
+                {% if album.temp %}
+                    <img src="{% url 'show_photo' album.temp %}" alt="{{ album.name }}" height="150">
+                {% else %}
+                    <img src="{% static 'img/defaultalbum.png' %}" alt="{{ album.name }}" height="150">
+                {% endif %}
+                <br>{{ album.name }}</a></td>
         {% endfor %}
         </tr>
         <tr>
