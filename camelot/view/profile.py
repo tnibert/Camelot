@@ -70,6 +70,7 @@ def update_profile(request):
         data = {}
 
         if form.is_valid():
+            data['displayname'] = form.cleaned_data['displayname']
             data['description'] = form.cleaned_data['description']
 
             # we may want to kwargs the following

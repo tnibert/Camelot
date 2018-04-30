@@ -33,7 +33,8 @@ class profilecontroller(genericcontroller):
                 friendstatus = "not friends"
 
         # we will want to have a separate display name later
-        return {"uid": profile.user.id, "friendstatus": friendstatus, "name": profile.user.username, "description": profile.description}
+        return {"uid": profile.user.id, "friendstatus": friendstatus,
+                "name": profile.user.username if len(profile.dname) == 0 else profile.dname, "description": profile.description}
 
     def update_profile_data(self, **kwargs):
         """
@@ -44,7 +45,11 @@ class profilecontroller(genericcontroller):
         # TODO: double check that the following will actually check if the user is not logged in, unit test
         if not self.uprofile:
             return None
+
+        dname = kwargs.get('displayname', self.uprofile.dname)
         desc = kwargs.get('description', self.uprofile.description)
+
+        self.uprofile.dname = dname
         self.uprofile.description = desc
         self.uprofile.save()
         return self.uprofile

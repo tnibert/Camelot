@@ -15,7 +15,7 @@ class Profile(models.Model):
     email_confirmed = models.BooleanField(default=False)
     profile_pic = models.ForeignKey('Photo', default=None, on_delete=models.SET_DEFAULT, null=True, blank=True)
     # display name
-    dname = models.CharField(max_length=100, default="")
+    dname = models.CharField(max_length=MAXDISPLAYNAME, default="")
 
     def __str__(self):
         return "Profile " + str(self.id) + ": " + str(self.user.username)

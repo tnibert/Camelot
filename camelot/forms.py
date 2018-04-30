@@ -45,7 +45,8 @@ class UploadPhotoForm(forms.Form):
                 forms.CharField(max_length=MAXPHOTODESC, required=False)
 
 class EditProfileForm(forms.Form):
-    # need to have existing description filled in by default on form display
+    # need to have existing fields filled in by default on form display
+    displayname = forms.CharField(label='Display Name', max_length=MAXDISPLAYNAME)
     description = forms.CharField(label='Description', max_length=300,
                                   # the following might be best done in css
                                   widget=forms.Textarea(attrs={'cols': 50, 'rows': 6}))

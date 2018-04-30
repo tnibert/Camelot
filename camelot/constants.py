@@ -5,6 +5,7 @@ Define constants that we use throughout the application
 # model sizes, will be used in forms and model definitions
 GROUPNAMELEN=30
 MAXPHOTODESC=150
+MAXDISPLAYNAME=100
 
 ALBUM_PUBLIC=1
 ALBUM_ALLFRIENDS=2
