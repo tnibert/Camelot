@@ -150,8 +150,10 @@ class ProfileViewTestsLoggedIn(TestCase):
 
         myform = response.context['form']
 
+        dname = "Test Name"
         description = "I am a pumpkin"
         data = myform.initial
+        data['displayname'] = dname
         data['description'] = description
 
         response = self.client.post(reverse('update_profile'), data, follow=True)
@@ -159,6 +161,7 @@ class ProfileViewTestsLoggedIn(TestCase):
         self.assertEqual(response.status_code, 200)
         self.u.profile.refresh_from_db()
         assert self.u.profile.description == description
+        assert self.u.profile.dname == dname
 
 class ProfileViewTestsNotLoggedIn(TestCase):
     def setUp(self):
