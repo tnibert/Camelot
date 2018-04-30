@@ -2,7 +2,13 @@
 
 {% block content2 %}
     {% for friend in friendlist %}
-        <a href="{% url 'show_profile' friend.user.id %}">{{ friend.user.username }}</a>
+        <a href="{% url 'show_profile' friend.user.id %}">
+            {% if friend.dname|length > 0 %}
+                {{ friend.dname }}
+            {% else %}
+                {{ friend.user.username }}
+            {% endif %}
+        </a>
         <br>
     {% endfor %}
 {% endblock %}

@@ -2,7 +2,13 @@
 
 {% block content2 %}
     {% for fship in pending %}
-        <a href="{% url 'show_profile' fship.requester.user.id %}">{{ fship.requester.user.username }}</a>
+        <a href="{% url 'show_profile' fship.requester.user.id %}">
+            {% if fship.requester.dname|length > 0 %}
+                {{ fship.requester.dname }}
+            {% else %}
+                {{ fship.requester.user.username }}
+            {% endif %}
+        </a>
         <br>
         <form action="{% url 'confirm_friend' fship.requester.user.id %}">
             <input type="submit" value="Confirm" />
