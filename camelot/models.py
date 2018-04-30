@@ -14,6 +14,8 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     email_confirmed = models.BooleanField(default=False)
     profile_pic = models.ForeignKey('Photo', default=None, on_delete=models.SET_DEFAULT, null=True, blank=True)
+    # display name
+    dname = models.CharField(max_length=100, default="")
 
     def __str__(self):
         return "Profile " + str(self.id) + ": " + str(self.user.username)
@@ -22,7 +24,7 @@ class Profile(models.Model):
 @receiver(post_save, sender=User)
 def update_user_profile(sender, instance, created, **kwargs):
     if created:
-        Profile.objects.create(user=instance)
+        Profile.objects.create(user=instance, dname=instance.username)
     instance.profile.save()
 
 
