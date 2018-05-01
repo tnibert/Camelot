@@ -124,6 +124,23 @@ class friendcontroller(genericcontroller):
         """
         return self.filter_friendships(self.return_friendship_list(profile), profile)
 
+    def findfriends(self, searchstr):
+        """
+        Search for friends by display name and username, filtering out existing friends
+        :param searchstr: string to search for
+        :return: queryset of profiles
+        """
+        def _defaultsearch(str):
+            return Profile.objects.filter(dname__contains=str)
+
+        def _pgsearch(str):
+            # postgres specific search
+            # todo: test, maybe create environment with postgres
+            profiles = Profile.objects.filter(dname__unaccent__lower__trigram_similar=searchstr)
+
+        profiles = _defaultsearch(searchstr)
+        return profiles
+
 
 def are_friends(profile1, profile2, confirmed=True):
     """
