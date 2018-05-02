@@ -384,3 +384,7 @@ def add_contrib(request, albumid):
 
     # if not a post, we 404
     return Http404
+
+
+def download_album(request, albumid):
+    pass
