@@ -2,6 +2,7 @@ from .genericcontroller import genericcontroller
 from ..models import Friendship, Profile, FriendGroup
 from .utilities import AlreadyExistsException, AddSelfException
 from django.db.models import Q
+from itertools import chain
 
 class friendcontroller(genericcontroller):
 
@@ -131,12 +132,14 @@ class friendcontroller(genericcontroller):
         :return: queryset of profiles
         """
         def _defaultsearch(str):
-            return Profile.objects.filter(dname__contains=str)
+            return Profile.objects.filter(dname__contains=str)\
+                .union(Profile.objects.filter(user__username__contains=str)).distinct()
 
         def _pgsearch(str):
             # postgres specific search
             # todo: test, maybe create environment with postgres
-            return Profile.objects.filter(dname__unaccent__lower__trigram_similar=searchstr)
+            return Profile.objects.filter(dname__unaccent__lower__trigram_similar=searchstr)\
+                .union(Profile.objects.filter(user__username__unaccent__lower__trigram_similar=str)).distinct()
 
         profiles = _defaultsearch(searchstr)
         return profiles
