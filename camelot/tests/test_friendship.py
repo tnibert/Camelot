@@ -169,10 +169,21 @@ class FriendshipTests(FriendGroupControllerTests):
         assert are_friends(self.u.profile, self.friend.profile)
 
     def test_find_friends(self):
-        search = "Test"
-        qset = self.friendcontrol.findfriends(search)
-        for i in qset:
-            print(i)
+        self.u.profile.dname = "test hi"
+        self.u.profile.save()
+        search1 = "test"
+        search2 = "3"
+        search3 = "NOT IN USERS"
+        search4 = "hi"
+        qset = self.friendcontrol.findfriends(search1)
+        assert len(qset) == 3
+        qset = self.friendcontrol.findfriends(search2)
+        assert len(qset) == 1
+        qset = self.friendcontrol.findfriends(search3)
+        assert len(qset) == 0
+        qset = self.friendcontrol.findfriends(search4)
+        assert len(qset) == 1
+
 
 from ..view import friend
 
