@@ -44,9 +44,9 @@ class UploadPhotoForm(forms.Form):
             # generate extra fields in the number specified via extra_fields
             # we can use label variable here
             self.fields['file_{index}'.format(index=index+1)] = \
-                forms.ImageField()
+                forms.ImageField(label="File")
             self.fields['desc_{index}'.format(index=index+1)] = \
-                forms.CharField(max_length=MAXPHOTODESC, required=False)
+                forms.CharField(label="Description", max_length=MAXPHOTODESC, required=False)
 
 
 class EditProfileForm(forms.Form):
