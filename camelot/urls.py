@@ -37,7 +37,7 @@ urlpatterns = [
     url(r'^profile/photo/(?P<photoid>\d+)/set_profilepic$', profile.make_profile_pic, name="set_profile_pic"),
     url(r'^photo/(?P<photoid>\d+)/delete$', album.delete_photo, name="delete_photo"),
     url(r'^album/(?P<albumid>\d+)/delete$', album.delete_album, name="delete_album"),
-    url(r'^group/delete$', group.delete_group, name="delete_group"),
+    path('search', friend.search, name="search"),
 ]
 
 if settings.DEBUG:

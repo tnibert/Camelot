@@ -136,7 +136,7 @@ class friendcontroller(genericcontroller):
         def _pgsearch(str):
             # postgres specific search
             # todo: test, maybe create environment with postgres
-            profiles = Profile.objects.filter(dname__unaccent__lower__trigram_similar=searchstr)
+            return Profile.objects.filter(dname__unaccent__lower__trigram_similar=searchstr)
 
         profiles = _defaultsearch(searchstr)
         return profiles

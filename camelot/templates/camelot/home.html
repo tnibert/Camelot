@@ -11,4 +11,11 @@
 <li><a href="{% url 'update_profile' %}">Edit Profile</a></li>
 <li><a href="{% url 'manage_groups' %}">Manage Friend Groups</a></li>
 </ul>
+
+<div>
+    <form action="{% url 'search' %}" method="post">
+    {% include 'camelot/genericformtemp.html' with form=searchform %}
+    <input type="submit" value="Search" />
+    </form>
+</div>
 {% endblock %}

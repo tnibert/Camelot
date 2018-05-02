@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from ..controllers.friendcontroller import friendcontroller
 from ..controllers.utilities import get_profile_from_uid, AlreadyExistsException, AddSelfException
+from ..forms import SearchForm
 
 @login_required
 def add_friend(request, userid):
@@ -62,3 +63,14 @@ def show_pending_friend_reqs(request):
     pendingfriendships = friendcontrol.return_pending_requests()
 
     return render(request, 'camelot/showpending.html', {'pending': pendingfriendships})
+
+@login_required
+def search(request):
+    if request.method == 'POST':
+        form = SearchForm(request.POST)
+        if form.is_valid():
+            friendcontrol = friendcontroller(request.user.id)
+            searchtext = form.cleaned_data['searchtext']
+            result = friendcontrol.findfriends(searchtext)
+            retdict = {'result': result}
+            return render(request, 'camelot/searchresults.html', retdict)

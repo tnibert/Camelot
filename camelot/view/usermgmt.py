@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
 
-from ..forms import SignUpForm
+from ..forms import SignUpForm, SearchForm
 from ..tokens import account_activation_token
 from ..controllers.friendcontroller import friendcontroller
 
@@ -45,7 +45,8 @@ def index(request):
 @login_required
 def user_home(request):
     retdict = {
-        "pendingreqs": len(friendcontroller(request.user.id).return_pending_requests())
+        "pendingreqs": len(friendcontroller(request.user.id).return_pending_requests()),
+        "searchform": SearchForm()
     }
     return render(request, 'camelot/home.html', retdict)
 

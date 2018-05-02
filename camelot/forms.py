@@ -7,6 +7,7 @@ from .models import FriendGroup
 from .controllers.groupcontroller import groupcontroller
 from .controllers.friendcontroller import friendcontroller
 
+
 class SignUpForm(UserCreationForm):
     email = forms.EmailField(help_text='Required')
 
@@ -14,9 +15,11 @@ class SignUpForm(UserCreationForm):
         model = User
         fields = ('username', 'email', 'password1', 'password2', )
 
+
 class AlbumCreateForm(forms.Form):
     albumname = forms.CharField(label='Photo album name', max_length=70)
     description = forms.CharField(label='Photo album description', max_length=300)
+
 
 class UploadPhotoForm(forms.Form):
     # todo: read django security doc regarding this
@@ -39,10 +42,12 @@ class UploadPhotoForm(forms.Form):
         for index in range(int(self.extra_fields)):
             #print("In form for loop index " + str(index))
             # generate extra fields in the number specified via extra_fields
+            # we can use label variable here
             self.fields['file_{index}'.format(index=index+1)] = \
                 forms.ImageField()
             self.fields['desc_{index}'.format(index=index+1)] = \
                 forms.CharField(max_length=MAXPHOTODESC, required=False)
+
 
 class EditProfileForm(forms.Form):
     # need to have existing fields filled in by default on form display
@@ -50,6 +55,11 @@ class EditProfileForm(forms.Form):
     description = forms.CharField(label='Description', max_length=300,
                                   # the following might be best done in css
                                   widget=forms.Textarea(attrs={'cols': 50, 'rows': 6}))
+
+
+class SearchForm(forms.Form):
+    searchtext = forms.CharField(label='Friend Search', max_length=MAXDISPLAYNAME)
+
 
 class ManageGroupsForm(forms.Form):
     """
