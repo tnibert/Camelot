@@ -18,7 +18,14 @@ class Profile(models.Model):
     dname = models.CharField(max_length=MAXDISPLAYNAME, default="")
 
     def __str__(self):
-        return "Profile " + str(self.id) + ": " + str(self.user.username)
+        """
+        This will now be how we manage the distinction between displayname and username
+        :return: display name or user name is no display name
+        """
+        if len(self.dname) == 0:
+            return self.user.username
+        else:
+            return self.dname
 
 
 @receiver(post_save, sender=User)

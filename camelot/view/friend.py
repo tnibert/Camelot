@@ -66,11 +66,16 @@ def show_pending_friend_reqs(request):
 
 @login_required
 def search(request):
+    """
+    View endpoint to find new friends, awww
+    :param request:
+    :return:
+    """
     if request.method == 'POST':
         form = SearchForm(request.POST)
         if form.is_valid():
             friendcontrol = friendcontroller(request.user.id)
             searchtext = form.cleaned_data['searchtext']
-            result = friendcontrol.findfriends(searchtext)
-            retdict = {'result': result}
+            results = friendcontrol.findfriends(searchtext)
+            retdict = {'results': results}
             return render(request, 'camelot/searchresults.html', retdict)
