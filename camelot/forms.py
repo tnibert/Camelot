@@ -123,6 +123,28 @@ class AddContributorForm(forms.Form):
         """
         super(AddContributorForm, self).__init__(*args, **kwargs)
         control = friendcontroller(myuid)
+        # todo: change this to str(x) rather than x.user.username, look for other instances
         ch = lambda: [(x.id, x.user.username) for x in control.return_friend_list(control.uprofile) if x not in album.contributors.all()]
         self.fields['idname'] = forms.MultipleChoiceField(
             label='New Contributor', choices=ch)
+
+
+class ManageGroupMemberForm(forms.Form):
+
+    def __init__(self, myprofile, group, remove=False, *args, **kwargs):
+        super(ManageGroupMemberForm, self).__init__(*args, **kwargs)
+
+        friendcontrol = friendcontroller(myprofile.user.id)
+        if not remove:
+            # add friend to group
+            ch = lambda: [(x.id, str(x)) for x in friendcontrol.return_friend_list(myprofile) if
+                          x not in group.members.all()]
+            label = "Add Friends"
+        else:
+            # remove friend from group
+            ch = lambda: [(x.id, str(x)) for x in friendcontrol.return_friend_list(myprofile) if
+                          x in group.members.all()]
+            label = "Remove Friends"
+
+        self.fields['idname'] = forms.MultipleChoiceField(
+            label=label, choices=ch)

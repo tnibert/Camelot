@@ -1,28 +1,15 @@
 {% extends 'camelot/baseloggedin.html' %}
 
 {% block content2 %}
-<h2>Groups</h2>
-<table>
-    {% for group in groups %}
-    <tr>
-        <td>{{ group.name }} - <a href="">Edit Members</a></td>
-        <td>
-            {% for member in group.members.all %}
-            {{ member }}
-            {% endfor %}
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+<h2>{{ group.name }}</h2>
+
 <br>
-<!-- add button for adding group -->
-<h2>Add New Group</h2>
+<h2>Add Members</h2>
 <form action="{% url 'create_group' %}" method="post">
     {% include 'camelot/genericformtemp.html' with form=addform %}
     <input type="submit" value="Add" />
 </form>
-<!-- add button for deleting group -->
-<h2>Delete Group</h2>
+<h2>Delete Members</h2>
 <form action="{% url 'delete_group' %}" method="post">
     {% include 'camelot/genericformtemp.html' with form=delform %}
     <input type="submit" value="Delete" />

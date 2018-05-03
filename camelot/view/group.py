@@ -82,11 +82,18 @@ def manage_groups(request):
 def manage_group(request, id):
     """
     View to manage an individual group
+    add/remove members
     :param request:
     :param id: id of the group to manage
     :return:
     """
-    pass
+    groupcontrol = groupcontroller(request.user.id)
+    retdict = {
+        "group": return_group_from_id(id),
+        "addform": None,
+        "delform": None
+    }
+    return render(request, "camelot/editgroupmembers.html", retdict)
 
 @login_required
 def add_friend_to_group(request, userid):
