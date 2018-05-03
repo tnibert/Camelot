@@ -39,6 +39,7 @@ urlpatterns = [
     url(r'^album/(?P<albumid>\d+)/delete$', album.delete_album, name="delete_album"),
     url(r'^group/delete$', group.delete_group, name="delete_group"),
     path('search', friend.search, name="search"),
+    url(r'^group/(?P<id>\d+)/manage$', group.manage_group, name="manage_group"),
 ]
 
 if settings.DEBUG:

@@ -6,7 +6,7 @@ from django.http import Http404
 from ..controllers.groupcontroller import groupcontroller, is_in_group, return_group_from_id
 from ..controllers.friendcontroller import are_friends
 from ..controllers.utilities import get_profile_from_uid
-from ..forms import AddGroupForm, MyGroupSelectForm
+from ..forms import AddGroupForm, MyGroupSelectForm, ManageGroupMemberForm
 
 """
 Let's try to make this a bit more... restful?  Whatever that really means
@@ -88,10 +88,11 @@ def manage_group(request, id):
     :return:
     """
     groupcontrol = groupcontroller(request.user.id)
+    group = return_group_from_id(id)
     retdict = {
-        "group": return_group_from_id(id),
-        "addform": None,
-        "delform": None
+        "group": group,
+        "addform": ManageGroupMemberForm(request.user.profile, group),
+        "delform": ManageGroupMemberForm(request.user.profile, group, remove=True)
     }
     return render(request, "camelot/editgroupmembers.html", retdict)
 

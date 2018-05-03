@@ -1,16 +1,16 @@
 {% extends 'camelot/baseloggedin.html' %}
 
 {% block content2 %}
-<h2>{{ group.name }}</h2>
+<h2>Edit {{ group.name }} Members</h2>
 
 <br>
 <h2>Add Members</h2>
-<form action="{% url 'create_group' %}" method="post">
+<form action="{% url '' %}" method="post">
     {% include 'camelot/genericformtemp.html' with form=addform %}
     <input type="submit" value="Add" />
 </form>
 <h2>Delete Members</h2>
-<form action="{% url 'delete_group' %}" method="post">
+<form action="{% url '' %}" method="post">
     {% include 'camelot/genericformtemp.html' with form=delform %}
     <input type="submit" value="Delete" />
 </form>
