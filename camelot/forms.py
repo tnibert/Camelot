@@ -130,7 +130,7 @@ class AddContributorForm(forms.Form):
 
 
 class ManageGroupMemberForm(forms.Form):
-
+    # todo: order alphabetically
     def __init__(self, myprofile, group, remove=False, *args, **kwargs):
         super(ManageGroupMemberForm, self).__init__(*args, **kwargs)
 

@@ -99,6 +99,12 @@ def manage_group(request, id):
 
 @login_required
 def remove_friend_from_group(request, groupid):
+    """
+    Remove friends from a group from the group management page
+    :param request:
+    :param groupid:
+    :return:
+    """
     if request.method == 'POST':
         group = return_group_from_id(groupid)
         groupcontrol = groupcontroller(request.user.id)
@@ -113,13 +119,26 @@ def remove_friend_from_group(request, groupid):
 
 @login_required
 def add_friend_to_group_mgmt(request, groupid):
-    pass
+    """
+    Add friends to a group from the group management page
+    :param request:
+    :param groupid:
+    :return:
+    """
+    if request.method == 'POST':
+        group = return_group_from_id(groupid)
+        groupcontrol = groupcontroller(request.user.id)
+        form = ManageGroupMemberForm(request.user.profile, group, False, request.POST)
+
+        if form.is_valid():
+
+            profiles = [get_profile_from_uid(int(x)) for x in form.cleaned_data['idname']]
+            for profile in profiles:
+                groupcontrol.add_member(group.id, profile)
+            return redirect("manage_group", group.id)
 
 @login_required
 def add_friend_to_group(request, userid):
-    # todo: use this in group management form
-    # need to adjust for multiple users
-    # maybe not... maybe need a new function
     """
     View to add a friend to a group after creating friendship
     Need to check if a friendship exists before allowing access
