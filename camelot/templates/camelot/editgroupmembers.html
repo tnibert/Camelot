@@ -2,7 +2,9 @@
 
 {% block content2 %}
 <h2>Edit {{ group.name }} Members</h2>
-
+{% for member in group.members.all %}
+    {{ member }}<br>
+{% endfor %}
 <br>
 <h2>Add Members</h2>
 <form action="{% url 'group_friend_add' group.id %}" method="post">

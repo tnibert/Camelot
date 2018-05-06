@@ -5,11 +5,9 @@
 <table>
     {% for group in groups %}
     <tr>
-        <td>{{ group.name }} - <a href="{% url 'manage_group' group.id %}">Edit Members</a></td>
+        <td>{{ group.name }}</td>
         <td>
-            {% for member in group.members.all %}
-            {{ member }}
-            {% endfor %}
+            <a href="{% url 'manage_group' group.id %}">Edit Members</a>
         </td>
     </tr>
     {% endfor %}
