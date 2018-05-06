@@ -2,6 +2,7 @@ from django.urls import path
 from django.conf.urls import url
 from django.conf.urls.static import static
 from django.conf import settings
+from django.contrib.auth import views as auth_views
 from .view import album, usermgmt, profile, friend, group
 
 urlpatterns = [
@@ -42,6 +43,11 @@ urlpatterns = [
     url(r'^group/(?P<id>\d+)/manage$', group.manage_group, name="manage_group"),
     url(r'^group/(?P<groupid>\d+)/rmmember$', group.remove_friend_from_group, name="group_friend_remove"),
     url(r'^group/(?P<groupid>\d+)/addmember$', group.add_friend_to_group_mgmt, name="group_friend_add"),
+    url(r'^password_reset/$', auth_views.password_reset, name='password_reset'),
+    url(r'^password_reset/done/$', auth_views.password_reset_done, name='password_reset_done'),
+    url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+        auth_views.password_reset_confirm, name='password_reset_confirm'),
+    url(r'^reset/done/$', auth_views.password_reset_complete, name='password_reset_complete'),
 ]
 
 if settings.DEBUG:
