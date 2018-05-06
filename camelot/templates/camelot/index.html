@@ -26,5 +26,8 @@ Welcome to Camelot.<br>
         </tr>
     </table>  
 </form><br>
-<a href="{% url 'user_register' %}">Register</a>
+<ul>
+    <li><a href="{% url 'user_register' %}">Register</a></li>
+    <li><a href="{% url 'password_reset' %}"> I Forgot My Password</a></li>
+</ul>
 {% endblock %}
