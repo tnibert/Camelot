@@ -121,6 +121,7 @@ def is_in_group(group, profile):
     else:
         return False
 
+
 def return_group_from_id(id):
     # todo: unit test
     """

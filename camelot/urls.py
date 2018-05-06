@@ -40,6 +40,8 @@ urlpatterns = [
     url(r'^group/delete$', group.delete_group, name="delete_group"),
     path('search', friend.search, name="search"),
     url(r'^group/(?P<id>\d+)/manage$', group.manage_group, name="manage_group"),
+    url(r'^group/(?P<groupid>\d+)/rmmember$', group.remove_friend_from_group, name="group_friend_remove"),
+    url(r'^group/(?P<groupid>\d+)/addmember$', group.add_friend_to_group_mgmt, name="group_friend_add"),
 ]
 
 if settings.DEBUG:

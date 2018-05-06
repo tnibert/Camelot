@@ -137,12 +137,12 @@ class ManageGroupMemberForm(forms.Form):
         friendcontrol = friendcontroller(myprofile.user.id)
         if not remove:
             # add friend to group
-            ch = lambda: [(x.id, str(x)) for x in friendcontrol.return_friend_list(myprofile) if
+            ch = lambda: [(x.user.id, str(x)) for x in friendcontrol.return_friend_list(myprofile) if
                           x not in group.members.all()]
             label = "Add Friends"
         else:
             # remove friend from group
-            ch = lambda: [(x.id, str(x)) for x in friendcontrol.return_friend_list(myprofile) if
+            ch = lambda: [(x.user.id, str(x)) for x in friendcontrol.return_friend_list(myprofile) if
                           x in group.members.all()]
             label = "Remove Friends"
 

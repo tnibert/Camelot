@@ -5,12 +5,12 @@
 
 <br>
 <h2>Add Members</h2>
-<form action="{% url '' %}" method="post">
+<form action="{% url 'group_friend_add' group.id %}" method="post">
     {% include 'camelot/genericformtemp.html' with form=addform %}
     <input type="submit" value="Add" />
 </form>
 <h2>Delete Members</h2>
-<form action="{% url '' %}" method="post">
+<form action="{% url 'group_friend_remove' group.id %}" method="post">
     {% include 'camelot/genericformtemp.html' with form=delform %}
     <input type="submit" value="Delete" />
 </form>
