@@ -2,10 +2,11 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.forms import ChoiceField, MultipleChoiceField
 from django.http import Http404
+from django.contrib import messages
 
 from ..controllers.groupcontroller import groupcontroller, is_in_group, return_group_from_id
 from ..controllers.friendcontroller import are_friends
-from ..controllers.utilities import get_profile_from_uid
+from ..controllers.utilities import get_profile_from_uid, AlreadyExistsException
 from ..forms import AddGroupForm, MyGroupSelectForm, ManageGroupMemberForm
 
 """
@@ -34,7 +35,10 @@ def create_group(request):
             if len(newgroupname) == 0:
                 # todo: pass in error, need to implement db constraint to take care of this
                 return redirect("manage_groups")
-            groupcontrol.create(newgroupname)
+            try:
+                groupcontrol.create(newgroupname)
+            except AlreadyExistsException as e:
+                messages.error(request, "Group name must be unique")
 
     # always redirect the same regardless of request type
     return redirect("manage_groups")
