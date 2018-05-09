@@ -1,6 +1,8 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 from .constants import *
 from .models import FriendGroup
@@ -8,8 +10,24 @@ from .controllers.groupcontroller import groupcontroller
 from .controllers.friendcontroller import friendcontroller
 
 
+# https://docs.djangoproject.com/en/dev/ref/validators/
+def validate_email(value):
+    """
+    Validate that email address of newly created user is not already registered
+    :param value:
+    :return:
+    """
+    try:
+        email = User.objects.get(email=value)
+    except User.DoesNotExist:
+        # if a user doesn't exist with the email, we pass
+        return
+    # if a user does exist with the email, raise
+    raise ValidationError("Email address already registered")
+
+
 class SignUpForm(UserCreationForm):
-    email = forms.EmailField(help_text='Required')
+    email = forms.EmailField(help_text='Required', validators=[validate_email])
 
     class Meta:
         model = User
