@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
+from django.template.defaultfilters import filesizeformat
 
 from .constants import *
 from .models import FriendGroup
@@ -38,6 +38,10 @@ class AlbumCreateForm(forms.Form):
     albumname = forms.CharField(label='Photo album name', max_length=70)
     description = forms.CharField(label='Photo album description', max_length=300)
 
+def validate_image(value):
+    if value._size > MAX_UPLOAD_SIZE:
+        raise ValidationError("Please keep file size under {}. Current file size {}".format(filesizeformat(str(MAX_UPLOAD_SIZE)), filesizeformat(value._size)))
+
 
 class UploadPhotoForm(forms.Form):
     # todo: read django security doc regarding this
@@ -51,7 +55,7 @@ class UploadPhotoForm(forms.Form):
         super(UploadPhotoForm, self).__init__(*args, **kwargs)
         self.fields['extra_field_count'].initial = self.extra_fields
 
-        self.fields['file_0'] = forms.ImageField()
+        self.fields['file_0'] = forms.ImageField(validators=[validate_image])
         self.fields['desc_0'] = forms.CharField(max_length=MAXPHOTODESC, required=False)
         self.fields['file_0'].label = "File"
         self.fields['desc_0'].label = "Description"
@@ -62,7 +66,7 @@ class UploadPhotoForm(forms.Form):
             # generate extra fields in the number specified via extra_fields
             # we can use label variable here
             self.fields['file_{index}'.format(index=index+1)] = \
-                forms.ImageField(label="File")
+                forms.ImageField(label="File", validators=[validate_image])
             self.fields['desc_{index}'.format(index=index+1)] = \
                 forms.CharField(label="Description", max_length=MAXPHOTODESC, required=False)
 
