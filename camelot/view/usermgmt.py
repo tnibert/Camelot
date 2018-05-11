@@ -4,10 +4,13 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
-
+#import logging
 from ..forms import SignUpForm, SearchForm
 from ..tokens import account_activation_token
 from ..controllers.friendcontroller import friendcontroller
+
+#logger = logging.getLogger(__name__)
+
 
 """
 User login and home page
@@ -83,7 +86,14 @@ def register(request):
                 'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
                 'token': account_activation_token.make_token(user),
             })
-            user.email_user(subject, message)
+            try:
+                user.email_user(subject, message)
+            except Exception as e:
+                # did not send email correctly, roll back
+                user.delete()
+                #logger.warning(e)
+                messages.add_message(request, messages.INFO, 'Error sending confirmation email')
+                return render('camelot/register.html', {'form': form})
 
             return redirect('account_activation_sent')
     else:
