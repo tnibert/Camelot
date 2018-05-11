@@ -5,6 +5,7 @@ from ..controllers.profilecontroller import profilecontroller
 from ..controllers.utilities import PermissionException, get_profile_from_uid
 
 from ..forms import EditProfileForm
+from ..constants import PREFIX
 
 def show_profile(request, userid):
     """
@@ -49,7 +50,7 @@ def return_raw_profile_pic(request, userid):
     if photo:
         fname = photo.filename
     else:
-        fname = "userphotos/defaultprofile.png"
+        fname = PREFIX + "userphotos/defaultprofile.png"
 
     with open(fname, "rb") as f:
         return HttpResponse(f.read(), content_type="image/*")
