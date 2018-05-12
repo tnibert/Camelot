@@ -47,8 +47,8 @@ def create_album(request):
     return render(request, 'camelot/createalbum.html', {'form': form})
 
 
-@login_required
 def display_albums(request, userid):
+    # todo: add unit test for non logged in user accessing
     albumcontrol = albumcontroller(request.user.id)
 
     # get albums
@@ -66,8 +66,7 @@ def display_albums(request, userid):
     retdict = {}
     retdict['userid'] = int(userid)
     retdict['albums'] = albums
-    # todo: BUG if we go to a contributed album, and then click back to albums,
-    # then the user will navigate to the album owner's page rather than the contributor's
+
     if len(contrib) > 0:
         retdict['contrib'] = contrib
     return render(request, 'camelot/showalbums.html', retdict)
