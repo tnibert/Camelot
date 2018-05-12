@@ -17,3 +17,5 @@ ACCESSTYPES = {ALBUM_PUBLIC: "public",
                    ALBUM_ALLFRIENDS: "all friends",
                    ALBUM_GROUPS: "specified groups",
                    ALBUM_PRIVATE: "owner and contributors"}
+
+PREFIX=""
