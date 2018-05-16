@@ -16,12 +16,20 @@ from ..controllers.friendcontroller import friendcontroller
 User login and home page
 """
 
+
 def index(request):
     if request.method == "POST":
-        # do we need to use is_valid() here?
+        # todo: use is_valid() here?
         username = request.POST['username']
         password = request.POST['password']
-        user = authenticate(username=username, password=password)
+        # be aware of potential for returning multiple users?
+        try:
+            temp_user = User.objects.get(username__iexact=username)
+        except User.DoesNotExist:
+            # create message
+            messages.add_message(request, messages.INFO, 'Invalid Login')
+            return redirect("index")
+        user = authenticate(username=temp_user.username, password=password)
         if user is not None:
             if user.is_active:
                 login(request, user)    # check for login failure?
@@ -68,37 +76,43 @@ from django.template.loader import render_to_string
 
 from ..controllers.profilecontroller import profilecontroller
 
-# need to implement a user registration function with email confirmation
-# need to error handle if email can't be sent
+# user registration function with email confirmation
 def register(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
-            user = form.save(commit=False)
-            user.is_active = False
-            user.save()
-
-            current_site = get_current_site(request)
-            subject = 'Activate Your Camelot Account'
-            message = render_to_string('camelot/account_activation_email.html', {
-                'user': user,
-                'domain': current_site.domain,
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
-                'token': account_activation_token.make_token(user),
-            })
             try:
-                user.email_user(subject, message)
-            except Exception as e:
-                # did not send email correctly, roll back
-                user.delete()
-                #logger.warning(e)
-                messages.add_message(request, messages.INFO, 'Error sending confirmation email')
-                return render('camelot/register.html', {'form': form})
+                User.objects.get(username__iexact=form.cleaned_data['username'])
+            except User.DoesNotExist:
+                user = form.save(commit=False)
+                user.is_active = False
+                user.save()
 
-            return redirect('account_activation_sent')
-    else:
-        form = SignUpForm()
-    
+                current_site = get_current_site(request)
+                subject = 'Activate Your PicPicPanda Account'
+                message = render_to_string('camelot/account_activation_email.html', {
+                    'user': user,
+                    'domain': current_site.domain,
+                    'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
+                    'token': account_activation_token.make_token(user),
+                })
+                try:
+                    user.email_user(subject, message)
+                except Exception as e:
+                    # did not send email correctly, roll back
+                    user.delete()
+                    #logger.warning(e)
+                    messages.add_message(request, messages.INFO, 'Error sending confirmation email')
+                    # why does this render work, but the bottom one requires a request?
+                    return render('camelot/register.html', {'form': form})
+
+                return redirect('account_activation_sent')
+
+            messages.add_message(request, messages.INFO, 'Username already exists')
+
+    form = SignUpForm()
+
+    #print(request.method)
     return render(request, 'camelot/register.html', {'form': form})
 
 def account_activation_sent(request):
@@ -121,7 +135,7 @@ def activate(request, uidb64, token):
         profilecontrol = profilecontroller(uid)
         profilecontrol.create_default_groups()
 
-        login(request, user)
+        #login(request, user)
         return redirect('user_home')
     else:
         return render(request, 'camelot/account_activation_invalid.html')
