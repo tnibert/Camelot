@@ -132,7 +132,7 @@ class albumcontroller(genericcontroller):
         # todo: this naming system may create clashes when we start deleting db entries?
         # will it reuse ids?  I think it will.  But does that matter?  Maybe not..
         fname = PREFIX + 'userphotos/{}/{}/{}'.format(self.uprofile.user.id, album.id, newphoto.id)
-        thumbname = PREFIX + 'thumbs/{}/{}/{}'.format(self.uprofile.user.id, album.id, newphoto.id)
+        thumbname = PREFIX + 'thumbs/{}/{}/{}.png'.format(self.uprofile.user.id, album.id, newphoto.id)
 
         # update filename in db now that we have our primary key
         newphoto.filename = fname
@@ -142,6 +142,7 @@ class albumcontroller(genericcontroller):
 
         # well now we definitely depend on python 3.2+
         makedirs("/".join(fname.split("/")[:-1]), exist_ok=True)
+        makedirs("/".join(thumbname.split("/")[:-1]), exist_ok=True)
 
         # save file in chunks to save memory
         CHUNK_SIZE = 430        # bytes
@@ -150,6 +151,11 @@ class albumcontroller(genericcontroller):
             while chunk:  # loop until the chunk is empty (the file is exhausted)
                 destination.write(chunk)
                 chunk = fi.read(CHUNK_SIZE)  # read the next chunk
+
+        # save thumbnail
+        fi.seek(0)
+        #open(thumbname, 'a').close()
+        ThumbFromBuffer(fi).save(thumbname)
 
         return newphoto
 
@@ -295,6 +301,6 @@ def ThumbFromBuffer(buf):
     """
     img = Image.open(BytesIO(buf.read()))
     baseheight = THUMBHEIGHT
-    hpercent = (baseheight / float(img.size[0]))
-    wsize = int((float(img.size[1]) * float(hpercent)))
+    hpercent = (baseheight / float(img.size[1]))
+    wsize = int((float(img.size[0]) * float(hpercent)))         # we can change 0 to 1 for a square
     return img.resize((wsize, baseheight), Image.ANTIALIAS)
