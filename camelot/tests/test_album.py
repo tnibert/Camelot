@@ -5,7 +5,7 @@ from django.shortcuts import reverse
 from django.contrib.auth.models import User
 
 from ..models import Album, Photo
-from ..controllers.albumcontroller import albumcontroller, collate_owner_and_contrib
+from ..controllers.albumcontroller import *
 from ..controllers.groupcontroller import groupcontroller
 from ..controllers.utilities import *
 from ..view.album import *
@@ -419,6 +419,13 @@ class AlbumControllerTests(TestCase):
         assert not self.albumcontrol.set_accesstype(testalbum, 2.5)
         assert not self.albumcontrol.set_accesstype(testalbum, 100)
         assert testalbum.accesstype == ALBUM_PRIVATE
+
+    def test_create_thumbnail_in_memory(self):
+
+        with open('camelot/tests/resources/testimage.jpg', 'rb') as fi:
+            thumb = ThumbFromBuffer(fi)
+            assert thumb.size[0] == 180         # width
+            assert thumb.size[1] == 180         # height
 
 
 class AlbumViewTests(TestCase):

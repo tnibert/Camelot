@@ -19,3 +19,5 @@ ACCESSTYPES = {ALBUM_PUBLIC: "public",
                    ALBUM_PRIVATE: "owner and contributors"}
 
 PREFIX=""
+
+THUMBHEIGHT=180

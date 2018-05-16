@@ -6,6 +6,8 @@ from .groupcontroller import is_in_group
 from ..constants import *
 from django.utils import timezone
 from os import makedirs, unlink
+from io import BytesIO
+from PIL import Image
 
 class albumcontroller(genericcontroller):
     """
@@ -130,9 +132,11 @@ class albumcontroller(genericcontroller):
         # todo: this naming system may create clashes when we start deleting db entries?
         # will it reuse ids?  I think it will.  But does that matter?  Maybe not..
         fname = PREFIX + 'userphotos/{}/{}/{}'.format(self.uprofile.user.id, album.id, newphoto.id)
+        thumbname = PREFIX + 'thumbs/{}/{}/{}'.format(self.uprofile.user.id, album.id, newphoto.id)
 
         # update filename in db now that we have our primary key
         newphoto.filename = fname
+        newphoto.thumb = thumbname
 
         newphoto.save()
 
@@ -282,3 +286,15 @@ def collate_owner_and_contrib(album):
     lst = list(album.contributors.all())
     lst.append(album.owner)
     return lst
+
+def ThumbFromBuffer(buf):
+    """
+    Take an image buffer, scale, and return a thumbnail
+    :param buf: raw image data buffer
+    :return: PIL Image thumbnail
+    """
+    img = Image.open(BytesIO(buf.read()))
+    baseheight = THUMBHEIGHT
+    hpercent = (baseheight / float(img.size[0]))
+    wsize = int((float(img.size[1]) * float(hpercent)))
+    return img.resize((wsize, baseheight), Image.ANTIALIAS)

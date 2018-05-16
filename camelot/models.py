@@ -82,6 +82,7 @@ class Album(models.Model):
 
 class Photo(models.Model):
     filename = models.CharField(max_length=200, default='')
+    thumb = models.CharField(max_length=200, default='')
     description = models.CharField(max_length=150)      # these length values should be defined elsewhere
     # foreign key - album
     album = models.ForeignKey(Album, on_delete=models.CASCADE)
@@ -92,4 +93,13 @@ class Photo(models.Model):
 # receiver to delete the file on disk when we delete a photo from database
 @receiver(post_delete, sender=Photo)
 def delete_photo_file(sender, instance, *args, **kwargs):
-    unlink(instance.filename)
+    try:
+        unlink(instance.filename)
+    except FileNotFoundError:
+        # todo: log
+        pass
+    try:
+        unlink(instance.thumb)
+    except FileNotFoundError:
+        # todo: log
+        pass
