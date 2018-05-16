@@ -183,7 +183,7 @@ def add_photo(request, id):
     return render(request, 'camelot/uploadphoto.html', {'form': form, 'albumid': id})   # so maybe we make the move to class based views
 
 
-def return_photo_file_http(request, photoid):
+def return_photo_file_http(request, photoid, thumb=False):
     """
     wrapper to securely show a photo without exposing externally
     We must ensure the security of photo.filename, because if this can be messed with our whole filesystem could be vulnerable
@@ -199,8 +199,19 @@ def return_photo_file_http(request, photoid):
         raise PermissionException
 
     # we might want to enclose this in a try except block, but for now it is ok like this
+    if thumb:
+        #try:
+        with open(photo.thumb, "rb") as f:
+            return HttpResponse(f.read(), content_type="image/png")
+        # if we don't have a thumb, pass the whole image - it's an option
+        #except FileNotFoundError:
+            # todo: log
+        #    pass
+
+    # if we haven't returned from thumb, return the full image
     with open(photo.filename, "rb") as f:
         return HttpResponse(f.read(), content_type="image/*")
+
 
 @login_required
 def delete_photo(request, photoid):

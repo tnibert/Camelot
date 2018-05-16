@@ -19,6 +19,7 @@ urlpatterns = [
     url(r'^album/(?P<id>\d+)/(?P<contribid>\d+)$', album.display_album, name="show_album"),
     url(r'^album/(?P<id>\d+)/upload_photos/$', album.add_photo, name="upload_photos"),
     url(r'^photo/(?P<photoid>\d+)/$', album.return_photo_file_http, name="show_photo"),
+    url(r'^photo/(?P<photoid>\d+)/thumb/$', album.return_photo_file_http, {'thumb': True}, name="show_thumb"),
     url(r'^profile/(?P<userid>\d+)/$', profile.show_profile, name="show_profile"),
     url(r'^profile/(?P<userid>\d+)/friends$', friend.view_friend_list, name="show_friends"),
     url(r'^profile/(?P<userid>\d+)/add_friend$', friend.add_friend, name="add_friend"),
