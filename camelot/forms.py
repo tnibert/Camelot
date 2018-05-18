@@ -36,7 +36,7 @@ class SignUpForm(UserCreationForm):
 
 class AlbumCreateForm(forms.Form):
     albumname = forms.CharField(label='Photo album name', max_length=70)
-    description = forms.CharField(label='Photo album description', max_length=300)
+    description = forms.CharField(label='Photo album description', max_length=300, required=False)
 
 def validate_image(value):
     if value._size > MAX_UPLOAD_SIZE:
