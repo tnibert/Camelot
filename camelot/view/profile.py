@@ -78,6 +78,9 @@ def update_profile(request):
             profilecontrol.update_profile_data(**data)
             return redirect("show_profile", request.user.id)
     else:
-        form = EditProfileForm(initial={'description': profilecontrol.uprofile.description})
+        form = EditProfileForm(initial={
+            'displayname': str(profilecontrol.uprofile),
+            'description': profilecontrol.uprofile.description
+        })
     return render(request, 'camelot/editprofile.html', {'form': form})
 
