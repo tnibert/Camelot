@@ -13,7 +13,7 @@
         <div class="gallery">
             <a href="{% url 'show_album' album.id %}">
                 {% if album.temp %}
-                    <img src="{% url 'show_photo' album.temp %}" alt="{{ album.name }}" height="150">
+                    <img src="{% url 'show_thumb' album.temp %}" alt="{{ album.name }}" height="150">
                 {% else %}
                     <img src="{% static 'img/defaultalbum.png' %}" alt="{{ album.name }}" height="150">
                 {% endif %}

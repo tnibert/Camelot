@@ -5,7 +5,7 @@ from django.shortcuts import reverse
 from django.contrib.auth.models import User
 
 from ..models import Album, Photo
-from ..controllers.albumcontroller import albumcontroller, collate_owner_and_contrib
+from ..controllers.albumcontroller import *
 from ..controllers.groupcontroller import groupcontroller
 from ..controllers.utilities import *
 from ..view.album import *
@@ -102,13 +102,17 @@ class AlbumControllerTests(TestCase):
             # double check that our test is sending the right type for fi and that django will sent in rb mode
             with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
                 myphoto = self.albumcontrol.add_photo_to_album(myalbum.id, "generic description", fi)
-                # need to add checks for file existence
 
             # asserts
             assert myphoto.uploader == self.u.profile
             assert myphoto.album == myalbum
             assert myphoto.description == "generic description"
             assert myphoto.filename == "userphotos/1/1/1"
+            assert myphoto.thumb == "thumbs/1/1/1.png"
+
+            # test file existence
+            assert os.path.isfile(myphoto.filename)
+            assert os.path.isfile(myphoto.thumb)
 
         finally:
             # clean up
@@ -419,6 +423,15 @@ class AlbumControllerTests(TestCase):
         assert not self.albumcontrol.set_accesstype(testalbum, 2.5)
         assert not self.albumcontrol.set_accesstype(testalbum, 100)
         assert testalbum.accesstype == ALBUM_PRIVATE
+
+    def test_create_thumbnail_in_memory(self):
+
+        with open('camelot/tests/resources/testimage.jpg', 'rb') as fi:
+            thumb = ThumbFromBuffer(fi)
+            # testimage is a square, so thumbheight will work for both - 180
+            # todo: improve test with multi dimensioned image
+            assert thumb.size[0] == THUMBHEIGHT         # width
+            assert thumb.size[1] == THUMBHEIGHT         # height
 
 
 class AlbumViewTests(TestCase):

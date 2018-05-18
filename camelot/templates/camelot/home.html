@@ -1,7 +1,7 @@
 {% extends 'camelot/baseloggedin.html' %}
 
 {% block content2 %}
-<h1>Welcome to Camelot {{request.user.username}}</h1>
+<h1>Welcome to PicPicPanda {{request.user.username}}</h1>
 <ul class="navbar">
 <li><a href="{% url 'create_album' %}">Create Album</a></li>
 <li><a href="{%url 'show_albums' request.user.id %}">View Albums</a></li>

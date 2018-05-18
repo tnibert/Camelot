@@ -48,7 +48,7 @@ def return_raw_profile_pic(request, userid):
     # todo: add unit test
     photo = get_profile_from_uid(userid).profile_pic
     if photo:
-        fname = photo.filename
+        fname = photo.thumb
     else:
         fname = PREFIX + "userphotos/defaultprofile.png"
 

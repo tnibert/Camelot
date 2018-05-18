@@ -1,7 +1,6 @@
 {% extends 'camelot/baseloggedin.html' %}
 {% block content1 %}
-Welcome to Camelot - a privacy aware photo sharing site.<br>
-<!-- login form here, index action value will likely change -->
+Welcome to PicPicPanda - a privacy aware photo sharing site.<br>
 
 {% if messages %}
     {% for message in messages %}
@@ -12,7 +11,7 @@ Welcome to Camelot - a privacy aware photo sharing site.<br>
 <form name="login" action="{% url 'index' %}" method="post" accept-charset="utf-8">  
     {% csrf_token %}
 
-    <!-- this might be better implemented the normal form way -->
+    {# this might be better implemented the normal form way #}
     <table>
         <tr><td><label for="username">Username: </label></td>  
         <td><input type="text" name="username" placeholder="username" required></td>
@@ -25,7 +24,7 @@ Welcome to Camelot - a privacy aware photo sharing site.<br>
         <td><input type="submit" value="Login"></td>
         </tr>
     </table>  
-</form><br>
+</form>
 <ul>
     <li><a href="{% url 'user_register' %}">Register</a></li>
     <li><a href="{% url 'password_reset' %}"> I Forgot My Password</a></li>
