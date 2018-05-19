@@ -239,21 +239,21 @@ def delete_photo(request, photoid):
 @login_required
 def delete_album(request, albumid):
     """
-    For now this is a GET, may need to reconsider
-    ... you know what?  No, fuck that, a GET is the simplest implementation
-    and simplicity trumps paradigm dogma, this and delete_photo stay GETs
-    Delete an album
+    Ok, I was wrong, let's be more restful
+    Delete an album, check for confirmation first
     :param request:
     :param albumid: id of album to delete
     :return:
     """
 
-    # todo: add confirmation dialog
     albumcontrol = albumcontroller(request.user.id)
     album = albumcontrol.return_album(albumid)
 
-    if request.method == 'POST':
+    if albumcontrol.uprofile != album.owner:
+        raise PermissionException
 
+    if request.method == 'POST':
+        # todo: should use form to get album id
         if albumcontrol.delete_album(album):
             messages.add_message(request, messages.INFO, "Successfully deleted album")
             return redirect("show_albums", albumcontrol.uprofile.id)
