@@ -132,8 +132,8 @@ class friendcontroller(genericcontroller):
         :return: queryset of profiles
         """
         def _defaultsearch(str):
-            return Profile.objects.filter(dname__contains=str)\
-                .union(Profile.objects.filter(user__username__contains=str)).distinct()
+            return Profile.objects.filter(dname__icontains=str)\
+                .union(Profile.objects.filter(user__username__icontains=str)).distinct()
 
         def _pgsearch(str):
             # postgres specific search

@@ -19,12 +19,17 @@ class FriendGroupControllerTests(TestCase):
 
         self.friendcredentials = {
             'username': 'testuser2',
-            'email': 'user@test.com',
+            'email': 'user1@test.com',
             'password': 'secret'}
 
         self.friend2credentials = {
             'username': 'testuser3',
-            'email': 'user@test.com',
+            'email': 'user2@test.com',
+            'password': 'secret'}
+
+        self.friend3credentials = {
+            'username': 'TeStuSeR4',
+            'email': 'user@blah.com',
             'password': 'secret'}
 
         self.u = User.objects.create_user(**self.credentials)
@@ -35,6 +40,9 @@ class FriendGroupControllerTests(TestCase):
 
         self.friend2 = User.objects.create_user(**self.friend2credentials)
         self.friend2.save()
+
+        self.friend3 = User.objects.create_user(**self.friend3credentials)
+        self.friend3.save()
 
         self.friendcontrol = friendcontroller(self.u.id)
         self.otherfriendcontrol = friendcontroller(self.friend.id)
@@ -176,7 +184,7 @@ class FriendshipTests(FriendGroupControllerTests):
         search3 = "NOT IN USERS"
         search4 = "hi"
         qset = self.friendcontrol.findfriends(search1)
-        assert len(qset) == 3
+        assert len(qset) == 4
         qset = self.friendcontrol.findfriends(search2)
         assert len(qset) == 1
         qset = self.friendcontrol.findfriends(search3)
