@@ -2,8 +2,14 @@
 {% block content2 %}
 <div>
     <form action="{% url 'delete_album' album.id %}" method="post">
+        {% csrf_token %}
         <lable>Are you sure you want to delete {{ album.name }}?</lable>
-    {% include 'camelot/genericformtemp.html' with form=confirmform %}
+        <br><br>
+        {% for field in form %}
+        <p>
+            {{ field }}
+        </p>
+        {% endfor %}
     <input type="submit" value="Yes, I want to delete it forever" />
     </form>
 </div>

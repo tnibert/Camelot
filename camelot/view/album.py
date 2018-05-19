@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404
 from django.forms import MultipleChoiceField
@@ -254,10 +255,10 @@ def delete_album(request, albumid):
     if request.method == 'POST':
 
         if albumcontrol.delete_album(album):
-            # add success notification
+            messages.add_message(request, messages.INFO, "Successfully deleted album")
             return redirect("show_albums", albumcontrol.uprofile.id)
         else:
-            # todo: add failure notification
+            messages.add_message(request, messages.INFO, "Failed to delete album")
             return redirect("show_album", album.id)
 
     else:
