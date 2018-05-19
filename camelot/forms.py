@@ -170,3 +170,11 @@ class ManageGroupMemberForm(forms.Form):
 
         self.fields['idname'] = forms.MultipleChoiceField(
             label=label, choices=ch)
+
+
+class DeleteConfirmForm(forms.Form):
+
+    def __init__(self, id, *args, **kwargs):
+        super(DeleteConfirmForm, self).__init__(*args, **kwargs)
+
+        self.fields['resource'] = forms.IntegerField(widget=forms.HiddenInput(), initial=id)

@@ -1,0 +1,10 @@
+{% extends 'camelot/baseloggedin.html' %}
+{% block content2 %}
+<div>
+    <form action="{% url 'delete_album' album.id %}" method="post">
+        <lable>Are you sure you want to delete {{ album.name }}?</lable>
+    {% include 'camelot/genericformtemp.html' with form=confirmform %}
+    <input type="submit" value="Yes, I want to delete it forever" />
+    </form>
+</div>
+{% endblock %}

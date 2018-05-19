@@ -6,7 +6,7 @@ from random import randint
 from ..controllers.albumcontroller import albumcontroller, collate_owner_and_contrib
 from ..controllers.friendcontroller import are_friends
 from ..controllers.utilities import PermissionException
-from ..forms import AlbumCreateForm, UploadPhotoForm, EditAlbumAccesstypeForm, MyGroupSelectForm, AddContributorForm
+from ..forms import AlbumCreateForm, UploadPhotoForm, EditAlbumAccesstypeForm, MyGroupSelectForm, AddContributorForm, DeleteConfirmForm
 from ..constants import *
 from ..controllers.utilities import *
 from ..models import Profile, FriendGroup, Photo
@@ -246,15 +246,25 @@ def delete_album(request, albumid):
     :param albumid: id of album to delete
     :return:
     """
+
     # todo: add confirmation dialog
     albumcontrol = albumcontroller(request.user.id)
     album = albumcontrol.return_album(albumid)
 
-    if albumcontrol.delete_album(album):
-        return redirect("show_albums", albumcontrol.uprofile.id)
+    if request.method == 'POST':
+
+        if albumcontrol.delete_album(album):
+            # add success notification
+            return redirect("show_albums", albumcontrol.uprofile.id)
+        else:
+            # todo: add failure notification
+            return redirect("show_album", album.id)
+
     else:
-        # todo: add failure notification
-        return redirect("show_album", album.id)
+        # present confirmation dialog
+        confirm = DeleteConfirmForm(albumid)
+        retdict = {'confirmform': confirm, 'album': album}
+        return render(request, "camelot/confirmdelete.html", retdict)
 
 
 @login_required
