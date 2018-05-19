@@ -1,7 +1,7 @@
 {% extends 'camelot/baseloggedin.html' %}
 
 {% block content2 %}
-<h1>Welcome to PicPicPanda {{request.user.username}}</h1>
+<h1>Welcome to PicPicPanda {{user.profile}}</h1>
 <ul class="navbar">
 <li><a href="{% url 'create_album' %}">Create Album</a></li>
 <li><a href="{%url 'show_albums' request.user.id %}">View Albums</a></li>
@@ -11,6 +11,11 @@
 <li><a href="{% url 'update_profile' %}">Edit Profile</a></li>
 <li><a href="{% url 'manage_groups' %}">Manage Friend Groups</a></li>
 </ul>
+
+<td>
+    <tr>Your profile url:</tr>
+    <tr>https://picpicpanda.com/space/{{request.user.username}}</tr>
+</td>
 
 <div>
     <form action="{% url 'search' %}" method="post">
