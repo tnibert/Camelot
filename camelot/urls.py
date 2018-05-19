@@ -21,6 +21,7 @@ urlpatterns = [
     url(r'^photo/(?P<photoid>\d+)/$', album.return_photo_file_http, name="show_photo"),
     url(r'^photo/(?P<photoid>\d+)/thumb/$', album.return_photo_file_http, {'thumb': True}, name="show_thumb"),
     url(r'^profile/(?P<userid>\d+)/$', profile.show_profile, name="show_profile"),
+    url(r'^space/(?P<username>[\w\-]+)/$', profile.show_profile_by_name, name="show_profile_name"),
     url(r'^profile/(?P<userid>\d+)/friends$', friend.view_friend_list, name="show_friends"),
     url(r'^profile/(?P<userid>\d+)/add_friend$', friend.add_friend, name="add_friend"),
     url(r'^profile/(?P<userid>\d+)/confirm$', friend.confirm_friend, name="confirm_friend"),

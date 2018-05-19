@@ -1,11 +1,13 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from ..controllers.profilecontroller import profilecontroller
-from ..controllers.utilities import PermissionException, get_profile_from_uid
+from ..controllers.utilities import PermissionException, get_profile_from_uid, get_profid_from_username
 
 from ..forms import EditProfileForm
 from ..constants import PREFIX
+
 
 def show_profile(request, userid):
     """
@@ -23,6 +25,15 @@ def show_profile(request, userid):
         raise
 
     return render(request, 'camelot/profile.html', data)
+
+
+def show_profile_by_name(request, username):
+    try:
+        user = get_profid_from_username(username)
+    except User.DoesNotExist:
+        raise Http404
+
+    return show_profile(request, user.id)
 
 
 @login_required
