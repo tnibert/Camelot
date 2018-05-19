@@ -546,9 +546,9 @@ class test_manage_page_permissions(PermissionTestCase):
         self.addgroupgetrequest = self.factory.get(reverse("add_album_groups", kwargs={"albumid":self.testalbum.id}))
         self.addgroupgetrequest.user = self.u
 
-        assert album.add_contrib(self.addcontribgetrequest, self.testalbum.id) == Http404
-        assert album.update_access_type(self.updateaccessgetrequest, self.testalbum.id) == Http404
-        assert album.add_groups(self.addgroupgetrequest, self.testalbum.id) == Http404
+        self.assertRaises(Http404, album.add_contrib, self.addcontribgetrequest, self.testalbum.id)
+        self.assertRaises(Http404, album.update_access_type, self.updateaccessgetrequest, self.testalbum.id)
+        self.assertRaises(Http404, album.add_groups, self.addgroupgetrequest, self.testalbum.id)
         # todo: maybe make this a loop
 
 

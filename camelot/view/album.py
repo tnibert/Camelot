@@ -313,7 +313,7 @@ def update_access_type(request, id):
             albumcontrol.set_accesstype(album, atype)
             return redirect("manage_album", id)
 
-    return Http404
+    raise Http404
 
 @login_required
 def add_groups(request, albumid):
@@ -352,7 +352,7 @@ def add_groups(request, albumid):
         return redirect("manage_album", album.id)
 
     # if not a post, we 404
-    return Http404
+    raise Http404
 
 @login_required
 def add_contrib(request, albumid):
@@ -393,7 +393,7 @@ def add_contrib(request, albumid):
         return redirect("manage_album", album.id)
 
     # if not a post, we 404
-    return Http404
+    raise Http404
 
 
 def download_album(request, albumid):
