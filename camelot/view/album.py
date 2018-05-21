@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404
 from django.forms import MultipleChoiceField
+from django.views.decorators.http import etag
 from random import randint
 from ..controllers.albumcontroller import albumcontroller, collate_owner_and_contrib
 from ..controllers.friendcontroller import are_friends
@@ -184,6 +185,11 @@ def add_photo(request, id):
     return render(request, 'camelot/uploadphoto.html', {'form': form, 'albumid': id})   # so maybe we make the move to class based views
 
 
+def make_photo_etag():
+    return "1"
+
+
+@etag(make_photo_etag)
 def return_photo_file_http(request, photoid, thumb=False):
     """
     wrapper to securely show a photo without exposing externally
