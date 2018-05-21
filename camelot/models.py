@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
+from django.utils import timezone
 from os import unlink
 from .constants import *
 
@@ -89,6 +90,7 @@ class Photo(models.Model):
     # set default on delete may not be appropriate
     # todo: be aware of this when we implement user deletion
     uploader = models.ForeignKey(Profile, default=None, on_delete=models.SET_DEFAULT, null=True, blank=True)
+    pub_date = models.DateTimeField('date published', default=timezone.now)
 
 
 # receiver to delete the file on disk when we delete a photo from database
