@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404
 from django.forms import MultipleChoiceField
+from django.views.decorators.http import etag
 from random import randint
 from ..controllers.albumcontroller import albumcontroller, collate_owner_and_contrib
 from ..controllers.friendcontroller import are_friends
@@ -11,6 +12,18 @@ from ..forms import AlbumCreateForm, UploadPhotoForm, EditAlbumAccesstypeForm, M
 from ..constants import *
 from ..controllers.utilities import *
 from ..models import Profile, FriendGroup, Photo
+
+#def album_perm_check(func):
+#    """
+#    This is a decorator to validate permissions
+#    This is being implemented late, so it isn't used in most places we check permissions
+#    Has been created for photo returning etag
+#    :param func:
+#    :return:
+#    """
+#    def wrapper(*args, **kwargs):
+#        pass
+#    return wrapper
 
 """
 Album views
@@ -184,6 +197,24 @@ def add_photo(request, id):
     return render(request, 'camelot/uploadphoto.html', {'form': form, 'albumid': id})   # so maybe we make the move to class based views
 
 
+def make_photo_etag(request, *args, **kwargs):
+    """
+    Permission check and return etag for photo
+    :param request:
+    :param args:
+    :param kwargs:
+    :return: etag if has permission, else raise PermissionException
+    """
+    photoid = kwargs.get('photoid')
+    albumcontrol = albumcontroller(request.user.id)
+    photo = albumcontrol.return_photo(photoid)
+    if not albumcontrol.has_permission_to_view(photo.album):
+        raise PermissionException
+    else:
+        return str(photo.pub_date)
+
+
+@etag(make_photo_etag)
 def return_photo_file_http(request, photoid, thumb=False):
     """
     wrapper to securely show a photo without exposing externally
@@ -192,14 +223,12 @@ def return_photo_file_http(request, photoid, thumb=False):
     :param photoid: id of photo
     :return:
     """
+    # Permission check moved to make_photo_etag()
+    # and the next two lines just got redundant... double db queries...
     albumcontrol = albumcontroller(request.user.id)
     photo = albumcontrol.return_photo(photoid)
 
-    # permission check
-    if not albumcontrol.has_permission_to_view(photo.album):
-        raise PermissionException
-
-    # we might want to enclose this in a try except block, but for now it is ok like this
+    # we might want to enclose theee withs in a try except block, but for now it is ok like this
     if thumb:
         #try:
         with open(photo.thumb, "rb") as f:
