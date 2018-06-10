@@ -207,7 +207,7 @@ def make_photo_etag(request, *args, **kwargs):
     """
     photoid = kwargs.get('photoid')
     albumcontrol = albumcontroller(request.user.id)
-    photo = albumcontrol.return_photo(photoid)
+    photo = albumcontrol.return_photo(int(photoid))
     if not albumcontrol.has_permission_to_view(photo.album):
         raise PermissionException
     else:

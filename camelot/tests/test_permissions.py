@@ -183,6 +183,62 @@ class PermissionTestCase(TestCase):
         else:
             self.assertRaises(PermissionException, func, request, id)
 
+    def perm_escalate_helper_get_with_client(self, albumcontrol, testalbum, id, argname, func, level):
+        """
+        Fixture to incrementally tighten permissions for album using client
+        Needed to test album.return_photo_file_http due to etag change
+        :param albumcontrol: albumcontroller object
+        :param testalbum: album to raise permissions of
+        :param id: function arg to test against
+        :param argname: the argument name that id corresponds to in kwargs for url
+        :param func: url name from urls.py for the function
+        :param level: level of access user should have
+                1: public
+                2: all friends
+                3: groups
+                4: private
+                -- defined in constants --
+        """
+        permexceptstr = "Well, look at you, trying to access stuff you can't access on a privacy aware website."
+        # assign anonymous user to requests
+        #request.user = user
+
+        albumcontrol.set_accesstype(testalbum, ALBUM_PUBLIC)
+
+        response = self.client.get(reverse(func, kwargs={argname: id}))
+        if level >= ALBUM_PUBLIC:
+            self.assertEqual(response.status_code, 200)
+            assert permexceptstr not in str(response.content)
+        else:
+            assert permexceptstr in str(response.content)
+
+        albumcontrol.set_accesstype(testalbum, ALBUM_ALLFRIENDS)
+
+        response = self.client.get(reverse(func, kwargs={argname: id}))
+        if level >= ALBUM_ALLFRIENDS:
+            self.assertEqual(response.status_code, 200)
+            assert permexceptstr not in str(response.content)
+        else:
+            assert permexceptstr in str(response.content)
+
+        albumcontrol.set_accesstype(testalbum, ALBUM_GROUPS)
+
+        response = self.client.get(reverse(func, kwargs={argname: id}))
+        if level >= ALBUM_GROUPS:
+            self.assertEqual(response.status_code, 200)
+            assert permexceptstr not in str(response.content)
+        else:
+            assert permexceptstr in str(response.content)
+
+        albumcontrol.set_accesstype(testalbum, ALBUM_PRIVATE)
+
+        response = self.client.get(reverse(func, kwargs={argname: id}))
+        if level >= ALBUM_PRIVATE:
+            self.assertEqual(response.status_code, 200)
+            assert permexceptstr not in str(response.content)
+        else:
+            assert permexceptstr in str(response.content)
+
 
 class AlbumPhotoViewPermissionsTest(PermissionTestCase):
     """
@@ -303,8 +359,8 @@ class AlbumPhotoViewPermissionsTest(PermissionTestCase):
                                   self.u2, album.display_album, ALBUM_PRIVATE)
 
         # test photo view
-        self.perm_escalate_helper(self.albumcontrol, self.photorequest, self.testalbum, self.photo.id,
-                                  self.u2, album.return_photo_file_http, ALBUM_PRIVATE)
+        self.perm_escalate_helper_get_with_client(self.albumcontrol, self.testalbum, self.photo.id,
+                                                  "photoid", "show_photo", ALBUM_PRIVATE)
 
         # test individual photo view page
         self.perm_escalate_helper(self.albumcontrol, self.indivphotorequest, self.testalbum, self.photo.id,
