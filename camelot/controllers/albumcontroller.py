@@ -129,20 +129,22 @@ class albumcontroller(genericcontroller):
         newphoto.save()
 
         # create filename with primary key
-        # todo: this naming system may create clashes when we start deleting db entries?
         # will it reuse ids?  I think it will.  But does that matter?  Maybe not..
         fname = PREFIX + 'userphotos/{}/{}/{}'.format(self.uprofile.user.id, album.id, newphoto.id)
         thumbname = PREFIX + 'thumbs/{}/{}/{}.png'.format(self.uprofile.user.id, album.id, newphoto.id)
+        midname = PREFIX + 'mid/{}/{}/{}.png'.format(self.uprofile.user.id, album.id, newphoto.id)
 
         # update filename in db now that we have our primary key
         newphoto.filename = fname
         newphoto.thumb = thumbname
+        newphoto.midsize = midname
 
         newphoto.save()
 
         # well now we definitely depend on python 3.2+
         makedirs("/".join(fname.split("/")[:-1]), exist_ok=True)
         makedirs("/".join(thumbname.split("/")[:-1]), exist_ok=True)
+        makedirs("/".join(midname.split("/")[:-1]), exist_ok=True)
 
         # save file in chunks to save memory
         CHUNK_SIZE = 430        # bytes
@@ -154,8 +156,11 @@ class albumcontroller(genericcontroller):
 
         # save thumbnail
         fi.seek(0)
-        #open(thumbname, 'a').close()
         ThumbFromBuffer(fi).save(thumbname)
+
+        # save mid size image
+        fi.seek(0)
+        ThumbFromBuffer(fi, MIDHEIGHT).save(midname)
 
         return newphoto
 
@@ -293,14 +298,20 @@ def collate_owner_and_contrib(album):
     lst.append(album.owner)
     return lst
 
-def ThumbFromBuffer(buf):
+def ThumbFromBuffer(buf, baseheight=THUMBHEIGHT):
     """
     Take an image buffer, scale, and return a thumbnail
     :param buf: raw image data buffer
     :return: PIL Image thumbnail
     """
     img = Image.open(BytesIO(buf.read()))
-    baseheight = THUMBHEIGHT
+
+    # if the image is smaller than our target height, don't resize it
+    # this will leave us double saving sometimes, but right now, we need to do that for png uniformity
+    # todo; resolve this redundancy
+    if img.size[1] <= baseheight:
+        return img
+
     hpercent = (baseheight / float(img.size[1]))
     wsize = int((float(img.size[0]) * float(hpercent)))         # we can change 0 to 1 for a square
     return img.resize((wsize, baseheight), Image.ANTIALIAS)
