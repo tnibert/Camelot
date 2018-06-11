@@ -199,45 +199,43 @@ class PermissionTestCase(TestCase):
                 4: private
                 -- defined in constants --
         """
-        permexceptstr = "Well, look at you, trying to access stuff you can't access on a privacy aware website."
-        # assign anonymous user to requests
-        #request.user = user
+        #permexceptstr = "Well, look at you, trying to access stuff you can't access on a privacy aware website."
 
         albumcontrol.set_accesstype(testalbum, ALBUM_PUBLIC)
 
         response = self.client.get(reverse(func, kwargs={argname: id}))
+
         if level >= ALBUM_PUBLIC:
             self.assertEqual(response.status_code, 200)
-            assert permexceptstr not in str(response.content)
         else:
-            assert permexceptstr in str(response.content)
+            self.assertEqual(response.status_code, 404)
 
         albumcontrol.set_accesstype(testalbum, ALBUM_ALLFRIENDS)
 
         response = self.client.get(reverse(func, kwargs={argname: id}))
+
         if level >= ALBUM_ALLFRIENDS:
             self.assertEqual(response.status_code, 200)
-            assert permexceptstr not in str(response.content)
         else:
-            assert permexceptstr in str(response.content)
+            self.assertEqual(response.status_code, 404)
 
         albumcontrol.set_accesstype(testalbum, ALBUM_GROUPS)
 
         response = self.client.get(reverse(func, kwargs={argname: id}))
+
         if level >= ALBUM_GROUPS:
             self.assertEqual(response.status_code, 200)
-            assert permexceptstr not in str(response.content)
         else:
-            assert permexceptstr in str(response.content)
+            self.assertEqual(response.status_code, 404)
 
         albumcontrol.set_accesstype(testalbum, ALBUM_PRIVATE)
 
         response = self.client.get(reverse(func, kwargs={argname: id}))
+
         if level >= ALBUM_PRIVATE:
             self.assertEqual(response.status_code, 200)
-            assert permexceptstr not in str(response.content)
         else:
-            assert permexceptstr in str(response.content)
+            self.assertEqual(response.status_code, 404)
 
 
 class AlbumPhotoViewPermissionsTest(PermissionTestCase):
@@ -245,6 +243,7 @@ class AlbumPhotoViewPermissionsTest(PermissionTestCase):
     Test album view and photo view permissions
     Covers show_album, show_photo, and present_photo
     """
+    # todo: adjust all of these tests to use the client fixture
     def setUp(self):
 
         super(AlbumPhotoViewPermissionsTest, self).setUp()
@@ -284,8 +283,8 @@ class AlbumPhotoViewPermissionsTest(PermissionTestCase):
                                   AnonymousUser(), album.display_album, ALBUM_PUBLIC)
 
         # test photo view
-        self.perm_escalate_helper(self.albumcontrol, self.photorequest, self.testalbum, self.photo.id,
-                                  AnonymousUser(), album.return_photo_file_http, ALBUM_PUBLIC)
+        self.perm_escalate_helper_get_with_client(self.albumcontrol, self.testalbum, self.photo.id,
+                                                  "photoid", "show_photo", ALBUM_PUBLIC)
 
         # test individual photo view page
         self.perm_escalate_helper(self.albumcontrol, self.indivphotorequest, self.testalbum, self.photo.id,
@@ -304,8 +303,8 @@ class AlbumPhotoViewPermissionsTest(PermissionTestCase):
                                   self.u2, album.display_album, ALBUM_PUBLIC)
 
         # test photo view
-        self.perm_escalate_helper(self.albumcontrol, self.photorequest, self.testalbum, self.photo.id,
-                                  self.u2, album.return_photo_file_http, ALBUM_PUBLIC)
+        self.perm_escalate_helper_get_with_client(self.albumcontrol, self.testalbum, self.photo.id,
+                                                  "photoid", "show_photo", ALBUM_PUBLIC)
 
         # test individual photo view page
         self.perm_escalate_helper(self.albumcontrol, self.indivphotorequest, self.testalbum, self.photo.id,
@@ -323,8 +322,8 @@ class AlbumPhotoViewPermissionsTest(PermissionTestCase):
                                   self.u2, album.display_album, ALBUM_ALLFRIENDS)
 
         # test photo view
-        self.perm_escalate_helper(self.albumcontrol, self.photorequest, self.testalbum, self.photo.id,
-                                  self.u2, album.return_photo_file_http, ALBUM_ALLFRIENDS)
+        self.perm_escalate_helper_get_with_client(self.albumcontrol, self.testalbum, self.photo.id,
+                                                  "photoid", "show_photo", ALBUM_ALLFRIENDS)
 
         # test individual photo view page
         self.perm_escalate_helper(self.albumcontrol, self.indivphotorequest, self.testalbum, self.photo.id,
@@ -341,8 +340,8 @@ class AlbumPhotoViewPermissionsTest(PermissionTestCase):
                                   self.u2, album.display_album, ALBUM_GROUPS)
 
         # test photo view
-        self.perm_escalate_helper(self.albumcontrol, self.photorequest, self.testalbum, self.photo.id,
-                                  self.u2, album.return_photo_file_http, ALBUM_GROUPS)
+        self.perm_escalate_helper_get_with_client(self.albumcontrol, self.testalbum, self.photo.id,
+                                                  "photoid", "show_photo", ALBUM_GROUPS)
 
         # test individual photo view page
         self.perm_escalate_helper(self.albumcontrol, self.indivphotorequest, self.testalbum, self.photo.id,
@@ -377,8 +376,8 @@ class AlbumPhotoViewPermissionsTest(PermissionTestCase):
                                   self.u, album.display_album, ALBUM_PRIVATE)
 
         # test photo view
-        self.perm_escalate_helper(self.albumcontrol, self.photorequest, self.testalbum, self.photo.id,
-                                  self.u, album.return_photo_file_http, ALBUM_PRIVATE)
+        self.perm_escalate_helper_get_with_client(self.albumcontrol, self.testalbum, self.photo.id,
+                                                  "photoid", "show_photo", ALBUM_PRIVATE)
 
         # test individual photo view page
         self.perm_escalate_helper(self.albumcontrol, self.indivphotorequest, self.testalbum, self.photo.id,
