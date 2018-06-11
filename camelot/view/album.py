@@ -215,12 +215,15 @@ def make_photo_etag(request, *args, **kwargs):
 
 
 @etag(make_photo_etag)
-def return_photo_file_http(request, photoid, thumb=False):
+def return_photo_file_http(request, photoid, thumb=False, mid=True):
     """
     wrapper to securely show a photo without exposing externally
     We must ensure the security of photo.filename, because if this can be messed with our whole filesystem could be vulnerable
     :param request:
     :param photoid: id of photo
+    :param thumb: If true display thumbnail image
+    :param mid: If true and thumb is false, display mid size image
+    If both thumb and mid are false, display full size image
     :return:
     """
     # Permission check moved to make_photo_etag()
@@ -228,19 +231,22 @@ def return_photo_file_http(request, photoid, thumb=False):
     albumcontrol = albumcontroller(request.user.id)
     photo = albumcontrol.return_photo(photoid)
 
-    # we might want to enclose theee withs in a try except block, but for now it is ok like this
+    # default to rendering midsize image
+    name = photo.midsize
+    ext = "png"
     if thumb:
-        #try:
-        with open(photo.thumb, "rb") as f:
-            return HttpResponse(f.read(), content_type="image/png")
-        # if we don't have a thumb, pass the whole image - it's an option
-        #except FileNotFoundError:
-            # todo: log
-        #    pass
+        name = photo.thumb
+    elif not mid:
+        name = photo.filename
+        ext = "*"
 
-    # if we haven't returned from thumb, return the full image
-    with open(photo.filename, "rb") as f:
-        return HttpResponse(f.read(), content_type="image/*")
+    # we might want to enclose these withs in a try except block, but for now it is ok like this
+    #try:
+    with open(name, "rb") as f:
+        return HttpResponse(f.read(), content_type="image/{}".format(ext))
+    # if we don't have a thumb, pass the whole image - it's an option
+    #except FileNotFoundError:
+        # todo: log
 
 
 @login_required
