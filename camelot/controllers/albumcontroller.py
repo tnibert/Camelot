@@ -129,7 +129,6 @@ class albumcontroller(genericcontroller):
         newphoto.save()
 
         # create filename with primary key
-        # todo: this naming system may create clashes when we start deleting db entries?
         # will it reuse ids?  I think it will.  But does that matter?  Maybe not..
         fname = PREFIX + 'userphotos/{}/{}/{}'.format(self.uprofile.user.id, album.id, newphoto.id)
         thumbname = PREFIX + 'thumbs/{}/{}/{}.png'.format(self.uprofile.user.id, album.id, newphoto.id)
@@ -138,7 +137,7 @@ class albumcontroller(genericcontroller):
         # update filename in db now that we have our primary key
         newphoto.filename = fname
         newphoto.thumb = thumbname
-        newphoto.mid = midname
+        newphoto.midsize = midname
 
         newphoto.save()
 
@@ -306,6 +305,13 @@ def ThumbFromBuffer(buf, baseheight=THUMBHEIGHT):
     :return: PIL Image thumbnail
     """
     img = Image.open(BytesIO(buf.read()))
+
+    # if the image is smaller than our target height, don't resize it
+    # this will leave us double saving sometimes, but right now, we need to do that for png uniformity
+    # todo; resolve this redundancy
+    if img.size[1] <= baseheight:
+        return img
+
     hpercent = (baseheight / float(img.size[1]))
     wsize = int((float(img.size[0]) * float(hpercent)))         # we can change 0 to 1 for a square
     return img.resize((wsize, baseheight), Image.ANTIALIAS)
