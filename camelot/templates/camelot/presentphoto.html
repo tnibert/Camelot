@@ -4,6 +4,7 @@
 {% load staticfiles %}
     <ul>
         <li><a href="{% url 'show_album' photo.album.id %}">Back To Album</a></li>
+        <li><a href="{% url 'show_photo_full' photo.id %}">View Full Size</a></li>
         {% if request.user.profile == photo.album.owner or request.user.profile in photo.album.contributors.all %}
         <li><a href="{% url 'set_profile_pic' photo.id %}">Set As Profile Picture</a></li>
         {% endif %}
