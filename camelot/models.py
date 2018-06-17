@@ -92,6 +92,8 @@ class Photo(models.Model):
     # todo: be aware of this when we implement user deletion
     uploader = models.ForeignKey(Profile, default=None, on_delete=models.SET_DEFAULT, null=True, blank=True)
     pub_date = models.DateTimeField('date published', default=timezone.now)
+    # image mime type for full size image (mid and thumbs are png)
+    imgtype = models.CharField(max_length=50, null=True)
 
 
 # receiver to delete the file on disk when we delete a photo from database
