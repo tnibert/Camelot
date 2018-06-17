@@ -233,17 +233,17 @@ def return_photo_file_http(request, photoid, thumb=False, mid=True):
 
     # default to rendering midsize image
     name = photo.midsize
-    ext = "png"
+    mime = "image/png"
     if thumb:
         name = photo.thumb
     elif not mid:
         name = photo.filename
-        ext = "*"
+        mime = photo.imgtype
 
     # we might want to enclose these withs in a try except block, but for now it is ok like this
     #try:
     with open(name, "rb") as f:
-        return HttpResponse(f.read(), content_type="image/{}".format(ext))
+        return HttpResponse(f.read(), content_type=mime)
     # if we don't have a thumb, pass the whole image - it's an option
     #except FileNotFoundError:
         # todo: log
