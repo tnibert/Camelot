@@ -139,6 +139,11 @@ class albumcontroller(genericcontroller):
         newphoto.thumb = thumbname
         newphoto.midsize = midname
 
+        fi.seek(0)
+        with Image.open(BytesIO(fi.read())) as img:
+            newphoto.imgtype = Image.MIME[img.format]
+
+        # save data structure to db
         newphoto.save()
 
         # well now we definitely depend on python 3.2+
@@ -147,6 +152,7 @@ class albumcontroller(genericcontroller):
         makedirs("/".join(midname.split("/")[:-1]), exist_ok=True)
 
         # save file in chunks to save memory
+        fi.seek(0)
         CHUNK_SIZE = 430        # bytes
         with open(fname, 'wb+') as destination:
             chunk = fi.read(CHUNK_SIZE)
@@ -314,4 +320,6 @@ def ThumbFromBuffer(buf, baseheight=THUMBHEIGHT):
 
     hpercent = (baseheight / float(img.size[1]))
     wsize = int((float(img.size[0]) * float(hpercent)))         # we can change 0 to 1 for a square
+
+    # will this return approach leak memory?
     return img.resize((wsize, baseheight), Image.ANTIALIAS)
