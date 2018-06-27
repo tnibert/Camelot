@@ -262,13 +262,25 @@ def delete_photo(request, photoid):
     albumcontrol = albumcontroller(request.user.id)
     photo = albumcontrol.return_photo(photoid)
     album = photo.album
-    # controller method will check permission
-    if albumcontrol.delete_photo(photo):
-        return redirect("show_album", album.id)
-    else:
-        # todo: add some kind of failure notification
-        return redirect("present_photo", photo.id)
 
+    # if we are not the owner or uploader, don't allow access
+    if albumcontrol.uprofile != album.owner and albumcontrol.uprofile != photo.uploader:
+        raise PermissionException
+
+    # if we post, delete the photo
+    if request.method == 'POST':
+        # controller method will check permission
+        if albumcontrol.delete_photo(photo):
+            return redirect("show_album", album.id)
+        else:
+            # todo: add some kind of failure notification
+            return redirect("present_photo", photo.id)
+    # if we don't post, present confirmation form
+    else:
+        # present confirmation dialog
+        confirm = DeleteConfirmForm(photo.id)
+        retdict = {'confirmform': confirm, 'photo': photo}
+        return render(request, "camelot/confirmdelete.html", retdict)
 
 # I don't like how similar the code between show albums and show album is
 @login_required
