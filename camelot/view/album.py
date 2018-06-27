@@ -252,13 +252,15 @@ def return_photo_file_http(request, photoid, thumb=False, mid=True):
 @login_required
 def delete_photo(request, photoid):
     """
-    For now this is a GET, may need to reconsider
     Delete a photo
+
+    There is too much copy pasting between this and and delete_album()
+    May want to consolidate later
+
     :param request:
     :param photoid: id of photo to delete
     :return: redirect to album
     """
-    # todo: add confirmation dialog
     albumcontrol = albumcontroller(request.user.id)
     photo = albumcontrol.return_photo(photoid)
     album = photo.album
