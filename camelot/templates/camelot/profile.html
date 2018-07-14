@@ -9,7 +9,6 @@ Friend request pending<br>
 {% endif %}
 <img src="{% url 'profile_pic' uid %}" height="150">
 <p>{{ name }}</p>
-<p>Description:</p>
 <p>{{ description }}</p>
 <p><a href="{% url 'show_albums' uid %}">Albums</a></p>
 <p><a href="{% url 'show_friends' uid %}">Friends</a></p>
