@@ -21,6 +21,7 @@ urlpatterns = [
     url(r'^photo/(?P<photoid>\d+)/$', album.return_photo_file_http, name="show_photo"),
     url(r'^photo/(?P<photoid>\d+)/thumb/$', album.return_photo_file_http, {'thumb': True}, name="show_thumb"),
     url(r'^photo/(?P<photoid>\d+)/fullsize/$', album.return_photo_file_http, {'mid': False}, name="show_photo_full"),
+    url(r'^photo/(?P<photoid>\d+)/rotated/(?P<rotation>\d+)$', album.return_photo_file_http, name="show_photo_rotated"),
     url(r'^profile/(?P<userid>\d+)/$', profile.show_profile, name="show_profile"),
     url(r'^space/(?P<username>[\w\-]+)/$', profile.show_profile_by_name, name="show_profile_name"),
     url(r'^profile/(?P<userid>\d+)/friends$', friend.view_friend_list, name="show_friends"),

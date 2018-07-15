@@ -18,7 +18,11 @@
         <table class="gal-img">
             <tr>
                 {# https://www.iconfinder.com/icons/186410/arrow_left_previous_icon#size=256 - free for commercial use #}
-                <td><img src="{% url 'show_photo' photo.id %}" alt="{{ photo.description }}" ></td>
+                {% if rotation == 0 %}
+                    <td><img src="{% url 'show_photo' photo.id %}" alt="{{ photo.description }}" ></td>
+                (% else %}
+                    <td><img src="{% url 'show_photo_rotated' photo.id rotation %}" alt="{{ photo.description }}" ></td>
+                {% endif %}
             </tr>
             <br>
             <tr>

@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404
 from django.forms import MultipleChoiceField
 from django.views.decorators.http import etag
+from PIL import Image
 from random import randint
 from ..controllers.albumcontroller import albumcontroller, collate_owner_and_contrib
 from ..controllers.friendcontroller import are_friends
@@ -135,7 +136,8 @@ def display_photo(request, photoid):
     retdict = {
         'next': albumphotos[i+1].id if i < (len(albumphotos) - 1) else albumphotos[0].id,
         'previous': albumphotos[i-1].id if i > 0 else albumphotos[(len(albumphotos)-1)].id,
-        'photo': photo
+        'photo': photo,
+        'rotation': 0
     }
 
     return render(request, 'camelot/presentphoto.html', retdict)
@@ -205,16 +207,17 @@ def make_photo_etag(request, *args, **kwargs):
     :return: etag if has permission, else raise PermissionException
     """
     photoid = kwargs.get('photoid')
+    rotation = kwargs.get('rotation')
     albumcontrol = albumcontroller(request.user.id)
     photo = albumcontrol.return_photo(int(photoid))
     if not albumcontrol.has_permission_to_view(photo.album):
         raise PermissionException
     else:
-        return str(photo.pub_date)
+        return str(photo.pub_date) + str(rotation)
 
 
 @etag(make_photo_etag)
-def return_photo_file_http(request, photoid, thumb=False, mid=True):
+def return_photo_file_http(request, photoid, thumb=False, mid=True, rotation=0):
     """
     wrapper to securely show a photo without exposing externally
     We must ensure the security of photo.filename, because if this can be messed with our whole filesystem could be vulnerable
@@ -222,13 +225,19 @@ def return_photo_file_http(request, photoid, thumb=False, mid=True):
     :param photoid: id of photo
     :param thumb: If true display thumbnail image
     :param mid: If true and thumb is false, display mid size image
+    :param rotation: the number of degrees to rotate the image
     If both thumb and mid are false, display full size image
     :return:
     """
+    # todo: this isn't working because we are getting 304 redirect...
+
     # Permission check moved to make_photo_etag()
     # and the next two lines just got redundant... double db queries...
     albumcontrol = albumcontroller(request.user.id)
     photo = albumcontrol.return_photo(photoid)
+    # we need to validate this value
+    rotation = int(rotation)
+    print(rotation)
 
     # default to rendering midsize image
     name = photo.midsize
@@ -241,8 +250,19 @@ def return_photo_file_http(request, photoid, thumb=False, mid=True):
 
     # we might want to enclose these withs in a try except block, but for now it is ok like this
     #try:
-    with open(name, "rb") as f:
-        return HttpResponse(f.read(), content_type=mime)
+    if rotation == 0:
+        with open(name, "rb") as f:
+            return HttpResponse(f.read(), content_type=mime)
+    else:
+        # return a rotated image
+        #try:
+        #    assert isinstance(rotation, int)
+        #except:
+        #    raise
+
+        with Image.open(name) as f:
+            return HttpResponse(f.rotate(rotation).tobytes(), content_type=mime)
+
     # if we don't have a thumb, pass the whole image - it's an option
     #except FileNotFoundError:
         # todo: log
