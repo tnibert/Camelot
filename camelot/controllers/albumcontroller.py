@@ -301,9 +301,14 @@ class albumcontroller(genericcontroller):
         :param photo: the photo to rotate
         :return:
         """
+        # todo: unit test
         if degree==0:
             return
-        pass
+        for img in (photo.filename, photo.midsize, photo.thumb):
+            with Image.open(img) as i:
+                rotated = i.rotate(degree)
+                rotated.save(img)
+
 
 def collate_owner_and_contrib(album):
     """
