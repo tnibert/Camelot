@@ -10,6 +10,7 @@
         {% endif %}
         {% if request.user.profile == photo.album.owner or request.user.profile == photo.uploader %}
         <li><a href="{% url 'delete_photo' photo.id %}">Delete Photo</a></li>
+        <li><a href="">Rotate Photo</a></li>
         {% endif %}
     </ul>
     <div>

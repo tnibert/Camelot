@@ -294,6 +294,17 @@ class albumcontroller(genericcontroller):
         # todo: unit test
         return album.groups.all()
 
+    def save_rotated(self, photo, degree):
+        """
+        Save a photo with a rotation
+        :param degree: how many degrees to rotate the image
+        :param photo: the photo to rotate
+        :return:
+        """
+        if degree==0:
+            return
+        pass
+
 def collate_owner_and_contrib(album):
     """
     Combine owner and contributors into list
