@@ -131,8 +131,8 @@ class albumcontroller(genericcontroller):
         # create filename with primary key
         # will it reuse ids?  I think it will.  But does that matter?  Maybe not..
         fname = PREFIX + 'userphotos/{}/{}/{}'.format(self.uprofile.user.id, album.id, newphoto.id)
-        thumbname = PREFIX + 'thumbs/{}/{}/{}.png'.format(self.uprofile.user.id, album.id, newphoto.id)
-        midname = PREFIX + 'mid/{}/{}/{}.png'.format(self.uprofile.user.id, album.id, newphoto.id)
+        thumbname = PREFIX + 'thumbs/{}/{}/{}.jpg'.format(self.uprofile.user.id, album.id, newphoto.id)
+        midname = PREFIX + 'mid/{}/{}/{}.jpg'.format(self.uprofile.user.id, album.id, newphoto.id)
 
         # update filename in db now that we have our primary key
         newphoto.filename = fname
@@ -162,11 +162,11 @@ class albumcontroller(genericcontroller):
 
         # save thumbnail
         fi.seek(0)
-        ThumbFromBuffer(fi).save(thumbname)
+        ThumbFromBuffer(fi).save(thumbname, 'jpeg')
 
         # save mid size image
         fi.seek(0)
-        ThumbFromBuffer(fi, MIDHEIGHT).save(midname)
+        ThumbFromBuffer(fi, MIDHEIGHT).save(midname, 'jpeg')
 
         return newphoto
 
@@ -294,6 +294,7 @@ class albumcontroller(genericcontroller):
         # todo: unit test
         return album.groups.all()
 
+
 def collate_owner_and_contrib(album):
     """
     Combine owner and contributors into list
@@ -303,6 +304,7 @@ def collate_owner_and_contrib(album):
     lst = list(album.contributors.all())
     lst.append(album.owner)
     return lst
+
 
 def ThumbFromBuffer(buf, baseheight=THUMBHEIGHT):
     """

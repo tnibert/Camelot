@@ -1,9 +1,8 @@
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.shortcuts import reverse
-
 from django.contrib.auth.models import User
-
+from PIL import Image
 from ..models import Album, Photo
 from ..controllers.albumcontroller import *
 from ..controllers.groupcontroller import groupcontroller
@@ -100,6 +99,7 @@ class AlbumControllerTests(TestCase):
 
         try:
             # double check that our test is sending the right type for fi and that django will sent in rb mode
+            # todo: add a test for png
             with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
                 myphoto = self.albumcontrol.add_photo_to_album(myalbum.id, "generic description", fi)
 
@@ -108,11 +108,19 @@ class AlbumControllerTests(TestCase):
             assert myphoto.album == myalbum
             assert myphoto.description == "generic description"
             assert myphoto.filename == "userphotos/1/1/1"
-            assert myphoto.thumb == "thumbs/1/1/1.png"
+            assert myphoto.thumb == "thumbs/1/1/1.jpg"
+            assert myphoto.midsize == "mid/1/1/1.jpg"
+
+            with Image.open(myphoto.thumb) as img:
+                assert img.format == "JPEG"
+
+            with Image.open(myphoto.midsize) as img:
+                assert img.format == "JPEG"
 
             # test file existence
             assert os.path.isfile(myphoto.filename)
             assert os.path.isfile(myphoto.thumb)
+            assert os.path.isfile(myphoto.midsize)
 
         finally:
             # clean up

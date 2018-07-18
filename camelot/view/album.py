@@ -233,7 +233,8 @@ def return_photo_file_http(request, photoid, thumb=False, mid=True):
 
     # default to rendering midsize image
     name = photo.midsize
-    mime = "image/png"
+    # todo: handle conversion to jpeg of existing images in migration
+    mime = "image/jpeg"
     if thumb:
         name = photo.thumb
     elif not mid:
