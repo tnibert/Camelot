@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from PIL import Image
 from PIL.ExifTags import TAGS
 
 
@@ -22,6 +23,26 @@ def get_exif(img):
         decoded = TAGS.get(tag, tag)
         ret[decoded] = value
     return ret
+
+def get_rotation(photo):
+    """
+    Get the rotation of an image from exif tags
+    :param photo: django ORM photo model
+    :return: css tag name of the rotation
+    """
+    rotation = ""
+    with Image.open(photo.filename) as img:
+        if 'exif' in img.info:
+            exif = get_exif(img)
+            print(exif)
+            # these are the class names in the css
+            if exif['Orientation'] == 6:
+                rotation = "rotate90"
+            elif exif['Orientation'] == 8:
+                rotation = "rotate270"
+            elif exif['Orientation'] == 3:
+                rotation = "rotate180"
+    return rotation
 
 
 class AlreadyExistsException(Exception):

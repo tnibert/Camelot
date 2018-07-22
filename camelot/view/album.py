@@ -7,7 +7,7 @@ from django.views.decorators.http import etag
 from random import randint
 from ..controllers.albumcontroller import albumcontroller, collate_owner_and_contrib
 from ..controllers.friendcontroller import are_friends
-from ..controllers.utilities import PermissionException
+from ..controllers.utilities import PermissionException, get_rotation
 from ..forms import AlbumCreateForm, UploadPhotoForm, EditAlbumAccesstypeForm, MyGroupSelectForm, AddContributorForm, DeleteConfirmForm
 from ..constants import *
 from ..controllers.utilities import *
@@ -119,7 +119,6 @@ def display_photo(request, photoid):
     :param photoid:
     :return:
     """
-    # todo: verify what happens if you have only 0, 1, or 2 photos in album
 
     albumcontrol = albumcontroller(request.user.id)
     photo = albumcontrol.return_photo(photoid)
@@ -133,10 +132,13 @@ def display_photo(request, photoid):
     # find index of our photo in the queryset
     i = list(albumphotos.values_list('id', flat=True)).index(int(photoid))
 
+    rotation = get_rotation(photo)
+
     retdict = {
         'next': albumphotos[i+1].id if i < (len(albumphotos) - 1) else albumphotos[0].id,
         'previous': albumphotos[i-1].id if i > 0 else albumphotos[(len(albumphotos)-1)].id,
-        'photo': photo
+        'photo': photo,
+        'rotation': rotation
     }
 
     return render(request, 'camelot/presentphoto.html', retdict)
