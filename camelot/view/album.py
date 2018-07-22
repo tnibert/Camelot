@@ -74,7 +74,10 @@ def display_albums(request, userid):
         photos = albumcontrol.get_photos_for_album(album)
         if len(photos) > 0:
             # we check if this exists in the template and if not, render a default image
-            album.temp = photos[randint(0, len(photos)-1)].id
+            randindex = randint(0, len(photos)-1)
+            album.temp = photos[randindex].id
+            album.myphotorotation = get_rotation(photos[randindex])
+            print(album.myphotorotation)
 
     # create dictionary to render
     retdict = {}
@@ -100,6 +103,10 @@ def display_album(request, id, contribid=None):
     album = albumcontrol.return_album(id)
     # query db for photos in album
     photos = albumcontrol.get_photos_for_album(album)
+
+    # todo: this will be extraordinarily expensive if we don't change get_rotation()
+    for photo in photos:
+        photo.myrotation = get_rotation(photo)
 
     # for back link navigation to contributors
     # if the id provided is not valid, set to the album owner
