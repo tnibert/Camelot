@@ -111,6 +111,7 @@ class albumcontroller(genericcontroller):
 
     def add_photo_to_album(self, albumid, description, fi):
         """
+        Saves photo to disk and adds it to the given album
         this could be done in something like celery
         :param albumid: id of the album to add to
         :param description: description of the photo
@@ -160,13 +161,15 @@ class albumcontroller(genericcontroller):
                 destination.write(chunk)
                 chunk = fi.read(CHUNK_SIZE)  # read the next chunk
 
+        # do we need to adjust size parameters in exif tags?
+
         # save thumbnail
         fi.seek(0)
-        ThumbFromBuffer(fi).save(thumbname, 'jpeg')
+        ThumbFromBuffer(fi, thumbname)
 
         # save mid size image
         fi.seek(0)
-        ThumbFromBuffer(fi, MIDHEIGHT).save(midname, 'jpeg')
+        ThumbFromBuffer(fi, midname, MIDHEIGHT)
 
         return newphoto
 
@@ -306,22 +309,36 @@ def collate_owner_and_contrib(album):
     return lst
 
 
-def ThumbFromBuffer(buf, baseheight=THUMBHEIGHT):
+def ThumbFromBuffer(buf, filename, baseheight=THUMBHEIGHT):
     """
     Take an image buffer, scale, and return a thumbnail
     :param buf: raw image data buffer
+    :param filename: file name to save as
     :return: PIL Image thumbnail
     """
+    exif = None
     img = Image.open(BytesIO(buf.read()))
 
     # if the image is smaller than our target height, don't resize it
     # this will leave us double saving sometimes, but right now, we need to do that for png uniformity
     # todo; resolve this redundancy
     if img.size[1] <= baseheight:
+        img.save(filename, 'jpeg')
         return img
+
+    if 'exif' in img.info:
+        exif = img.info['exif']
+        print(exif)
 
     hpercent = (baseheight / float(img.size[1]))
     wsize = int((float(img.size[0]) * float(hpercent)))         # we can change 0 to 1 for a square
 
     # will this return approach leak memory?
-    return img.resize((wsize, baseheight), Image.ANTIALIAS)
+    newimg = img.resize((wsize, baseheight), Image.ANTIALIAS)
+
+    if not exif:
+        newimg.save(filename, 'jpeg')
+    else:
+        newimg.save(filename, 'jpeg', exif=exif)
+
+    return newimg

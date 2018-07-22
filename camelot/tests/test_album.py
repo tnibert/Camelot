@@ -111,16 +111,16 @@ class AlbumControllerTests(TestCase):
             assert myphoto.thumb == "thumbs/1/1/1.jpg"
             assert myphoto.midsize == "mid/1/1/1.jpg"
 
+            # test file existence
+            assert os.path.isfile(myphoto.filename)
+            assert os.path.isfile(myphoto.thumb)
+            assert os.path.isfile(myphoto.midsize)
+
             with Image.open(myphoto.thumb) as img:
                 assert img.format == "JPEG"
 
             with Image.open(myphoto.midsize) as img:
                 assert img.format == "JPEG"
-
-            # test file existence
-            assert os.path.isfile(myphoto.filename)
-            assert os.path.isfile(myphoto.thumb)
-            assert os.path.isfile(myphoto.midsize)
 
         finally:
             # clean up
@@ -435,11 +435,15 @@ class AlbumControllerTests(TestCase):
     def test_create_thumbnail_in_memory(self):
 
         with open('camelot/tests/resources/testimage.jpg', 'rb') as fi:
-            thumb = ThumbFromBuffer(fi)
-            # testimage is a square, so thumbheight will work for both - 180
-            # todo: improve test with multi dimensioned image
-            assert thumb.size[0] == THUMBHEIGHT         # width
-            assert thumb.size[1] == THUMBHEIGHT         # height
+            try:
+                thumb = ThumbFromBuffer(fi, "blahblahblah.jpg")
+                # testimage is a square, so thumbheight will work for both - 180
+                # todo: improve test with multi dimensioned image
+                assert thumb.size[0] == THUMBHEIGHT         # width
+                assert thumb.size[1] == THUMBHEIGHT         # height
+                # todo: assert file exists blahblahblah.jpg
+            finally:
+                os.unlink("blahblahblah.jpg")
 
 
 class AlbumViewTests(TestCase):
