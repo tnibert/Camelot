@@ -94,6 +94,7 @@ class Photo(models.Model):
     pub_date = models.DateTimeField('date published', default=timezone.now)
     # image mime type for full size image (mid and thumbs are png)
     imgtype = models.CharField(max_length=50, null=False)
+    exiforientation = models.IntegerField(default=None, null=True, blank=True)
 
 
 # receiver to delete the file on disk when we delete a photo from database
