@@ -15,9 +15,9 @@
         {% for photo in photos %}
         <!-- need to add more space between photos -->
             <div class="gallery">
-                <a href="{% url 'present_photo' photo.id %}">
+                <div><a href="{% url 'present_photo' photo.id %}">
                     <img class="{{ photo.myrotation }}"src="{% url 'show_thumb' photo.id %}" alt="{{ photo.description }}">
-                </a>
+                </a></div>
                 <div class="desc">{{ photo.description }}</div>
             </div>
         {% endfor %}
