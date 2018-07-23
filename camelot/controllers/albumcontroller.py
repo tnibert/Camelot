@@ -316,7 +316,6 @@ def ThumbFromBuffer(buf, filename, baseheight=THUMBHEIGHT):
     :param filename: file name to save as
     :return: PIL Image thumbnail
     """
-    exif = None
     img = Image.open(BytesIO(buf.read()))
 
     # if the image is smaller than our target height, don't resize it
@@ -326,19 +325,12 @@ def ThumbFromBuffer(buf, filename, baseheight=THUMBHEIGHT):
         img.save(filename, 'jpeg')
         return img
 
-    if 'exif' in img.info:
-        exif = img.info['exif']
-        print(exif)
-
     hpercent = (baseheight / float(img.size[1]))
     wsize = int((float(img.size[0]) * float(hpercent)))         # we can change 0 to 1 for a square
 
     # will this return approach leak memory?
     newimg = img.resize((wsize, baseheight), Image.ANTIALIAS)
 
-    if not exif:
-        newimg.save(filename, 'jpeg')
-    else:
-        newimg.save(filename, 'jpeg', exif=exif)
+    newimg.save(filename, 'jpeg')
 
     return newimg
