@@ -104,10 +104,18 @@ def display_album(request, id, contribid=None):
     # query db for photos in album
     photos = albumcontrol.get_photos_for_album(album)
 
+    #print("before rotations")
     # todo: this will be extraordinarily expensive if we don't change get_rotation()
     for photo in photos:
-        photo.myrotation = get_rotation(photo)
+        #print("Getting photo {}".format(photo.id))
+        try:
+            photo.myrotation = get_rotation(photo)
+        except Exception as e:
+            print(e)
+            print(type(e))
+        #print("GOT")
 
+    #print("got rotations")
     # for back link navigation to contributors
     # if the id provided is not valid, set to the album owner
     if not contribid or int(contribid) not in [x.id for x in collate_owner_and_contrib(album)]:
