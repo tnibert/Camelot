@@ -42,12 +42,16 @@ def get_rotation(photo):
             if 'exif' in img.info:
                 exif = get_exif(img)
                 #print(exif)
-                assert isinstance(exif['Orientation'], int)
-                photo.exiforientation = exif['Orientation']
+                try:
+                    assert isinstance(exif['Orientation'], int)
+                    photo.exiforientation = exif['Orientation']
+                except KeyError:
+                    photo.exiforientation = 1
+
             else:
                 photo.exiforientation = 1
         photo.save()
-
+    #print("Checking orientation")
     # these are the class names in the css
     if photo.exiforientation == 6:
         rotation = "rotate90"
@@ -55,6 +59,7 @@ def get_rotation(photo):
         rotation = "rotate270"
     elif photo.exiforientation == 3:
         rotation = "rotate180"
+    #print("Got orientation")
     return rotation
 
 
