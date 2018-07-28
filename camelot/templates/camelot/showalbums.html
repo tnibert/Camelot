@@ -11,12 +11,14 @@
 <div>
     {% for album in albums %}
         <div class="gallery">
+            <div>
             <a href="{% url 'show_album' album.id %}">
                 {% if album.temp %}
-                    <img src="{% url 'show_thumb' album.temp %}" alt="{{ album.name }}" height="150">
+                    <img class="{{ album.myphotorotation }}" src="{% url 'show_thumb' album.temp %}" alt="{{ album.name }}" height="150">
                 {% else %}
                     <img src="{% static 'img/defaultalbum.png' %}" alt="{{ album.name }}" height="150">
                 {% endif %}
+            </a></div>
                 <div class="desc">{{ album.name }}<br>{{ album.description }}</div>
             </a>
         </div>
@@ -29,12 +31,14 @@
 
     {% for album in contrib %}
         <div class="gallery">
+            <div>
             <a href="{% url 'show_album' id=album.id contribid=userid %}">
                 {% if album.temp %}
-                    <img src="{% url 'show_thumb' album.temp %}" alt="{{ album.name }}" height="150">
+                    <img class="{{ album.myphotorotation }}" src="{% url 'show_thumb' album.temp %}" alt="{{ album.name }}" height="150">
                 {% else %}
                     <img src="{% static 'img/defaultalbum.png' %}" alt="{{ album.name }}" height="150">
                 {% endif %}
+            </a></div>
                 <div class="desc">{{ album.name }}<br>{{ album.description }}</div>
             </a>
         </div>

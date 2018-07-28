@@ -1,9 +1,8 @@
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.shortcuts import reverse
-
 from django.contrib.auth.models import User
-
+from PIL import Image
 from ..models import Album, Photo
 from ..controllers.albumcontroller import *
 from ..controllers.groupcontroller import groupcontroller
@@ -100,6 +99,7 @@ class AlbumControllerTests(TestCase):
 
         try:
             # double check that our test is sending the right type for fi and that django will sent in rb mode
+            # todo: add a test for png
             with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
                 myphoto = self.albumcontrol.add_photo_to_album(myalbum.id, "generic description", fi)
 
@@ -108,11 +108,19 @@ class AlbumControllerTests(TestCase):
             assert myphoto.album == myalbum
             assert myphoto.description == "generic description"
             assert myphoto.filename == "userphotos/1/1/1"
-            assert myphoto.thumb == "thumbs/1/1/1.png"
+            assert myphoto.thumb == "thumbs/1/1/1.jpg"
+            assert myphoto.midsize == "mid/1/1/1.jpg"
 
             # test file existence
             assert os.path.isfile(myphoto.filename)
             assert os.path.isfile(myphoto.thumb)
+            assert os.path.isfile(myphoto.midsize)
+
+            with Image.open(myphoto.thumb) as img:
+                assert img.format == "JPEG"
+
+            with Image.open(myphoto.midsize) as img:
+                assert img.format == "JPEG"
 
         finally:
             # clean up
@@ -123,6 +131,29 @@ class AlbumControllerTests(TestCase):
         #c = Client()
         #with open('wishlist.doc') as fp:
         #    c.post('/customers/wishes/', {'name': 'fred', 'attachment
+
+    def test_get_rotation(self):
+        if not os.path.exists(self.testdir):
+            os.makedirs(self.testdir)
+        os.chdir(self.testdir)
+
+        myalbum = self.albumcontrol.create_album("image add test", "lalala")
+
+        try:
+            # todo: add a test image with exif rotation tag
+            # todo: flesh out this test a bit
+            with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
+                myphoto = self.albumcontrol.add_photo_to_album(myalbum.id, "generic description", fi)
+                assert myphoto.exiforientation is None
+                assert get_rotation(myphoto) == ""
+                myphoto.refresh_from_db()
+                assert myphoto.exiforientation == 1
+
+        finally:
+            # clean up
+            os.chdir("..")
+            shutil.rmtree(self.testdir)
+
 
     def test_add_image_to_other_user_album_controller(self):
         """
@@ -427,11 +458,15 @@ class AlbumControllerTests(TestCase):
     def test_create_thumbnail_in_memory(self):
 
         with open('camelot/tests/resources/testimage.jpg', 'rb') as fi:
-            thumb = ThumbFromBuffer(fi)
-            # testimage is a square, so thumbheight will work for both - 180
-            # todo: improve test with multi dimensioned image
-            assert thumb.size[0] == THUMBHEIGHT         # width
-            assert thumb.size[1] == THUMBHEIGHT         # height
+            try:
+                thumb = ThumbFromBuffer(fi, "blahblahblah.jpg")
+                # testimage is a square, so thumbheight will work for both - 180
+                # todo: improve test with multi dimensioned image
+                assert thumb.size[0] == THUMBHEIGHT         # width
+                assert thumb.size[1] == THUMBHEIGHT         # height
+                # todo: assert file exists blahblahblah.jpg
+            finally:
+                os.unlink("blahblahblah.jpg")
 
 
 class AlbumViewTests(TestCase):

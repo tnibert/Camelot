@@ -111,6 +111,7 @@ class albumcontroller(genericcontroller):
 
     def add_photo_to_album(self, albumid, description, fi):
         """
+        Saves photo to disk and adds it to the given album
         this could be done in something like celery
         :param albumid: id of the album to add to
         :param description: description of the photo
@@ -131,8 +132,8 @@ class albumcontroller(genericcontroller):
         # create filename with primary key
         # will it reuse ids?  I think it will.  But does that matter?  Maybe not..
         fname = PREFIX + 'userphotos/{}/{}/{}'.format(self.uprofile.user.id, album.id, newphoto.id)
-        thumbname = PREFIX + 'thumbs/{}/{}/{}.png'.format(self.uprofile.user.id, album.id, newphoto.id)
-        midname = PREFIX + 'mid/{}/{}/{}.png'.format(self.uprofile.user.id, album.id, newphoto.id)
+        thumbname = PREFIX + 'thumbs/{}/{}/{}.jpg'.format(self.uprofile.user.id, album.id, newphoto.id)
+        midname = PREFIX + 'mid/{}/{}/{}.jpg'.format(self.uprofile.user.id, album.id, newphoto.id)
 
         # update filename in db now that we have our primary key
         newphoto.filename = fname
@@ -160,13 +161,18 @@ class albumcontroller(genericcontroller):
                 destination.write(chunk)
                 chunk = fi.read(CHUNK_SIZE)  # read the next chunk
 
+        # do we need to adjust size parameters in exif tags?
+
         # save thumbnail
         fi.seek(0)
-        ThumbFromBuffer(fi).save(thumbname)
+        ThumbFromBuffer(fi, thumbname)
 
         # save mid size image
         fi.seek(0)
-        ThumbFromBuffer(fi, MIDHEIGHT).save(midname)
+        ThumbFromBuffer(fi, midname, MIDHEIGHT)
+
+        # We will not set the rotation in the db with get_rotation() at this point.
+        # It will be set upon first photo access.
 
         return newphoto
 
@@ -294,6 +300,7 @@ class albumcontroller(genericcontroller):
         # todo: unit test
         return album.groups.all()
 
+
 def collate_owner_and_contrib(album):
     """
     Combine owner and contributors into list
@@ -304,10 +311,12 @@ def collate_owner_and_contrib(album):
     lst.append(album.owner)
     return lst
 
-def ThumbFromBuffer(buf, baseheight=THUMBHEIGHT):
+
+def ThumbFromBuffer(buf, filename, baseheight=THUMBHEIGHT):
     """
     Take an image buffer, scale, and return a thumbnail
     :param buf: raw image data buffer
+    :param filename: file name to save as
     :return: PIL Image thumbnail
     """
     img = Image.open(BytesIO(buf.read()))
@@ -316,10 +325,15 @@ def ThumbFromBuffer(buf, baseheight=THUMBHEIGHT):
     # this will leave us double saving sometimes, but right now, we need to do that for png uniformity
     # todo; resolve this redundancy
     if img.size[1] <= baseheight:
+        img.save(filename, 'jpeg')
         return img
 
     hpercent = (baseheight / float(img.size[1]))
     wsize = int((float(img.size[0]) * float(hpercent)))         # we can change 0 to 1 for a square
 
     # will this return approach leak memory?
-    return img.resize((wsize, baseheight), Image.ANTIALIAS)
+    newimg = img.resize((wsize, baseheight), Image.ANTIALIAS)
+
+    newimg.save(filename, 'jpeg')
+
+    return newimg
