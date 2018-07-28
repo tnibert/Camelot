@@ -325,14 +325,15 @@ def ThumbFromBuffer(buf, filename, baseheight=THUMBHEIGHT):
     # this will leave us double saving sometimes, but right now, we need to do that for png uniformity
     # todo; resolve this redundancy
     if img.size[1] <= baseheight:
-        img.save(filename, 'jpeg')
-        return img
+        newimg = img.convert('RGB')
+        newimg.save(filename, 'jpeg')
+        return newimg
 
     hpercent = (baseheight / float(img.size[1]))
     wsize = int((float(img.size[0]) * float(hpercent)))         # we can change 0 to 1 for a square
 
     # will this return approach leak memory?
-    newimg = img.resize((wsize, baseheight), Image.ANTIALIAS)
+    newimg = img.resize((wsize, baseheight), Image.ANTIALIAS).convert('RGB')
 
     newimg.save(filename, 'jpeg')
 
