@@ -128,6 +128,7 @@ table.logincontent {
 
 /* for rotations of images */
 /* this seems to sufficiently work for now */
+/* todo: we may want to create separate css for in photo presentation and album presentation */
 .rotate90 {
    -webkit-transform: rotate(90deg) translateY(-100%);
    -moz-transform: rotate(90deg) translateY(-100%);
@@ -141,8 +142,10 @@ table.logincontent {
    /* Chrome */
    -ms-transform-origin: top left;
    /* I don't know how these values will do with a variety of pictures */
-   padding-bottom: 22%;
-   padding-top:25%;
+   padding-bottom: 20%;
+   padding-top:18%;
+
+   width: 70%;
 }
 /*https://www.quora.com/How-can-you-rotate-images-using-JavaScript - some good css info*/
 /*.rotate180 {

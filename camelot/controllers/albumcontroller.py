@@ -171,6 +171,9 @@ class albumcontroller(genericcontroller):
         fi.seek(0)
         ThumbFromBuffer(fi, midname, MIDHEIGHT)
 
+        # We will not set the rotation in the db with get_rotation() at this point.
+        # It will be set upon first photo access.
+
         return newphoto
 
     def get_photos_for_album(self, album):
