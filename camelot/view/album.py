@@ -77,7 +77,7 @@ def display_albums(request, userid):
             randindex = randint(0, len(photos)-1)
             album.temp = photos[randindex].id
             album.myphotorotation = get_rotation(photos[randindex])
-            print(album.myphotorotation)
+            #print(album.myphotorotation)
 
     # create dictionary to render
     retdict = {}

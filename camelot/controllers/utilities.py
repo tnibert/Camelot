@@ -41,7 +41,7 @@ def get_rotation(photo):
         with Image.open(photo.filename) as img:
             if 'exif' in img.info:
                 exif = get_exif(img)
-                print(exif)
+                #print(exif)
                 assert isinstance(exif['Orientation'], int)
                 photo.exiforientation = exif['Orientation']
             else:
