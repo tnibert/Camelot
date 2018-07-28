@@ -36,6 +36,8 @@ def get_rotation(photo):
     :return: css tag name of the rotation
     """
     rotation = ""
+    if photo is None:
+        return rotation
     if photo.exiforientation is None:
         # if we haven't created our orientation in the db, create it
         with Image.open(photo.filename) as img:
