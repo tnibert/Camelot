@@ -37,7 +37,8 @@ class profilecontroller(genericcontroller):
 
         # we will want to have a separate display name later
         return {"uid": profile.user.id, "friendstatus": friendstatus,
-                "name": profile.user.username if len(profile.dname) == 0 else profile.dname, "description": profile.description}
+                "name": profile.user.username if len(profile.dname) == 0 else profile.dname,
+                "description": profile.description}
 
     def update_profile_data(self, **kwargs):
         """
@@ -94,6 +95,8 @@ class profilecontroller(genericcontroller):
         """
         Creates a feed of friend activity for the user to view
         :return: A list of photos
+        We do not want to keep this as a list of photos
+        eventually we want like "so and so added # photos to album blah"
         """
         # initialize our controllers
         friendcontrol = friendcontroller(self.uprofile.user.id)

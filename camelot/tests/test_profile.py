@@ -128,11 +128,17 @@ class ProfileControllerTests(TestCase):
             self.groupcontrol.add_member(testgroup.id, self.u.profile)
 
             feed = self.profilecontrol1.get_feed()
+
+            # test that we filter correctly by permissions
             assert phot[4] in feed
             assert phot[3] in feed
             assert phot[2] not in feed
             assert phot[1] in feed
             assert phot[0] not in feed
+
+            # assert that photos are ordered correctly (newest to oldest)
+            # todo: the pub_dates of the photos don't vary?  at least not in display, and the following assert doesn't work
+            #assert feed[0] is phot[4]
 
         finally:
             # clean up
