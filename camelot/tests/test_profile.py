@@ -125,9 +125,14 @@ class ProfileControllerTests(TestCase):
             testgroup = self.groupcontrol.create("testgroup")
 
             self.albumcontrol.add_group_to_album(alb[1], testgroup)
+            self.groupcontrol.add_member(testgroup.id, self.u.profile)
 
             feed = self.profilecontrol1.get_feed()
-
+            assert phot[4] in feed
+            assert phot[3] in feed
+            assert phot[2] not in feed
+            assert phot[1] in feed
+            assert phot[0] not in feed
 
         finally:
             # clean up
