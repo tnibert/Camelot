@@ -98,6 +98,7 @@ class profilecontroller(genericcontroller):
         We do not want to keep this as a list of photos
         eventually we want like "so and so added # photos to album blah"
         """
+        # todo: feed shows as utc, need to adjust for user's timezone
         # initialize our controllers
         friendcontrol = friendcontroller(self.uprofile.user.id)
         friendlist = friendcontrol.return_friend_list(self.uprofile)
@@ -105,13 +106,13 @@ class profilecontroller(genericcontroller):
 
         # get all photos owned or uploaded by friends
         allfriendphotos = Photo.objects.filter(Q(uploader__in=friendlist) | Q(uploader=self.uprofile))\
-            .order_by('pub_date')
+            .order_by('-pub_date')
 
         # filter the photos based on if our user has permission to view them
         # this is not the most efficient way to do this, but we have encapsulated so we can revisit (lol sure buddy)
         feedphotos = [photo for photo in allfriendphotos if albumcontrol.has_permission_to_view(photo.album)]
 
-        feed = feedphotos[:5]
+        feed = feedphotos[:10]
         return feed
 
 
