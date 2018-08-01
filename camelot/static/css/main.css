@@ -176,5 +176,13 @@ table.logincontent {
 }*/
 
 #feed {
+    flex: 1;
+}
 
+#homenav {
+    flex: 0 0 65%;
+}
+
+.sidebyside {
+    display: flex;
 }
