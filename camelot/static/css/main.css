@@ -191,3 +191,13 @@ table.logincontent {
 .sidebyside {
     display: flex;
 }
+
+/* center the ad in the bottom of the screen */
+.ad {
+  position:absolute;
+  width:480px;
+  height:60px;
+  margin-left:-150px;
+  bottom:0px;
+  left:50%;    
+}
