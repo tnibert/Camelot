@@ -55,9 +55,11 @@ def index(request):
 
 @login_required
 def user_home(request):
+    pcontrol = profilecontroller(request.user.id)
     retdict = {
         "pendingreqs": len(friendcontroller(request.user.id).return_pending_requests()),
-        "searchform": SearchForm()
+        "searchform": SearchForm(),
+        "feed": pcontrol.get_feed()
     }
     return render(request, 'camelot/home.html', retdict)
 

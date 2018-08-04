@@ -38,6 +38,7 @@ class groupcontroller(genericcontroller):
         """
         # assert that the users are in fact friends, or at least pending
         # although who knows, maybe you do want to give someone who isn't your friend certain view access
+        # todo: try to hack this using pending friends
         try:
             assert (are_friends(profile, self.uprofile, confirmed=True) or are_friends(profile, self.uprofile, confirmed=False))
         except Exception as e:

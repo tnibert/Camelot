@@ -174,3 +174,20 @@ table.logincontent {
     /* Chrome
     -ms-transform-origin: top left;
 }*/
+
+
+/* used in user home page */
+#feed {
+    /*flex: 1;*/
+    padding: 10px;
+    border-style: dashed;
+    border-color: #191970;
+}
+
+#homenav {
+    flex: 0 0 50%;
+}
+
+.sidebyside {
+    display: flex;
+}

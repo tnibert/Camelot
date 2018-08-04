@@ -1,9 +1,12 @@
+from django.db.models import Q
 from .genericcontroller import genericcontroller
 from .utilities import get_profile_from_uid, PermissionException
-from .friendcontroller import are_friends
+from .friendcontroller import friendcontroller, are_friends
 from .groupcontroller import groupcontroller
-from .albumcontroller import collate_owner_and_contrib
+from .albumcontroller import albumcontroller, collate_owner_and_contrib
 from ..models import Photo
+from ..constants import *
+
 
 class profilecontroller(genericcontroller):
 
@@ -34,7 +37,8 @@ class profilecontroller(genericcontroller):
 
         # we will want to have a separate display name later
         return {"uid": profile.user.id, "friendstatus": friendstatus,
-                "name": profile.user.username if len(profile.dname) == 0 else profile.dname, "description": profile.description}
+                "name": profile.user.username if len(profile.dname) == 0 else profile.dname,
+                "description": profile.description}
 
     def update_profile_data(self, **kwargs):
         """
@@ -86,3 +90,33 @@ class profilecontroller(genericcontroller):
             return True
         else:
             return False
+
+    def get_feed(self):
+        """
+        Creates a feed of friend activity for the user to view
+        :return: A list of photos
+        We do not want to keep this as a list of photos
+        eventually we want like "so and so added # photos to album blah"
+        """
+        # todo: feed shows as utc, need to adjust for user's timezone
+        # initialize our controllers
+        friendcontrol = friendcontroller(self.uprofile.user.id)
+        friendlist = friendcontrol.return_friend_list(self.uprofile)
+        albumcontrol = albumcontroller(self.uprofile.user.id)
+
+        # get all photos owned or uploaded by friends
+        allfriendphotos = Photo.objects.filter(Q(uploader__in=friendlist) | Q(uploader=self.uprofile))\
+            .order_by('-pub_date')
+
+        # filter the photos based on if our user has permission to view them
+        # this is not the most efficient way to do this, but we have encapsulated so we can revisit (lol sure buddy)
+        feedphotos = [photo for photo in allfriendphotos if albumcontrol.has_permission_to_view(photo.album)]
+
+        feed = feedphotos[:15]
+        return feed
+
+
+#class feed_event:
+    # this class will be used to aggregate events occurring to the same album by the same user at similar time
+#    def __init__(self, alb, ):
+#        album =

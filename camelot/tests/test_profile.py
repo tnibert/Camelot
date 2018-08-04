@@ -6,8 +6,11 @@ from django.shortcuts import reverse
 import os
 import shutil
 
-from ..controllers import profilecontroller                 # I don't know why this import works...
+from ..controllers.profilecontroller import profilecontroller
+from ..controllers.groupcontroller import groupcontroller
 from ..controllers.albumcontroller import albumcontroller
+from .helperfunctions import complete_add_friends
+from ..constants import *
 
 class ProfileControllerTests(TestCase):
     def setUp(self):
@@ -93,6 +96,55 @@ class ProfileControllerTests(TestCase):
         # clean up
         os.chdir("..")
         shutil.rmtree(self.testdir)
+
+    def test_get_feed(self):
+        self.testdir = "testdir"
+        if not os.path.exists(self.testdir):
+            os.makedirs(self.testdir)
+        os.chdir(self.testdir)
+
+        complete_add_friends(self.u.id, self.u2.id)
+        self.albumcontrol = albumcontroller(self.u2.id)
+        self.groupcontrol = groupcontroller(self.u2.id)
+
+        # create albums of each access type, two for groups (one u is in group, one u is not in group)
+        alb = []
+        phot = []
+        try:
+            with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
+                for i in range(5):
+                    alb.append(self.albumcontrol.create_album("test {}".format(i), "test"))
+                    phot.append(self.albumcontrol.add_photo_to_album(alb[i].id, "description {}".format(i), fi))
+
+            self.albumcontrol.set_accesstype(alb[0], ALBUM_PRIVATE)
+            self.albumcontrol.set_accesstype(alb[1], ALBUM_GROUPS)
+            self.albumcontrol.set_accesstype(alb[2], ALBUM_GROUPS)
+            self.albumcontrol.set_accesstype(alb[3], ALBUM_ALLFRIENDS)
+            self.albumcontrol.set_accesstype(alb[4], ALBUM_PUBLIC)
+
+            testgroup = self.groupcontrol.create("testgroup")
+
+            self.albumcontrol.add_group_to_album(alb[1], testgroup)
+            self.groupcontrol.add_member(testgroup.id, self.u.profile)
+
+            feed = self.profilecontrol1.get_feed()
+
+            # test that we filter correctly by permissions
+            assert phot[4] in feed
+            assert phot[3] in feed
+            assert phot[2] not in feed
+            assert phot[1] in feed
+            assert phot[0] not in feed
+
+            # assert that photos are ordered correctly (newest to oldest)
+            # todo: the pub_dates of the photos don't vary?  at least not in display, and the following assert doesn't work
+            #assert feed[0] is phot[4]
+
+        finally:
+            # clean up
+            os.chdir("..")
+            shutil.rmtree(self.testdir)
+
 
 from ..view.profile import *
 

@@ -2,6 +2,8 @@
 
 {% block content2 %}
 <h1>Welcome to PicPicPanda {{user.profile}}</h1>
+<section class="sidebyside">
+<div id="homenav">
 <ul class="navbar">
 <li><a href="{% url 'create_album' %}">Create Album</a></li>
 <li><a href="{%url 'show_albums' request.user.id %}">View Albums</a></li>
@@ -23,4 +25,12 @@
     <input type="submit" value="Search" />
     </form>
 </div>
+</div>
+
+<div id="feed">
+    {% for item in feed %}
+    <p><a href="{% url 'show_profile' item.uploader.user.id %}">{{ item.uploader }}</a> uploaded a <a href="{% url 'present_photo' item.id %}">photo</a> to <a href="{% url 'show_album' item.album.id %}">{{ item.album }}</a> on {{ item.pub_date }} UTC</p>
+    {% endfor %}
+</div>
+</section>
 {% endblock %}
