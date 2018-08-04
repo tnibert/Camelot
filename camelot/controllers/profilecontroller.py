@@ -1,6 +1,6 @@
 from django.db.models import Q
 from .genericcontroller import genericcontroller
-from .utilities import get_profile_from_uid, PermissionException
+from .utilities import get_profile_from_uid, get_rotation, PermissionException
 from .friendcontroller import friendcontroller, are_friends
 from .groupcontroller import groupcontroller
 from .albumcontroller import albumcontroller, collate_owner_and_contrib
@@ -35,10 +35,10 @@ class profilecontroller(genericcontroller):
             else:
                 friendstatus = "not friends"
 
-        # we will want to have a separate display name later
         return {"uid": profile.user.id, "friendstatus": friendstatus,
                 "name": profile.user.username if len(profile.dname) == 0 else profile.dname,
-                "description": profile.description}
+                "description": profile.description,
+                "picrotation": get_rotation(profile.profile_pic)}
 
     def update_profile_data(self, **kwargs):
         """
