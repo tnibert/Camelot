@@ -112,10 +112,11 @@ class profilecontroller(genericcontroller):
         # this is not the most efficient way to do this, but we have encapsulated so we can revisit (lol sure buddy)
         feedphotos = [photo for photo in allfriendphotos if albumcontrol.has_permission_to_view(photo.album)]
 
-        feed = feedphotos[:10]
+        feed = feedphotos[:15]
         return feed
 
 
 #class feed_event:
+    # this class will be used to aggregate events occurring to the same album by the same user at similar time
 #    def __init__(self, alb, ):
 #        album =
