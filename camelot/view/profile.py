@@ -64,7 +64,8 @@ def return_raw_profile_pic(request, userid):
         fname = PREFIX + "userphotos/defaultprofile.png"
 
     with open(fname, "rb") as f:
-        return HttpResponse(f.read(), content_type="image/png")
+        # todo: check that this still works with default image
+        return HttpResponse(f.read(), content_type="image/jpeg")
 
 
 @login_required

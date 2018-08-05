@@ -141,11 +141,19 @@ table.logincontent {
    -webkit-transform-origin: top left;
    /* Chrome */
    -ms-transform-origin: top left;
+
+}
+
+.midrot {
    /* I don't know how these values will do with a variety of pictures */
    padding-bottom: 20%;
    padding-top:18%;
 
    width: 70%;
+}
+
+.picprofile {
+    padding-bottom:10%;
 }
 /*https://www.quora.com/How-can-you-rotate-images-using-JavaScript - some good css info*/
 /*.rotate180 {
