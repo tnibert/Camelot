@@ -113,6 +113,8 @@ class profilecontroller(genericcontroller):
         feedphotos = [photo for photo in allfriendphotos if albumcontrol.has_permission_to_view(photo.album)]
 
         feed = feedphotos[:15]
+        for feedphoto in feedphotos:
+            feedphoto.ts = feedphoto.pub_date.timestamp()
         return feed
 
 

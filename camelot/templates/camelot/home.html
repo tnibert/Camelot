@@ -27,9 +27,11 @@
 </div>
 </div>
 
+
+
 <div id="feed">
     {% for item in feed %}
-    <p><a href="{% url 'show_profile' item.uploader.user.id %}">{{ item.uploader }}</a> uploaded a <a href="{% url 'present_photo' item.id %}">photo</a> to <a href="{% url 'show_album' item.album.id %}">{{ item.album }}</a> on {{ item.pub_date }} UTC</p>
+    <p><a href="{% url 'show_profile' item.uploader.user.id %}">{{ item.uploader }}</a> uploaded a <a href="{% url 'present_photo' item.id %}">photo</a> to <a href="{% url 'show_album' item.album.id %}">{{ item.album }}</a> on {{ item.ts }}</p>
     {% endfor %}
 </div>
 
