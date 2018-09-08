@@ -98,7 +98,6 @@ class profilecontroller(genericcontroller):
         We do not want to keep this as a list of photos
         eventually we want like "so and so added # photos to album blah"
         """
-        # todo: feed shows as utc, need to adjust for user's timezone
         # initialize our controllers
         friendcontrol = friendcontroller(self.uprofile.user.id)
         friendlist = friendcontrol.return_friend_list(self.uprofile)
