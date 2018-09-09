@@ -1,6 +1,8 @@
 {% extends 'camelot/baseloggedin.html' %}
 
 {% block content2 %}
+{% load staticfiles %}
+<script src="{% static 'js/timezone.js' %}"></script>
 <h1>Welcome to PicPicPanda {{user.profile}}</h1>
 <section class="sidebyside">
 <div id="homenav">
@@ -27,9 +29,11 @@
 </div>
 </div>
 
+
+
 <div id="feed">
     {% for item in feed %}
-    <p><a href="{% url 'show_profile' item.uploader.user.id %}">{{ item.uploader }}</a> uploaded a <a href="{% url 'present_photo' item.id %}">photo</a> to <a href="{% url 'show_album' item.album.id %}">{{ item.album }}</a> on {{ item.pub_date }} UTC</p>
+    <p><a href="{% url 'show_profile' item.uploader.user.id %}">{{ item.uploader }}</a> uploaded a <a href="{% url 'present_photo' item.id %}">photo</a> to <a href="{% url 'show_album' item.album.id %}">{{ item.album }}</a> on <script>applyOffset({{ item.ts }});</script></p>
     {% endfor %}
 </div>
 
