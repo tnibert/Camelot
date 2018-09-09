@@ -8,5 +8,6 @@ function getOffset() {
 function applyOffset(UTCepoch) {
     var d = new Date(0);
     d.setUTCSeconds(UTCepoch);
-    document.write(d);
+
+    document.write(d.toLocaleDateString() + " at " + d.toLocaleTimeString());
 }
