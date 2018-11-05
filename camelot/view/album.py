@@ -171,7 +171,7 @@ def add_photo(request, id):
     # todo: add more checking for correct values,
     # descriptions and files need to have same number of elements
     # fname needs to be of correct format
-    # confirm all possible ways the js can be messed with
+    # confirm all possible ways the js can be messed with -> stop using the js in a shitty way
 
     # todo: add ability to select multiple files in file picker and auto fill form
 
