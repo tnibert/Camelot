@@ -38,13 +38,14 @@ class AlbumCreateForm(forms.Form):
     albumname = forms.CharField(label='Photo album name', max_length=70)
     description = forms.CharField(label='Photo album description', max_length=300, required=False)
 
+
 def validate_image(value):
     if value._size > MAX_UPLOAD_SIZE:
         raise ValidationError("Please keep file size under {}. Current file size {}".format(filesizeformat(str(MAX_UPLOAD_SIZE)), filesizeformat(value._size)))
 
 
 class UploadPhotoForm(forms.Form):
-    # todo: read django security doc regarding this
+    # todo: django security doc identifies potential vulnerability with uploading html file with valid png header
     # https://docs.djangoproject.com/en/2.0/topics/security/#user-uploaded-content-security
     extra_field_count = forms.CharField(widget=forms.HiddenInput())
 

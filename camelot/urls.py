@@ -4,6 +4,7 @@ from django.conf.urls.static import static
 from django.conf import settings
 from django.contrib.auth import views as auth_views
 from .view import album, usermgmt, profile, friend, group
+from .view.api import albumapi
 
 urlpatterns = [
     path('', usermgmt.index, name='index'),
@@ -51,6 +52,7 @@ urlpatterns = [
     url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
         auth_views.password_reset_confirm, name='password_reset_confirm'),
     url(r'^reset/done/$', auth_views.password_reset_complete, name='password_reset_complete'),
+    url(r'^api/upload/(?P<id>\d+)$', albumapi.upload_photo, name='uploadphotoapi'),
 ]
 
 if settings.DEBUG:

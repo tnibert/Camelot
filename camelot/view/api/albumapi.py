@@ -1,17 +1,26 @@
-import json
+from rest_framework.parsers import MultiPartParser
+from django.http import HttpResponse, JsonResponse
+import base64
 from django.contrib.auth.decorators import login_required
+from django.http.response import Http404
+from django.views.decorators.csrf import csrf_exempt        # don't continue to use this
 from ...controllers.albumcontroller import albumcontroller, collate_owner_and_contrib
 from ...controllers.utilities import *
+from ...forms import UploadPhotoAPIForm
+from ...apiserializers import PhotoUploadSerializer
+
 
 # upload photo
 @login_required
+@csrf_exempt
 def upload_photo(request, id):
     """
+    Used for image validation in photo upload API call
     Accept POSTed json
     format:
     {
         'description': description of photo
-        'image': raw image data
+        'image': base 64 encoded image data
     }
     :param request:
     :param id: id of album to upload to
@@ -25,17 +34,24 @@ def upload_photo(request, id):
         if albumcontrol.uprofile not in uploaders or albumcontrol.uprofile is None:
             raise PermissionException
 
-        # process request body and get image file
-        apijson = load_post_data(request)
+        print(request.body)
+        # todo: parsing is going haywire
+        data = MultiPartParser().parse(request)
 
-        # todo: sanitize image data
-        albumcontrol.add_photo_to_album(id, apijson['description'], apijson['image'])
+        # validate posted data
+        validation = PhotoUploadSerializer(data=data)
+        print(validation.data)
+        if validation.is_valid():
+            print(validation.data)
+
+            # b64 decode apijson['image']
+            #rawimg = base64.decodebytes()
+
+            #albumcontrol.add_photo_to_album(id, apijson['description'], rawimg)
+            return HttpResponse(status=204)
 
     else:
-        # return 404
-        pass
-
-    todo: test
+        raise Http404
 
 
 def load_post_data(request):
