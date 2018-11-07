@@ -29,17 +29,29 @@ class albumAPItests(TestCase):
 
         self.albumcontrol = albumcontroller(self.u.id)
 
-    def test_album_upload(self):
+    def test_photo_upload(self):
         albumid = self.albumcontrol.create_album("album for test", "lalala").id
 
-        fi = 'camelot/tests/resources/testimage.jpg'
-        payload = {"description": "this is a test"}
-        files = {
-            'json': (None, json.dumps(payload), 'application/json'),
-            'file': (os.path.basename(fi), open(fi, 'rb'), 'application/octet-stream')
-        }
+        with open('camelot/tests/resources/testimage.jpg', 'rb') as f:
+            # this request is probably wrong
+            response = self.client.post(reverse("uploadphotoapi", kwargs={'id': albumid}), files={'image': f})
 
-        response = self.client.post(reverse("uploadphotoapi", kwargs={'id': albumid}),
-                                    files=files)
+        print(response.text)
+        self.assertEqual(response.status_code, 201)
 
+    def test_photo_description_update(self):
+        seconddesc = "this is the second description"
+        payload = {"description": seconddesc}
+
+        # set up test
+        albumid = self.albumcontrol.create_album("album for test2", "lalala").id
+        with open('camelot/tests/resources/testimage.jpg', 'rb') as f:
+            newphoto = self.albumcontrol.add_photo_to_album(albumid, "this is the first description", f)
+
+        # send request
+        response = self.client.post(reverse("uploadphotoapi", kwargs={'id': albumid}), data=payload)
+
+        # checks
+        newphoto.refresh_from_db()
+        assert newphoto.description == seconddesc
         self.assertEqual(response.status_code, 204)
