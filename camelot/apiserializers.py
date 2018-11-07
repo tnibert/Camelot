@@ -4,5 +4,8 @@ from .constants import MAXPHOTODESC
 
 
 class PhotoUploadSerializer(serializers.Serializer):
-    description = serializers.CharField(max_length=MAXPHOTODESC)
     image = serializers.ImageField(validators=[validate_image])
+
+
+class PhotoDescriptSerializer(serializers.Serializer):
+    description = serializers.CharField(max_length=MAXPHOTODESC)
