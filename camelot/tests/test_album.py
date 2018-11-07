@@ -154,7 +154,6 @@ class AlbumControllerTests(TestCase):
             os.chdir("..")
             shutil.rmtree(self.testdir)
 
-
     def test_add_image_to_other_user_album_controller(self):
         """
         User should not be able to add image to another user's album
@@ -173,6 +172,28 @@ class AlbumControllerTests(TestCase):
         finally:
             os.chdir("..")
             shutil.rmtree(self.testdir)
+
+    def test_update_photo_description(self):
+        if not os.path.exists(self.testdir):
+            os.makedirs(self.testdir)
+        os.chdir(self.testdir)
+
+        myalbum = self.albumcontrol.create_album("image description update test", "lalala")
+
+        try:
+            with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
+                myphoto = self.albumcontrol.add_photo_to_album(myalbum.id, "generic description", fi)
+            assert myphoto.description == "generic description"
+            self.albumcontrol.update_photo_description(myphoto, "updated image description")
+
+            myphoto.refresh_from_db()
+            assert myphoto.description == "updated image description"
+
+        finally:
+            # clean up
+            os.chdir("..")
+            shutil.rmtree(self.testdir)
+
 
     def test_delete_photo(self):
         # set up dir
