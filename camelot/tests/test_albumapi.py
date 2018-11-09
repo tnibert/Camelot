@@ -33,10 +33,10 @@ class albumAPItests(TestCase):
         albumid = self.albumcontrol.create_album("album for test", "lalala").id
 
         with open('camelot/tests/resources/testimage.jpg', 'rb') as f:
-            # this request is probably wrong
-            response = self.client.post(reverse("uploadphotoapi", kwargs={'id': albumid}), files={'image': f})
+            response = self.client.post(reverse("uploadphotoapi", kwargs={'id': albumid}), {'image': f}, enctype="multipart/form-data")
 
-        #print(response.text)
+        data = json.loads(response.content)
+        self.assertEqual(data['id'], 1)
         self.assertEqual(response.status_code, 201)
 
     def test_photo_description_update(self):
@@ -48,15 +48,12 @@ class albumAPItests(TestCase):
         with open('camelot/tests/resources/testimage.jpg', 'rb') as f:
             newphoto = self.albumcontrol.add_photo_to_album(albumid, "this is the first description", f)
 
-        print(newphoto.description)
-
         # send request
-        response = self.client.post(reverse("updatephotodescapi", kwargs={'photoid': newphoto.id}), json.dumps(payload),
-                                content_type="application/json")
+        response = self.client.post(reverse("updatephotodescapi", kwargs={'photoid': newphoto.id}),
+                                    json.dumps(payload),
+                                    content_type="application/json")
 
         # checks
         newphoto.refresh_from_db()
-        print("---")
-        print(newphoto.description)
         self.assertEqual(response.status_code, 204)
         assert newphoto.description == seconddesc
