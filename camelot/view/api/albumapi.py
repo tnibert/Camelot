@@ -1,6 +1,7 @@
 from rest_framework.parsers import JSONParser, FileUploadParser
 from rest_framework.exceptions import ParseError
 from django.http import HttpResponse, JsonResponse
+import json
 import base64
 from django.contrib.auth.decorators import login_required
 from django.http.response import Http404
@@ -8,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt        # don't continue to 
 from ...controllers.albumcontroller import albumcontroller, collate_owner_and_contrib
 from ...controllers.utilities import *
 from ...apiserializers import PhotoUploadSerializer, PhotoDescriptSerializer
+from ...forms import validate_image
 
 
 # upload photo
@@ -59,24 +61,20 @@ def update_photo_description(request, photoid):
         photo = albumcontrol.return_photo(photoid)
 
         # check permissions - must be either photo uploader or album owner to change description
-        # test was failing here until we changed != to is not, however the check works in the albumcontroller with is not
-        # why?
         if (albumcontrol.uprofile != photo.uploader and albumcontrol.uprofile != photo.album.owner) or albumcontrol.uprofile is None:
             raise PermissionException
 
-        print(request)
-        #data = JSONParser.parse(request)
-        #print(data)
-        # this django rest framework stuff may be more trouble than it is worth...
-        validation = PhotoDescriptSerializer(data=request.data)
-        if validation.is_valid():
-            print("TEST")
-            print(validation.data)
-            try:
-                albumcontrol.update_photo_description(photo, validation['description'])
-            except Exception as e:
-                raise e
-            return HttpResponse(status=204)
+        # todo: validate the request
+        jsdat = request.body.decode('utf8')
+        data = json.loads(jsdat)
+
+        try:
+            albumcontrol.update_photo_description(photo, data['description'])
+        except Exception as e:
+            print(e)
+            raise e
+        return HttpResponse(status=204)
+
 
 
 def return_album_controller(userid, albumid):

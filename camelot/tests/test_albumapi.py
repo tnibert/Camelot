@@ -51,7 +51,8 @@ class albumAPItests(TestCase):
         print(newphoto.description)
 
         # send request
-        response = self.client.post(reverse("updatephotodescapi", kwargs={'photoid': newphoto.id}), data=payload)
+        response = self.client.post(reverse("updatephotodescapi", kwargs={'photoid': newphoto.id}), json.dumps(payload),
+                                content_type="application/json")
 
         # checks
         newphoto.refresh_from_db()
