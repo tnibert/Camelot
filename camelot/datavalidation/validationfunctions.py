@@ -9,6 +9,7 @@ This file contains functions to validate data input to the API
 
 Links:
 http://code.activestate.com/recipes/496942/
+https://www.owasp.org/index.php/XSS_(Cross_Site_Scripting)_Prevention_Cheat_Sheet
 """
 
 

@@ -50,7 +50,7 @@ class UploadPhotoForm(forms.Form):
         super(UploadPhotoForm, self).__init__(*args, **kwargs)
         self.fields['extra_field_count'].initial = self.extra_fields
 
-        self.fields['file_0'] = forms.ImageField(validators=[validate_image])
+        self.fields['file_0'] = forms.ImageField(validators=[validate_image_fsize])
         self.fields['desc_0'] = forms.CharField(max_length=MAXPHOTODESC, required=False)
         self.fields['file_0'].label = "File"
         self.fields['desc_0'].label = "Description"

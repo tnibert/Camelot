@@ -38,7 +38,56 @@ $(document).ready(function(){
         $("[name=extra_field_count]").val(form_count);
         // increment form count so our view knows to populate
         // that many fields for validation
-    })
+    });
+
+    // submit photos via API calls
+    $("form").on('submit', function (e) {
+        // https://simpleisbetterthancomplex.com/tutorial/2016/11/22/django-multiple-file-upload-using-ajax.html
+        var photos = new FormData(); //new FormData(document.getElementById("uploadphotosform"));
+        photos.append('image', $('#id_file_0')[0].files[0]);
+
+        /*oForm = document.getElementById("uploadphotosform");
+        console.log(oForm.elements.length);
+        console.log(oForm.elements);
+        for (var prop in oForm.elements) {
+            console.log(prop.value);
+        }*/
+        // for photo in photos
+        // call API
+
+        /*var oReq = new XMLHttpRequest();
+        oReq.open("POST", "api/upload/id", true);
+        oReq.onload = function(oEvent) {
+        if (oReq.status == 201) {
+            oOutput.innerHTML = "Uploaded!";
+        } else {
+            oOutput.innerHTML = "Error " + oReq.status + " occurred when trying to upload your file.<br \/>";
+        }*/
+        $.ajax({
+            type: 'POST',
+            data: photos,
+            url: '/api/upload/23',
+            dataType: 'multipart/form-data',
+            contentType: false,
+            processData: false,
+            statusCode: {
+                201: function () {
+                    console.log("Uploaded!");
+                }
+                // todo: handle error
+            }
+        });
+        /*.done(function (response) {
+            if (response.status == 201) {
+                console.log("Uploaded!");
+            } else {
+                console.log("Error " + response.status + " occurred when trying to upload your file.");
+            }
+        });*/
+
+        //stop form submission
+        e.preventDefault();
+    });
 });
 
 /*
