@@ -41,8 +41,12 @@ class AlbumCreateForm(forms.Form):
 class UploadPhotoForm(forms.Form):
     # todo: django security doc identifies potential vulnerability with uploading html file with valid png header
     # https://docs.djangoproject.com/en/2.0/topics/security/#user-uploaded-content-security
-    extra_field_count = forms.CharField(widget=forms.HiddenInput())
+    file = forms.ImageField(validators=[validate_image_fsize])
+    description = forms.CharField(max_length=MAXPHOTODESC, required=False)
 
+    """
+    extra_field_count = forms.CharField(widget=forms.HiddenInput())
+    
     def __init__(self, *args, **kwargs):
         #print("In Form Init")
         self.extra_fields = int(kwargs.pop('extra', 0))
@@ -50,9 +54,9 @@ class UploadPhotoForm(forms.Form):
         super(UploadPhotoForm, self).__init__(*args, **kwargs)
         self.fields['extra_field_count'].initial = self.extra_fields
 
-        self.fields['file_0'] = forms.ImageField(validators=[validate_image_fsize])
+        self.fields['file'] = forms.ImageField(validators=[validate_image_fsize])
         self.fields['desc_0'] = forms.CharField(max_length=MAXPHOTODESC, required=False)
-        self.fields['file_0'].label = "File"
+        self.fields['file'].label = "File"
         self.fields['desc_0'].label = "Description"
 
         # this loop should only be entered after a post with extra fields
@@ -60,11 +64,11 @@ class UploadPhotoForm(forms.Form):
             #print("In form for loop index " + str(index))
             # generate extra fields in the number specified via extra_fields
             # we can use label variable here
-            self.fields['file_{index}'.format(index=index+1)] = \
+            self.fields['file'.format(index=index+1)] = \
                 forms.ImageField(label="File", validators=[validate_image_fsize])
             self.fields['desc_{index}'.format(index=index+1)] = \
                 forms.CharField(label="Description", max_length=MAXPHOTODESC, required=False)
-
+    """
 
 class EditProfileForm(forms.Form):
     # need to have existing fields filled in by default on form display

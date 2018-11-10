@@ -16,7 +16,7 @@ $(document).ready(function(){
         enclose.append(element);
 
         element = $('<input type="file"/>');
-        element.attr('name', 'file_' + form_count);
+        element.attr('name', 'file');
         enclose.append(element);
 
         $("#forms").append(enclose);
@@ -42,9 +42,12 @@ $(document).ready(function(){
 
     // submit photos via API calls
     $("form").on('submit', function (e) {
-        // https://simpleisbetterthancomplex.com/tutorial/2016/11/22/django-multiple-file-upload-using-ajax.html
+        // todo: https://simpleisbetterthancomplex.com/tutorial/2016/11/22/django-multiple-file-upload-using-ajax.html
         var photos = new FormData(); //new FormData(document.getElementById("uploadphotosform"));
-        photos.append('image', $('#id_file_0')[0].files[0]);
+
+        photos.append('image', $('#id_file')[0].files[0]);
+
+        var albumid = document.getElementById("albumid").value;
 
         /*oForm = document.getElementById("uploadphotosform");
         console.log(oForm.elements.length);
@@ -52,8 +55,6 @@ $(document).ready(function(){
         for (var prop in oForm.elements) {
             console.log(prop.value);
         }*/
-        // for photo in photos
-        // call API
 
         /*var oReq = new XMLHttpRequest();
         oReq.open("POST", "api/upload/id", true);
@@ -63,27 +64,24 @@ $(document).ready(function(){
         } else {
             oOutput.innerHTML = "Error " + oReq.status + " occurred when trying to upload your file.<br \/>";
         }*/
+
         $.ajax({
             type: 'POST',
             data: photos,
-            url: '/api/upload/23',
+            url: '/api/upload/' + albumid,
             dataType: 'multipart/form-data',
             contentType: false,
             processData: false,
             statusCode: {
                 201: function () {
                     console.log("Uploaded!");
+                    window.location.href = '/album/' + albumid + '/';
                 }
                 // todo: handle error
             }
+        }).done(function (response) {
+            console.log("In done...");
         });
-        /*.done(function (response) {
-            if (response.status == 201) {
-                console.log("Uploaded!");
-            } else {
-                console.log("Error " + response.status + " occurred when trying to upload your file.");
-            }
-        });*/
 
         //stop form submission
         e.preventDefault();
