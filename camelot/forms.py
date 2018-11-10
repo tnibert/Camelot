@@ -2,8 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.template.defaultfilters import filesizeformat
-
+from .datavalidation.validationfunctions import validate_image_fsize
 from .constants import *
 from .models import FriendGroup
 from .controllers.groupcontroller import groupcontroller
@@ -39,11 +38,6 @@ class AlbumCreateForm(forms.Form):
     description = forms.CharField(label='Photo album description', max_length=300, required=False)
 
 
-def validate_image(value):
-    if value._size > MAX_UPLOAD_SIZE:
-        raise ValidationError("Please keep file size under {}. Current file size {}".format(filesizeformat(str(MAX_UPLOAD_SIZE)), filesizeformat(value._size)))
-
-
 class UploadPhotoForm(forms.Form):
     # todo: django security doc identifies potential vulnerability with uploading html file with valid png header
     # https://docs.djangoproject.com/en/2.0/topics/security/#user-uploaded-content-security
@@ -67,7 +61,7 @@ class UploadPhotoForm(forms.Form):
             # generate extra fields in the number specified via extra_fields
             # we can use label variable here
             self.fields['file_{index}'.format(index=index+1)] = \
-                forms.ImageField(label="File", validators=[validate_image])
+                forms.ImageField(label="File", validators=[validate_image_fsize])
             self.fields['desc_{index}'.format(index=index+1)] = \
                 forms.CharField(label="Description", max_length=MAXPHOTODESC, required=False)
 
@@ -128,11 +122,13 @@ class MyGroupSelectForm(forms.Form):
         self.fields['idname'] = choicefieldtype(
             label='Group Name', choices=ch)
 
+
 class EditAlbumAccesstypeForm(forms.Form):
     """
     Form to edit album access type
     """
     mytype = forms.ChoiceField(label="Access Types", choices=ACCESSTYPES.items())
+
 
 class AddContributorForm(forms.Form):
 

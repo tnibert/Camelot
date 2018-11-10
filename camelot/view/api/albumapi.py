@@ -6,7 +6,7 @@ from django.http.response import Http404
 from django.views.decorators.csrf import csrf_exempt        # don't continue to use this
 from ...controllers.albumcontroller import albumcontroller, collate_owner_and_contrib
 from ...controllers.utilities import *
-from ...forms import validate_image
+from ...datavalidation.validationfunctions import *
 
 
 @login_required
@@ -38,9 +38,8 @@ def upload_photo(request, id):
         # todo: validate image, running into issues using bytesio object, no attrib size
         # validate size
         # validate is image -> http://effbot.org/imagingbook/image.htm#tag-Image.Image.verify
-        #validate_image(rawimg)
+        validate_image(rawimg)
 
-        # todo: manually confirm that this is actually uploading a valid image
         photoid = albumcontrol.add_photo_to_album(id, '', rawimg).id
         return JsonResponse({"id": photoid}, status=201)
 
@@ -66,12 +65,14 @@ def update_photo_description(request, photoid):
         if (albumcontrol.uprofile != photo.uploader and albumcontrol.uprofile != photo.album.owner) or albumcontrol.uprofile is None:
             raise PermissionException
 
-        # todo: validate the request
         jsdat = request.body.decode('utf8')
         data = json.loads(jsdat)
 
+        # validate
+        validatedstr = validate_photo_description(data['description'])
+
         try:
-            albumcontrol.update_photo_description(photo, data['description'])
+            albumcontrol.update_photo_description(photo, validatedstr)
         except Exception as e:
             print(e)
             raise e
