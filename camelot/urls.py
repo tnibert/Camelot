@@ -54,7 +54,7 @@ urlpatterns = [
     url(r'^reset/done/$', auth_views.password_reset_complete, name='password_reset_complete'),
     # the following are api end points
     url(r'^api/upload/(?P<id>\d+)$', albumapi.upload_photo, name='uploadphotoapi'),
-    url(r'^api/update/photo/(?P<photoid>\d+)$', albumapi.update_photo_description, name='updatephotodescapi'),
+    url(r'^api/update/photo/desc/(?P<photoid>\d+)$', albumapi.update_photo_description, name='updatephotodescapi'),
 ]
 
 if settings.DEBUG:

@@ -13,7 +13,7 @@ def alter_description(s, photoid, desc):
     """
     payload = {"description": desc}
     headers = {'content_type': "application/json"}
-    p = s.post("{}/api/update/photo/{}".format(HOST, photoid),
+    p = s.post("{}/api/update/photo/desc/{}".format(HOST, photoid),
                                     json.dumps(payload))
     print(p)
     return p

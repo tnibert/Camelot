@@ -46,6 +46,8 @@ $(document).ready(function(){
         var photos = new FormData(); //new FormData(document.getElementById("uploadphotosform"));
 
         photos.append('image', $('#id_file')[0].files[0]);
+        console.log($('#id_description')[0].value);
+        var inputdesc = $('#id_description')[0].value;
 
         var albumid = document.getElementById("albumid").value;
 
@@ -69,12 +71,37 @@ $(document).ready(function(){
             type: 'POST',
             data: photos,
             url: '/api/upload/' + albumid,
-            dataType: 'multipart/form-data',
+            dataType: 'json',
             contentType: false,
             processData: false,
             statusCode: {
-                201: function () {
+                201: function (response) {
                     console.log("Uploaded!");
+                    console.log(response);
+                    console.log(response.id);
+                    var photoid = response.id;
+                    /*$.ajax({
+                            type: 'POST',
+                            data: descriptions,
+                            url: '/api/update/photo/desc/' + photoid,
+                            dataType: 'json',
+                            contentType: false,
+                            processData: false,
+                            statusCode: {
+                                204: function() {
+                                    console.log("Desc updated!");
+                                    window.location.href = '/album/' + albumid + '/';
+                                }
+                            }
+                    });*/
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("POST", '/api/update/photo/desc/' + photoid, true);
+                    xhr.setRequestHeader("Content-Type", "application/json");
+                    // todo: if you input the description "aslan", it will not update...?
+                    var data = JSON.stringify({"description": inputdesc});
+                    xhr.send(data);
+                    // todo: check success
+                    console.log("Desc updated!");
                     window.location.href = '/album/' + albumid + '/';
                 }
                 // todo: handle error
