@@ -1,11 +1,10 @@
 //https://stackoverflow.com/questions/6142025/dynamically-add-field-to-a-form
 
 $(document).ready(function(){
-    form_count = Number($("[name=extra_field_count]").val());
+    //form_count = Number($("[name=extra_field_count]").val());
     // get extra form count so we know what index to use for the next item.
-    //console.log(form_count)
 
-    $("#add-another").click(function() {
+    /*$("#add-another").click(function() {
         form_count ++;
         //console.log(form_count)
 
@@ -38,7 +37,7 @@ $(document).ready(function(){
         $("[name=extra_field_count]").val(form_count);
         // increment form count so our view knows to populate
         // that many fields for validation
-    });
+    });*/
 
     // submit photos via API calls
     $("form").on('submit', function (e) {
@@ -77,8 +76,6 @@ $(document).ready(function(){
             statusCode: {
                 201: function (response) {
                     console.log("Uploaded!");
-                    console.log(response);
-                    console.log(response.id);
                     var photoid = response.id;
                     /*$.ajax({
                             type: 'POST',
@@ -114,15 +111,6 @@ $(document).ready(function(){
         e.preventDefault();
     });
 });
-
-/*
-<p>
-        <label for="id_file">File:</label><br>
-        <input type="file" name="file" required id="id_file" />
-
-
-      </p>
-*/
 
 // probably wont use this but keeping for now
 function DuplicateIn() {
