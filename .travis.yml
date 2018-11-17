@@ -4,9 +4,8 @@ python:
   - "3.6"
   - "3.7"
 env:
-  - DJANGO=1.4.1
-  - DJANGO=1.4.3
   - DJANGO=2.0.1
+  - DJANGO=2.0.2
   - DJANGO=2.0.8
 # command to install dependencies
 install:
