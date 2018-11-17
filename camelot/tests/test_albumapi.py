@@ -40,7 +40,7 @@ class albumAPItests(TestCase):
         with open('camelot/tests/resources/testimage.jpg', 'rb') as f:
             response = self.client.post(reverse("uploadphotoapi", kwargs={'id': albumid}), {'image': f}, enctype="multipart/form-data")
 
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data['id'], 1)
         self.assertEqual(response.status_code, 201)
 
