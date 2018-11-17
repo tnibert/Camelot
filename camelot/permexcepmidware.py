@@ -18,7 +18,9 @@ class HandleBusinessExceptionMiddleware(MiddlewareMixin):
         # log the exception
         log = return_ex_logger(__name__)
         traceback_str = "".join(traceback.format_tb(exception.__traceback__))
-        log.error(traceback_str)
+        template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+        message = template.format(type(exception).__name__, exception.args)
+        log.error(message + "\n" + traceback_str)
 
         # process appropriately
         if isinstance(exception, PermissionException):

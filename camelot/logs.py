@@ -2,11 +2,11 @@ import logging
 
 
 def return_def_logger(name):
-    return return_logger(name, "spam.log")
+    return return_logger(name, "/var/log/www-data/spam.log")
 
 
 def return_ex_logger(name):
-    return return_logger(name, "exceptions.log")
+    return return_logger(name, "/var/log/www-data/exceptions.log")
 
 
 def return_logger(name, fname):
