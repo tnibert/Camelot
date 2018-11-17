@@ -40,19 +40,25 @@ def get_rotation(photo):
         return rotation
     if photo.exiforientation is None:
         # if we haven't created our orientation in the db, create it
-        with Image.open(photo.filename) as img:
-            if 'exif' in img.info:
-                exif = get_exif(img)
-                #print(exif)
-                try:
-                    assert isinstance(exif['Orientation'], int)
-                    photo.exiforientation = exif['Orientation']
-                except KeyError:
+        try:
+            with Image.open(photo.filename) as img:
+                if 'exif' in img.info:
+                    exif = get_exif(img)
+                    #print(exif)
+                    try:
+                        assert isinstance(exif['Orientation'], int)
+                        photo.exiforientation = exif['Orientation']
+                    except KeyError:
+                        photo.exiforientation = 1
+
+                else:
                     photo.exiforientation = 1
 
-            else:
-                photo.exiforientation = 1
+        except FileNotFoundError as e:
+            # todo: maybe delete the file from the db?
+            photo.exiforientation = 1
         photo.save()
+
     #print("Checking orientation")
     # these are the class names in the css
     if photo.exiforientation == 6:
