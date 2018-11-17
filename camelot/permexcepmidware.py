@@ -4,6 +4,8 @@ from django.http.response import Http404
 from django.shortcuts import render
 from django.contrib import messages
 from django.utils.deprecation import MiddlewareMixin
+from .logs import return_ex_logger
+import traceback
 
 class RedirectToRefererResponse(HttpResponseRedirect):
     def __init__(self, request, *args, **kwargs):
@@ -13,6 +15,12 @@ class RedirectToRefererResponse(HttpResponseRedirect):
 
 class HandleBusinessExceptionMiddleware(MiddlewareMixin):
     def process_exception(self, request, exception):
+        # log the exception
+        log = return_ex_logger(__name__)
+        traceback_str = "".join(traceback.format_tb(exception.__traceback__))
+        log.error(traceback_str)
+
+        # process appropriately
         if isinstance(exception, PermissionException):
             raise Http404
         elif isinstance(exception, AlreadyExistsException):
