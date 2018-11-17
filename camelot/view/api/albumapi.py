@@ -3,14 +3,12 @@ import json
 import io
 from django.contrib.auth.decorators import login_required
 from django.http.response import Http404
-from django.views.decorators.csrf import csrf_exempt        # don't continue to use this
 from ...controllers.albumcontroller import albumcontroller, collate_owner_and_contrib
 from ...controllers.utilities import *
 from ...datavalidation.validationfunctions import *
 
 
 @login_required
-@csrf_exempt
 def upload_photo(request, id):
     """
     Upload photo via API
@@ -49,7 +47,6 @@ def upload_photo(request, id):
 
 
 @login_required
-@csrf_exempt
 def update_photo_description(request, photoid):
     """
     Update the description of a photo

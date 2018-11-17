@@ -11,9 +11,9 @@ def alter_description(s, photoid, desc):
     :param desc:
     :return:
     """
+    headers = {'X-CSRFToken': s.cookies['csrftoken'], 'Referer': HOST}
     payload = {"description": desc}
-    headers = {'content_type': "application/json"}
     p = s.post("{}/api/update/photo/desc/{}".format(HOST, photoid),
-                                    json.dumps(payload))
+                                    json.dumps(payload), headers=headers)
     print(p)
     return p

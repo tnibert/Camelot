@@ -50,6 +50,8 @@ $(document).ready(function(){
 
         var albumid = document.getElementById("albumid").value;
 
+        var csrftoken = getCookie('csrftoken');
+
         /*oForm = document.getElementById("uploadphotosform");
         console.log(oForm.elements.length);
         console.log(oForm.elements);
@@ -65,6 +67,15 @@ $(document).ready(function(){
         } else {
             oOutput.innerHTML = "Error " + oReq.status + " occurred when trying to upload your file.<br \/>";
         }*/
+
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                    // Only send the token to relative URLs i.e. locally.
+                    xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+                }
+            }
+        });
 
         $.ajax({
             type: 'POST',
@@ -107,6 +118,7 @@ $(document).ready(function(){
                     }
                     xhr.open("POST", '/api/update/photo/desc/' + photoid, true);
                     xhr.setRequestHeader("Content-Type", "application/json");
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
                     var data = JSON.stringify({"description": inputdesc});
                     xhr.send(data);
 
@@ -146,4 +158,20 @@ function DuplicateIn() {
 
   if (formInvalid)
     alert('One or Two fields are empty. Please fill up all fields');
+}
+
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
 }
