@@ -2,11 +2,11 @@
 
 {% block content2 %}
 {% load staticfiles %}
+{# maybe make the following input field readonly https://www.w3schools.com/tags/att_input_readonly.asp #}
+<input type="hidden" id="albumid" name="albumid" value="{{ albumid }}">
 <script src="{% static 'js/jquery-3.3.1.js' %}"></script>
 <script src="{% static 'js/photoupload.js' %}"></script>
-<form id="uploadphotosform" action="{% url 'upload_photos' albumid %}" method="post" enctype='multipart/form-data'>
-    <!-- this following bit is repetitive and will need to be put in a separate file and imported in -->
-    <!-- description field will need to be way bigger -->
+<form id="uploadphotosform" method="post" enctype='multipart/form-data'>
     {% csrf_token %}
     <div id="forms">
         {{ form.as_p }}
@@ -14,5 +14,5 @@
 
     <input type="submit" value="Submit" />
 </form>
-<button id="add-another">add another</button>
+{# <button id="add-another">add another</button> #}
 {% endblock %}

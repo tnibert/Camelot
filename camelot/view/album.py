@@ -169,13 +169,8 @@ def add_photo(request, id):
     :return:
     """
     # todo: add more checking for correct values,
-    # descriptions and files need to have same number of elements
-    # fname needs to be of correct format
-    # confirm all possible ways the js can be messed with
-
     # todo: add ability to select multiple files in file picker and auto fill form
 
-    #print("In View")
     # https://docs.djangoproject.com/en/2.0/topics/http/file-uploads/
     albumcontrol = albumcontroller(request.user.id)
     # will raise PermissionException if user does not have permission to view
@@ -186,32 +181,9 @@ def add_photo(request, id):
     if albumcontrol.uprofile not in uploaders or albumcontrol.uprofile is None:
         raise PermissionException
 
-    if request.method == 'POST':
-        #print("In View Post")
-        form = UploadPhotoForm(request.POST, request.FILES, extra=request.POST.get('extra_field_count'))
-        #print("Created post form")
-        #print("in post, form.extra_fields is " + str(form.extra_fields))
-        if form.is_valid():
-            #print("Form valid")
-            #for i, j in form.cleaned_data.items():
-            #    print(str(i) + " = " + str(j))
-            photodesc = []
-            photodesc.append(form.cleaned_data['desc_0'])
-            for i in range(int(form.extra_fields)):
-                #print(i)
-                photodesc.append(form.cleaned_data['desc_' + str(i+1)])
-            #print(photodesc)
-            for fname, fdat in request.FILES.items():
-                #print(fname)
-                # figure out our index to match description to file
-                index = int(fname.split('_')[1])
-                # this method will check permission
-                albumcontrol.add_photo_to_album(id, photodesc[index], fdat)
+    form = UploadPhotoForm()
 
-            return redirect("show_album", id)
-    else:
-        form = UploadPhotoForm()
-    return render(request, 'camelot/uploadphoto.html', {'form': form, 'albumid': id})   # so maybe we make the move to class based views
+    return render(request, 'camelot/uploadphoto.html', {'form': form, 'albumid': id})
 
 
 def make_photo_etag(request, *args, **kwargs):

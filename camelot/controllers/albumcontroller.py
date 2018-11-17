@@ -203,6 +203,14 @@ class albumcontroller(genericcontroller):
         except:
             raise
 
+    def update_photo_description(self, photo, desc):
+        # check permissions - must be either photo uploader or album owner to change description
+        if (self.uprofile != photo.uploader and self.uprofile != photo.album.owner) or self.uprofile is None:
+            raise PermissionException
+
+        photo.description = desc
+        photo.save()
+
     def delete_album(self, album):
         if self.uprofile == album.owner:
 
