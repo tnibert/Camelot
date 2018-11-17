@@ -20,6 +20,7 @@ def upload_photo(request, id):
     :param id: id of album to upload to
     :return: json response with id of photo
     """
+
     if request.method == 'POST':
 
         def return_album_controller(userid, albumid):
@@ -56,6 +57,7 @@ def update_photo_description(request, photoid):
     :param photoid: the id of the photo to update descriotion of
     :return: HTTP 204 code on success, 404 if not POST
     """
+
     if request.method == 'POST':
         # get relevant controller and model data
         albumcontrol = albumcontroller(request.user.id)

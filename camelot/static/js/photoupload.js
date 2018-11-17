@@ -92,16 +92,38 @@ $(document).ready(function(){
                             }
                     });*/
                     var xhr = new XMLHttpRequest();
+                    // define success check
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === 4) {
+                            if (xhr.status === 204) {
+                                console.log('successful description update');
+                                window.location.href = '/album/' + albumid + '/';
+                            } else {
+                                console.log('failed description update');
+                                alert('Failed to add description to photo.  Sorry!');
+                                window.location.href = '/album/' + albumid + '/';
+                            }
+                        }
+                    }
                     xhr.open("POST", '/api/update/photo/desc/' + photoid, true);
                     xhr.setRequestHeader("Content-Type", "application/json");
-                    // todo: if you input the description "aslan", it will not update...?
                     var data = JSON.stringify({"description": inputdesc});
                     xhr.send(data);
-                    // todo: check success
-                    console.log("Desc updated!");
-                    window.location.href = '/album/' + albumid + '/';
+
+                    console.log("Desc update sent!");
                 }
-                // todo: handle error
+            },
+            // handle error case
+            error: function(jqXHR, textStatus, errorThrown) {
+                alert('Ooowee.. something went all kerbonkitybonk and the photo did not upload.  Whoops.');
+
+                //$('#result').html('<p>status code: '+jqXHR.status+'</p><p>errorThrown: ' + errorThrown + '</p><p>jqXHR.responseText:</p><div>'+jqXHR.responseText + '</div>');
+                console.log('jqXHR:');
+                console.log(jqXHR);
+                console.log('textStatus:');
+                console.log(textStatus);
+                console.log('errorThrown:');
+                console.log(errorThrown);
             }
         }).done(function (response) {
             console.log("In done...");
