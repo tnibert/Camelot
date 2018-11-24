@@ -12,6 +12,8 @@ install:
 before_script:
   - python manage.py makemigrations
   - python manage.py migrate
+  - sudo mkdir /var/log/www-data
+  - sudo chown travis:travis /var/log/www-data
 # command to run tests
 script:
   - python manage.py test
