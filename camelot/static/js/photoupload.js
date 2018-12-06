@@ -1,43 +1,6 @@
 //https://stackoverflow.com/questions/6142025/dynamically-add-field-to-a-form
 
 $(document).ready(function(){
-    //form_count = Number($("[name=extra_field_count]").val());
-    // get extra form count so we know what index to use for the next item.
-
-    /*$("#add-another").click(function() {
-        form_count ++;
-        //console.log(form_count)
-
-        // build elements and append to our forms container
-        enclose = $('<p>')
-
-        element = $('<label>File: </label>');
-        enclose.append(element);
-
-        element = $('<input type="file"/>');
-        element.attr('name', 'file');
-        enclose.append(element);
-
-        $("#forms").append(enclose);
-
-        // create new p element
-        enclose = $('<p>')
-
-        element = $('<label>Description: </label>');
-        enclose.append(element);
-
-        element = $('<input type="text"/>');
-        element.attr('name', 'desc_' + form_count);
-        enclose.append(element);
-
-        $("#forms").append(enclose);
-
-        //$("#forms").append($('</p>'));
-
-        $("[name=extra_field_count]").val(form_count);
-        // increment form count so our view knows to populate
-        // that many fields for validation
-    });*/
 
     // submit photos via API calls
     $("form").on('submit', function (e) {
@@ -70,10 +33,17 @@ $(document).ready(function(){
 
         $.ajaxSetup({
             beforeSend: function(xhr, settings) {
+                // use csrf token
                 if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
                     // Only send the token to relative URLs i.e. locally.
                     xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
                 }
+                
+                // replace submit button with "uploading..."
+                var myAnchor = document.getElementById("sendupload");
+                var mySpan = document.createElement("span");
+                mySpan.innerHTML = "Uploading...";
+                myAnchor.parentNode.replaceChild(mySpan, myAnchor);
             }
         });
 
