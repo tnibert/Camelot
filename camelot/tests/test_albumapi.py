@@ -5,6 +5,7 @@ from django.shortcuts import reverse
 import json
 import os
 from ..controllers.albumcontroller import albumcontroller
+from .helperfunctions import complete_add_friends
 
 class albumAPItests(TestCase):
 
@@ -133,3 +134,14 @@ class albumAPItests(TestCase):
         #print(newphoto.description)
         self.assertEqual(response.status_code, 204)
         assert newphoto.description == str
+
+    def test_get_albums(self):
+        """
+        Test the getalbumsapi api call
+        """
+
+        # todo: test for data present, complete add friends, test for additional friend data
+        response = self.client.get(reverse("getalbumsapi", kwargs={'userid': self.u2.id}))
+        self.assertEqual(response.status_code, 200)
+
+
