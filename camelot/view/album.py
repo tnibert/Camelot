@@ -90,6 +90,9 @@ def display_albums(request, userid, api=False):
         return render(request, 'camelot/showalbums.html', retdict)
         # showalbums.html might be able to be made more generic, may repeat in showalbum.html
     else:
+        # form albums field into json compatible format
+        retdict['albums'] = [{'id': album.id, 'name': album.name, 'description': album.description } for album in albums]
+
         return JsonResponse(retdict, status=200)
 
 
