@@ -30,6 +30,7 @@ class albumAPItests(TestCase):
         self.factory = RequestFactory()
 
         self.albumcontrol = albumcontroller(self.u.id)
+        self.albumcontrol2 = albumcontroller(self.u2.id)
 
     def test_photo_upload(self):
         """
@@ -140,8 +141,28 @@ class albumAPItests(TestCase):
         Test the getalbumsapi api call
         """
 
-        # todo: test for data present, complete add friends, test for additional friend data
+        # u2 adds two albums, not public (by default)
+        self.albumcontrol2.create_album("test1", "testdesc1")
+        self.albumcontrol2.create_album("test2", "testdesc2")
+
+        # u requests albums
         response = self.client.get(reverse("getalbumsapi", kwargs={'userid': self.u2.id}))
         self.assertEqual(response.status_code, 200)
 
+        # assert content, no albums
+        data = json.loads(response.content.decode('utf-8'))
+        #print(data)
+        self.assertEqual(data['albums'], [])
+
+        # complete add friends
+        complete_add_friends(self.u.id, self.u2.id)
+
+        # u requests albums
+        response = self.client.get(reverse("getalbumsapi", kwargs={'userid': self.u2.id}))
+        self.assertEqual(response.status_code, 200)
+
+        # assert content, 2 albums
+        data = json.loads(response.content.decode('utf-8'))
+        #print(data)
+        self.assertEqual(data['albums'], [{'id': 1, 'name': 'test1', 'description': 'testdesc1'}, {'id': 2, 'name': 'test2', 'description': 'testdesc2'}])
 
