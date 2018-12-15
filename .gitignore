@@ -1,2 +1,20 @@
 ./projectcamelot/settings.py
 ./camelot/constants.py
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# user photo repositories
+mid/
+thumbs/
+userphotos/
+
+# db
+db.sqlite*
+
+# logs
+*.log
+
+# from ide?
+.idea/
