@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, JsonResponse
 from django.forms import MultipleChoiceField
 from django.views.decorators.http import etag
 from random import randint
@@ -61,7 +61,7 @@ def create_album(request):
     return render(request, 'camelot/createalbum.html', {'form': form})
 
 
-def display_albums(request, userid):
+def display_albums(request, userid, api=False):
     # todo: add unit test for non logged in user accessing
     albumcontrol = albumcontroller(request.user.id)
 
@@ -86,8 +86,14 @@ def display_albums(request, userid):
 
     if len(contrib) > 0:
         retdict['contrib'] = contrib
-    return render(request, 'camelot/showalbums.html', retdict)
-    # showalbums.html might be able to be made more generic, may repeat in showalbum.html
+    if not api:
+        return render(request, 'camelot/showalbums.html', retdict)
+        # showalbums.html might be able to be made more generic, may repeat in showalbum.html
+    else:
+        # form albums field into json compatible format
+        retdict['albums'] = [{'id': album.id, 'name': album.name, 'description': album.description } for album in albums]
+
+        return JsonResponse(retdict, status=200)
 
 
 def display_album(request, id, contribid=None):

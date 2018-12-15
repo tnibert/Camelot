@@ -5,6 +5,7 @@ from django.shortcuts import reverse
 import json
 import os
 from ..controllers.albumcontroller import albumcontroller
+from .helperfunctions import complete_add_friends
 
 class albumAPItests(TestCase):
 
@@ -29,6 +30,7 @@ class albumAPItests(TestCase):
         self.factory = RequestFactory()
 
         self.albumcontrol = albumcontroller(self.u.id)
+        self.albumcontrol2 = albumcontroller(self.u2.id)
 
     def test_photo_upload(self):
         """
@@ -133,3 +135,34 @@ class albumAPItests(TestCase):
         #print(newphoto.description)
         self.assertEqual(response.status_code, 204)
         assert newphoto.description == str
+
+    def test_get_albums(self):
+        """
+        Test the getalbumsapi api call
+        """
+
+        # u2 adds two albums, not public (by default)
+        self.albumcontrol2.create_album("test1", "testdesc1")
+        self.albumcontrol2.create_album("test2", "testdesc2")
+
+        # u requests albums
+        response = self.client.get(reverse("getalbumsapi", kwargs={'userid': self.u2.id}))
+        self.assertEqual(response.status_code, 200)
+
+        # assert content, no albums
+        data = json.loads(response.content.decode('utf-8'))
+        #print(data)
+        self.assertEqual(data['albums'], [])
+
+        # complete add friends
+        complete_add_friends(self.u.id, self.u2.id)
+
+        # u requests albums
+        response = self.client.get(reverse("getalbumsapi", kwargs={'userid': self.u2.id}))
+        self.assertEqual(response.status_code, 200)
+
+        # assert content, 2 albums
+        data = json.loads(response.content.decode('utf-8'))
+        #print(data)
+        self.assertEqual(data['albums'], [{'id': 1, 'name': 'test1', 'description': 'testdesc1'}, {'id': 2, 'name': 'test2', 'description': 'testdesc2'}])
+

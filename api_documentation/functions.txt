@@ -1,0 +1,20 @@
+url(r'^api/upload/(?P<id>\d+)$', albumapi.upload_photo, name='uploadphotoapi'),
+post
+
+url(r'^api/update/photo/desc/(?P<photoid>\d+)$', albumapi.update_photo_description, name='updatephotodescapi'),
+post
+
+url(r'^api/(?P<userid>\d+)/getalbums$', album.display_albums, {'api': True}, name="getalbumsapi"),
+get
+
+url(r'^profile/(?P<userid>\d+)/profilepic$', profile.return_raw_profile_pic, name="profile_pic"),
+get
+
+url(r'^photo/(?P<photoid>\d+)/$', album.return_photo_file_http, name="show_photo"),
+get
+
+url(r'^photo/(?P<photoid>\d+)/thumb/$', album.return_photo_file_http, {'thumb': True}, name="show_thumb"),
+get
+
+url(r'^photo/(?P<photoid>\d+)/fullsize/$', album.return_photo_file_http, {'mid': False}, name="show_photo_full"),
+get
