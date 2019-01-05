@@ -97,7 +97,7 @@ $(document).ready(function(){
             },
             // handle error case
             error: function(jqXHR, textStatus, errorThrown) {
-                alert('Ooowee.. something went all kerbonkitybonk and the photo did not upload.  Whoops.');
+                alert('Ooowee.. we could not upload that photo.  Check javascript console for more info if so inclined.');
 
                 //$('#result').html('<p>status code: '+jqXHR.status+'</p><p>errorThrown: ' + errorThrown + '</p><p>jqXHR.responseText:</p><div>'+jqXHR.responseText + '</div>');
                 console.log('jqXHR:');

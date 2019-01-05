@@ -32,5 +32,4 @@ class HandleBusinessExceptionMiddleware(MiddlewareMixin):
             pass
         elif isinstance(exception, DiskExceededException):
             # todo: test in api tests
-            # todo: adjust threshold and test manually
-            return JsonResponse({'message': "Not enough space to store data"}, status=502)
+            return JsonResponse({'message': "Not enough space to store data"}, status=507)
