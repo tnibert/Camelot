@@ -1,5 +1,5 @@
-from .controllers.utilities import PermissionException, AlreadyExistsException
-from django.http import HttpResponseRedirect
+from .controllers.utilities import PermissionException, AlreadyExistsException, DiskExceededException
+from django.http import HttpResponseRedirect, JsonResponse
 from django.http.response import Http404
 from django.shortcuts import render
 from django.contrib import messages
@@ -30,3 +30,6 @@ class HandleBusinessExceptionMiddleware(MiddlewareMixin):
             #messages.error(request, message)
             #return RedirectToRefererResponse(request)
             pass
+        elif isinstance(exception, DiskExceededException):
+            # todo: test in api tests
+            return JsonResponse({'message': "Not enough space to store data"}, status=507)

@@ -81,3 +81,7 @@ class PermissionException(Exception):
 
 class AddSelfException(Exception):
     pass
+
+
+class DiskExceededException(Exception):
+    pass
