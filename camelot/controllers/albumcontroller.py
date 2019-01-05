@@ -8,6 +8,7 @@ from django.utils import timezone
 from os import makedirs, unlink
 from io import BytesIO
 from PIL import Image
+import shutil
 
 class albumcontroller(genericcontroller):
     """
@@ -124,6 +125,10 @@ class albumcontroller(genericcontroller):
         # check that user has permission to add to album
         if not ((self.uprofile == album.owner) or (self.uprofile in album.contributors.all())):
             raise PermissionException("User is not album owner or contributor")
+
+        # ensure that there is sufficient space on the filesystem, compare threshold to free space
+        if MIN_FREE_THRES > shutil.disk_usage(DATA_PARTITION_PATH)[2]:
+            raise DiskExceededException("Don't have enough space to store new photos")
 
         # add file to database
         newphoto = Photo(description=description, album=album, uploader=self.uprofile)

@@ -13,6 +13,7 @@ from ..constants import *
 
 import os
 import shutil
+from unittest import mock
 
 class AlbumControllerTests(TestCase):
     # this setUp code needs to be made universal
@@ -173,6 +174,28 @@ class AlbumControllerTests(TestCase):
             os.chdir("..")
             shutil.rmtree(self.testdir)
 
+    def test_add_photo_to_album_not_enough_disk(self):
+        """
+        If the free space on the partition is under a given threshold, we should exception
+        """
+
+        if not os.path.exists(self.testdir):
+            os.makedirs(self.testdir)
+        os.chdir(self.testdir)
+
+        myalbum = self.albumcontrol.create_album("my album", "low disk")
+
+        try:
+            with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
+                # depends on constants.MIN_FREE_THRES greater than 2 bytes
+                with mock.patch('shutil.disk_usage', return_value=(0, 0, 2)):
+                    self.assertRaises(DiskExceededException, self.albumcontrol.add_photo_to_album, myalbum.id, "low disk", fi)
+
+        finally:
+            os.chdir("..")
+            shutil.rmtree(self.testdir)
+
+
     def test_update_photo_description(self):
         if not os.path.exists(self.testdir):
             os.makedirs(self.testdir)
@@ -193,7 +216,6 @@ class AlbumControllerTests(TestCase):
             # clean up
             os.chdir("..")
             shutil.rmtree(self.testdir)
-
 
     def test_delete_photo(self):
         # set up dir
