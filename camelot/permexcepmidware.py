@@ -4,8 +4,8 @@ from django.http.response import Http404
 from django.shortcuts import render
 from django.contrib import messages
 from django.utils.deprecation import MiddlewareMixin
-from .logs import return_ex_logger
-import traceback
+from .logs import log_exception
+
 
 class RedirectToRefererResponse(HttpResponseRedirect):
     def __init__(self, request, *args, **kwargs):
@@ -13,14 +13,11 @@ class RedirectToRefererResponse(HttpResponseRedirect):
         super(RedirectToRefererResponse, self).__init__(
             redirect_to, *args, **kwargs)
 
+
 class HandleBusinessExceptionMiddleware(MiddlewareMixin):
     def process_exception(self, request, exception):
         # log the exception
-        log = return_ex_logger(__name__)
-        traceback_str = "".join(traceback.format_tb(exception.__traceback__))
-        template = "An exception of type {0} occurred. Arguments:\n{1!r}"
-        message = template.format(type(exception).__name__, exception.args)
-        log.error(message + "\n" + traceback_str)
+        log_exception(__name__, exception)
 
         # process appropriately
         if isinstance(exception, PermissionException):

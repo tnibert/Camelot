@@ -13,6 +13,7 @@ from ..forms import AlbumCreateForm, UploadPhotoForm, EditAlbumAccesstypeForm, M
 from ..constants import *
 from ..controllers.utilities import *
 from ..models import Profile, FriendGroup, Photo
+from ..logs import log_exception
 
 #def album_perm_check(func):
 #    """
@@ -456,10 +457,11 @@ def add_contrib(request, albumid):
                             })
                             # send email
                             c.user.email_user(subject, message)
-                        except Exception as e:
+                        except Exception as EmailEx:
                             # failed to send email
-                            # todo: log
-                            pass
+                            # log here because this error should not abort the process
+                            log_exception(__name__, EmailEx)
+
                     except Exception as e:
                         raise e
 
