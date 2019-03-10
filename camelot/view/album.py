@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404, JsonResponse
 from django.forms import MultipleChoiceField
 from django.views.decorators.http import etag
+from django.template.loader import render_to_string
 from random import randint
 from ..controllers.albumcontroller import albumcontroller, collate_owner_and_contrib
 from ..controllers.friendcontroller import are_friends
@@ -12,6 +13,7 @@ from ..forms import AlbumCreateForm, UploadPhotoForm, EditAlbumAccesstypeForm, M
 from ..constants import *
 from ..controllers.utilities import *
 from ..models import Profile, FriendGroup, Photo
+from ..logs import log_exception
 
 #def album_perm_check(func):
 #    """
@@ -414,7 +416,6 @@ def add_groups(request, albumid):
 def add_contrib(request, albumid):
     """
     Add a contributor to the album
-    This function makes me cry
     :param request:
     :param albumid: album id
     :return: redirect to album management page or 404 if not post
@@ -443,6 +444,24 @@ def add_contrib(request, albumid):
                     try:
                         # this assert may need to be handled at a higher level depending on what django does
                         assert albumcontrol.add_contributor_to_album(album, c)
+
+                        # notify the new contributor
+                        try:
+                            # prepare email
+                            subject = "You've been invited to contribute to a photo album!"
+                            message = render_to_string('camelot/added_as_contributor.html', {
+                                'user': c.user,
+                                'adder': albumcontrol.uprofile.dname,
+                                'thealbum': album.name,
+                                'albumid': album.id,
+                            })
+                            # send email
+                            c.user.email_user(subject, message)
+                        except Exception as EmailEx:
+                            # failed to send email
+                            # log here because this error should not abort the process
+                            log_exception(__name__, EmailEx)
+
                     except Exception as e:
                         raise e
 

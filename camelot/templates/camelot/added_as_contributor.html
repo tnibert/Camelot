@@ -1,0 +1,11 @@
+{% autoescape off %}
+Hi {{ user.username }},
+
+{{ adder }} has added you as a contributor to the album {{ thealbum }}
+
+You can start adding photos by heading over to https://picpicpanda.com/album/{{ albumid }}/
+
+Cheers,
+
+The PicPicPanda Team
+{% endautoescape %}
