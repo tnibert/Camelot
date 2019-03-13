@@ -57,7 +57,7 @@ urlpatterns = [
     url(r'^api/upload/(?P<id>\d+)$', albumapi.upload_photo, name='uploadphotoapi'),
     url(r'^api/update/photo/desc/(?P<photoid>\d+)$', albumapi.update_photo_description, name='updatephotodescapi'),
     url(r'^api/(?P<userid>\d+)/getalbums$', album.display_albums, {'api': True}, name="getalbumsapi"),
-    url(r'^api/album/(?P<id>\d+)/getphotos$', album.display_album, {'api': True}, name="getalbumsapi"),
+    url(r'^api/album/(?P<id>\d+)/getphotos$', album.display_album, {'api': True}, name="getphotosapi"),
 ]
 
 if settings.DEBUG:

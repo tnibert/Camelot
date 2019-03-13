@@ -125,9 +125,6 @@ def display_album(request, id, contribid=None, api=False):
 
         return JsonResponse(retdict, status=200)
 
-    # todo: unit test results if api requested without GET
-    # todo: unit test API endpoint
-
     # return for html rendering
     else:
         # todo: this will be extraordinarily expensive if we don't change get_rotation()
