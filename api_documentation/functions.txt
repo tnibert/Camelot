@@ -18,3 +18,6 @@ get
 
 url(r'^photo/(?P<photoid>\d+)/fullsize/$', album.return_photo_file_http, {'mid': False}, name="show_photo_full"),
 get
+
+url(r'^api/album/(?P<id>\d+)/getphotos$', album.display_album, {'api': True}, name="getphotosapi"),
+get

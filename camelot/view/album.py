@@ -84,26 +84,32 @@ def display_albums(request, userid, api=False):
     # create dictionary to render
     retdict = {}
     retdict['userid'] = int(userid)
-    retdict['albums'] = albums
 
-    if len(contrib) > 0:
-        retdict['contrib'] = contrib
     if not api:
+        retdict['albums'] = albums
+
+        if len(contrib) > 0:
+            retdict['contrib'] = contrib
+
         return render(request, 'camelot/showalbums.html', retdict)
         # showalbums.html might be able to be made more generic, may repeat in showalbum.html
+
     else:
         # form albums field into json compatible format
         retdict['albums'] = [{'id': album.id, 'name': album.name, 'description': album.description } for album in albums]
+        if len(contrib) > 0:
+            retdict['contrib'] = [{'id': album.id, 'name': album.name, 'description': album.description} for album in contrib]
 
         return JsonResponse(retdict, status=200)
 
 
-def display_album(request, id, contribid=None):
+def display_album(request, id, contribid=None, api=False):
     """
-
+    Display photos for album
     :param request:
     :param id: id of album (need to validate permissions)
     :param contribid: if we reached the page from a contributor's show albums page, back nav to contributor
+    :param api: boolean for if we return a json response or not
     :return:
     """
 
@@ -112,26 +118,35 @@ def display_album(request, id, contribid=None):
     # query db for photos in album
     photos = albumcontrol.get_photos_for_album(album)
 
-    #print("before rotations")
-    # todo: this will be extraordinarily expensive if we don't change get_rotation()
-    for photo in photos:
-        #print("Getting photo {}".format(photo.id))
-        try:
-            photo.myrotation = get_rotation(photo)
-        except Exception as e:
-            print(e)
-            print(type(e))
-        #print("GOT")
+    # return for api
+    if api:
+        if request.method == 'GET':
+            retdict = {}
+            retdict['photos'] = [{'id': photo.id, 'description': photo.description, 'pub_date': photo.pub_date, 'type': photo.imgtype } for photo in photos]
 
-    #print("got rotations")
-    # for back link navigation to contributors
-    # if the id provided is not valid, set to the album owner
-    if not contribid or int(contribid) not in [x.id for x in collate_owner_and_contrib(album)]:
-        contribid = album.owner.id
+            return JsonResponse(retdict, status=200)
+        else:
+            raise Http404
 
-    retdict = {'photos': photos, 'album': album, 'contribid': contribid}
+    # return for html rendering
+    else:
+        for photo in photos:
 
-    return render(request, 'camelot/showalbum.html', retdict)
+            try:
+                photo.myrotation = get_rotation(photo)
+            except Exception as e:
+                print(e)
+                print(type(e))
+
+        # for back link navigation to contributors
+        # if the id provided is not valid, set to the album owner
+        if not contribid or int(contribid) not in [x.id for x in collate_owner_and_contrib(album)]:
+            contribid = album.owner.id
+
+        retdict = {'photos': photos, 'album': album, 'contribid': contribid}
+
+        return render(request, 'camelot/showalbum.html', retdict)
+
 
 
 def display_photo(request, photoid):
