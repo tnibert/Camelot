@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.test.client import RequestFactory
 from django.shortcuts import reverse
 import json
+from json.decoder import JSONDecodeError
 import os
 import shutil
 from ..controllers.albumcontroller import albumcontroller
@@ -177,9 +178,6 @@ class albumAPItests(TestCase):
         :return:
         """
 
-        # todo: unit test results if api requested without GET
-        # todo: unit test with permission violation
-
         # create an album for u2, u will request it
         testalbum = self.albumcontrol2.create_album("test1", "testgetphotos")
 
@@ -203,7 +201,7 @@ class albumAPItests(TestCase):
 
             # confirm accuracy
             # datetime text format: 2019-03-13T09:18:15.628Z
-            self.assertEqual(data['photos'], [{'id': testphoto.id, 'description': testphoto.description, 'pub_date': testphoto.pub_date.strftime("%Y-%m-%dT%H:%M:%S.%fZ")[:-4]+'Z', 'type': testphoto.imgtype},
+            self.assertEqual(data['photos'], [{'id': testphoto.id, 'description': testphoto.description, 'pub_date': testphoto.pub_date.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+'Z', 'type': testphoto.imgtype},
                                               {'id': testphoto2.id, 'description': testphoto2.description, 'pub_date': testphoto2.pub_date.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+'Z', 'type': testphoto2.imgtype}])
 
         finally:
@@ -211,3 +209,62 @@ class albumAPItests(TestCase):
             os.chdir("..")
             shutil.rmtree(self.testdir)
 
+    def test_get_photos_invalid_post(self):
+        """
+        Test the get photos for album api call, make a post request
+        Should not succeed
+        """
+
+        # create an album for u2, u will request it
+        testalbum = self.albumcontrol2.create_album("test1", "testgetphotos")
+
+        # create friendship
+        complete_add_friends(self.u.id, self.u2.id)
+
+        # add photos to album
+        if not os.path.exists(self.testdir):
+            os.makedirs(self.testdir)
+        os.chdir(self.testdir)
+
+        try:
+            with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
+                testphoto = self.albumcontrol2.add_photo_to_album(testalbum.id, "generic description", fi)
+
+            # make api call
+            response = self.client.post(reverse("getphotosapi", kwargs={'id': testalbum.id}))
+            self.assertEqual(response.status_code, 404)
+            self.assertRaises(JSONDecodeError, json.loads, response.content.decode('utf-8'))
+
+        finally:
+            # clean up
+            os.chdir("..")
+            shutil.rmtree(self.testdir)
+
+    def test_get_photos_permission_violation(self):
+        """
+        Test the get photos for album api call
+        Attempt to access album without permissions to view
+        :return:
+        """
+
+        # create an album for u2, u will request it
+        testalbum = self.albumcontrol2.create_album("test1", "testgetphotos")
+
+        # add photos to album
+        # todo: maybe we should be putting these folder setups and tear downs in the setup method, consider
+        if not os.path.exists(self.testdir):
+            os.makedirs(self.testdir)
+        os.chdir(self.testdir)
+
+        try:
+            with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
+                testphoto = self.albumcontrol2.add_photo_to_album(testalbum.id, "generic description", fi)
+
+            # make api call
+            response = self.client.get(reverse("getphotosapi", kwargs={'id': testalbum.id}))
+            self.assertEqual(response.status_code, 404)
+
+        finally:
+            # clean up
+            os.chdir("..")
+            shutil.rmtree(self.testdir)

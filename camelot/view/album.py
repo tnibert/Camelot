@@ -119,15 +119,17 @@ def display_album(request, id, contribid=None, api=False):
     photos = albumcontrol.get_photos_for_album(album)
 
     # return for api
-    if api and request.method == 'GET':
-        retdict = {}
-        retdict['photos'] = [{'id': photo.id, 'description': photo.description, 'pub_date': photo.pub_date, 'type': photo.imgtype } for photo in photos]
+    if api:
+        if request.method == 'GET':
+            retdict = {}
+            retdict['photos'] = [{'id': photo.id, 'description': photo.description, 'pub_date': photo.pub_date, 'type': photo.imgtype } for photo in photos]
 
-        return JsonResponse(retdict, status=200)
+            return JsonResponse(retdict, status=200)
+        else:
+            raise Http404
 
     # return for html rendering
     else:
-        # todo: this will be extraordinarily expensive if we don't change get_rotation()
         for photo in photos:
 
             try:
