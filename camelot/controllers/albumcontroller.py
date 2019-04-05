@@ -313,6 +313,14 @@ class albumcontroller(genericcontroller):
         # todo: unit test
         return album.groups.all()
 
+    def set_album_name(self, album, newname):
+        """
+        Set a new name for an album
+        Note: album name limited to 70 characters (defined in models.py)
+        :return:
+        """
+        pass
+
 
 def collate_owner_and_contrib(album):
     """

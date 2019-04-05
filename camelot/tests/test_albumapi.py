@@ -268,3 +268,13 @@ class albumAPItests(TestCase):
             # clean up
             os.chdir("..")
             shutil.rmtree(self.testdir)
+
+    def test_rename_album(self):
+        """
+        Test API endpoint to rename an album
+        :return:
+        """
+        pass
+
+    def test_rename_album_bad_permissions(self):
+        pass

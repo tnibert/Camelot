@@ -511,6 +511,9 @@ class AlbumControllerTests(TestCase):
             finally:
                 os.unlink("blahblahblah.jpg")
 
+    def test_rename_album_controller(self):
+        pass
+
 
 class AlbumViewTests(TestCase):
     def setUp(self):
