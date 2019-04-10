@@ -5,6 +5,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 from os import unlink
 from .constants import *
+from .constants2 import *
 
 
 # verify enforcement of unique user email
@@ -67,7 +68,7 @@ class FriendGroup(models.Model):
 
 
 class Album(models.Model):
-    name = models.CharField(max_length=70)
+    name = models.CharField(max_length=MAX_ALBUM_NAME_LEN)
     description = models.CharField(max_length=300)
     pub_date = models.DateTimeField('date published')
     contributors = models.ManyToManyField(Profile, related_name="albumcontributors")

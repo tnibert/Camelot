@@ -10,6 +10,7 @@ from ..controllers.utilities import *
 from ..view.album import *
 from .helperfunctions import complete_add_friends
 from ..constants import *
+from ..constants2 import *
 
 import os
 import shutil
@@ -510,6 +511,75 @@ class AlbumControllerTests(TestCase):
                 # todo: assert file exists blahblahblah.jpg
             finally:
                 os.unlink("blahblahblah.jpg")
+
+    def test_rename_album_controller(self):
+        """
+        Change album name as owner
+        :return:
+        """
+        name1 = "first name"
+        name2 = "second name"
+
+        # create an album
+        testalbum = self.albumcontrol.create_album(name1, "testing change album name")
+
+        self.albumcontrol.set_album_name(testalbum, name2)
+
+        testalbum.refresh_from_db()
+        assert testalbum.name == name2
+
+    def test_rename_album_controller_too_large_name(self):
+        """
+
+        :return:
+        """
+        name1 = "first name"
+        name2 = "test" * MAX_ALBUM_NAME_LEN
+
+        # create an album
+        testalbum = self.albumcontrol.create_album(name1, "testing change album name")
+
+        self.albumcontrol.set_album_name(testalbum, name2)
+
+        testalbum.refresh_from_db()
+        assert testalbum.name != name2
+        assert testalbum.name == name2[:MAX_ALBUM_NAME_LEN]
+        assert len(testalbum.name) == MAX_ALBUM_NAME_LEN
+
+    def test_rename_album_controller_bad_permissions(self):
+        """
+        Attempt to change album name without being album owner
+        Will raise exception
+        Only owner can change an album name
+        May want to split into multiple unit tests
+        :return:
+        """
+        name1 = "first name"
+        name2 = "second name"
+
+        # create an album
+        testalbum = self.albumcontrol.create_album(name1, "testing change album name")
+
+        self.assertRaises(PermissionException, self.albumcontrol2.set_album_name, testalbum, name2)
+
+        testalbum.refresh_from_db()
+        assert testalbum.name == name1
+
+        # escalate to friends
+        complete_add_friends(self.u.id, self.u2.id)
+
+        self.assertRaises(PermissionException, self.albumcontrol2.set_album_name, testalbum, name2)
+
+        testalbum.refresh_from_db()
+        assert testalbum.name == name1
+
+        # add as contributor
+        self.albumcontrol.add_contributor_to_album(testalbum, self.u2.profile)
+
+        self.assertRaises(PermissionException, self.albumcontrol2.set_album_name, testalbum, name2)
+
+        testalbum.refresh_from_db()
+        assert testalbum.name == name1
 
 
 class AlbumViewTests(TestCase):
