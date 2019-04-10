@@ -319,6 +319,9 @@ class albumcontroller(genericcontroller):
         Note: album name limited to 70 characters (defined in models.py)
         :return:
         """
+        # check permissions
+
+        # update database
         pass
 
 
