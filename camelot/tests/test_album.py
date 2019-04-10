@@ -10,6 +10,7 @@ from ..controllers.utilities import *
 from ..view.album import *
 from .helperfunctions import complete_add_friends
 from ..constants import *
+from ..constants2 import *
 
 import os
 import shutil
@@ -526,6 +527,24 @@ class AlbumControllerTests(TestCase):
 
         testalbum.refresh_from_db()
         assert testalbum.name == name2
+
+    def test_rename_album_controller_too_large_name(self):
+        """
+
+        :return:
+        """
+        name1 = "first name"
+        name2 = "test" * MAX_ALBUM_NAME_LEN
+
+        # create an album
+        testalbum = self.albumcontrol.create_album(name1, "testing change album name")
+
+        self.albumcontrol.set_album_name(testalbum, name2)
+
+        testalbum.refresh_from_db()
+        assert testalbum.name != name2
+        assert testalbum.name == name2[:MAX_ALBUM_NAME_LEN]
+        assert len(testalbum.name) == MAX_ALBUM_NAME_LEN
 
     def test_rename_album_controller_bad_permissions(self):
         """

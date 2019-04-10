@@ -4,6 +4,7 @@ from .friendcontroller import are_friends
 from .genericcontroller import genericcontroller
 from .groupcontroller import is_in_group
 from ..constants import *
+from ..constants2 import *
 from django.utils import timezone
 from os import makedirs, unlink
 from io import BytesIO
@@ -320,9 +321,15 @@ class albumcontroller(genericcontroller):
         :return:
         """
         # check permissions
-
+        if self.uprofile is not album.owner:
+            raise PermissionException
+        # name is too long, truncate - apparently we need to manually enforce this
+        # may want to change to raise an error later, or we can delegate to API
+        if len(newname) > MAX_ALBUM_NAME_LEN:
+            newname = newname[:MAX_ALBUM_NAME_LEN]
         # update database
-        pass
+        album.name = newname
+        album.save()
 
 
 def collate_owner_and_contrib(album):
