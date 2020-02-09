@@ -6,30 +6,28 @@
 <h1>Welcome to PicPicPanda {{user.profile}}</h1>
 <section class="sidebyside">
 <div id="homenav">
-<ul class="navbar">
-<li><a href="{% url 'create_album' %}">Create Album</a></li>
-<li><a href="{%url 'show_albums' request.user.id %}">View Albums</a></li>
-<li><a href="{% url 'show_friends' request.user.id %}">View Friends</a></li>
-<li><a href="{% url 'show_pending_requests' %}">View Pending Friend Requests</a> ({{ pendingreqs }})</li>
-<li><a href="{% url 'show_profile' request.user.id %}">View Profile</a></li>
-<li><a href="{% url 'update_profile' %}">Edit Profile</a></li>
-<li><a href="{% url 'manage_groups' %}">Manage Friend Groups</a></li>
-</ul>
+    <ul class="navbar">
+    <li><a href="{% url 'create_album' %}">Create Album</a></li>
+    <li><a href="{%url 'show_albums' request.user.id %}">View Albums</a></li>
+    <li><a href="{% url 'show_friends' request.user.id %}">View Friends</a></li>
+    <li><a href="{% url 'show_pending_requests' %}">View Pending Friend Requests</a> ({{ pendingreqs }})</li>
+    <li><a href="{% url 'show_profile' request.user.id %}">View Profile</a></li>
+    <li><a href="{% url 'update_profile' %}">Edit Profile</a></li>
+    <li><a href="{% url 'manage_groups' %}">Manage Friend Groups</a></li>
+    </ul>
 
-<td>
-    <tr>Your profile url:</tr>
-    <tr>https://picpicpanda.com/space/{{request.user.username}}</tr>
-</td>
+    <td>
+        <tr>Your profile url:</tr>
+        <tr>https://picpicpanda.com/space/{{request.user.username}}</tr>
+    </td>
 
-<div>
-    <form action="{% url 'search' %}" method="post">
-    {% include 'camelot/genericformtemp.html' with form=searchform %}
-    <input type="submit" value="Search" />
-    </form>
+    <div>
+        <form action="{% url 'search' %}" method="post">
+        {% include 'camelot/genericformtemp.html' with form=searchform %}
+        <input type="submit" value="Search" />
+        </form>
+    </div>
 </div>
-</div>
-
-
 
 <div id="feed">
     {% for item in feed %}
