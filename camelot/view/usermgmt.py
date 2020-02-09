@@ -8,6 +8,7 @@ from django.contrib import messages
 from ..forms import SignUpForm, SearchForm
 from ..tokens import account_activation_token
 from ..controllers.friendcontroller import friendcontroller
+from ..friendfeed import generate_feed
 
 #logger = logging.getLogger(__name__)
 
@@ -53,19 +54,22 @@ def index(request):
     else:
         return render(request, 'camelot/index.html')
 
+
 @login_required
 def user_home(request):
     pcontrol = profilecontroller(request.user.id)
     retdict = {
         "pendingreqs": len(friendcontroller(request.user.id).return_pending_requests()),
         "searchform": SearchForm(),
-        "feed": pcontrol.get_feed()
+        "feed": generate_feed(pcontrol)[:15]
     }
     return render(request, 'camelot/home.html', retdict)
+
 
 def user_logout(request):
     logout(request)
     return redirect("index")
+
 
 """
 User registration
@@ -77,6 +81,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
 
 from ..controllers.profilecontroller import profilecontroller
+
 
 # user registration function with email confirmation
 def register(request):
@@ -114,8 +119,8 @@ def register(request):
 
     form = SignUpForm()
 
-    #print(request.method)
     return render(request, 'camelot/register.html', {'form': form})
+
 
 def account_activation_sent(request):
     return render(request, 'camelot/account_activation_sent.html')
