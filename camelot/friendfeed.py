@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 from collections import OrderedDict
+from datetime import datetime, timedelta
 
 
 def generate_feed(profilecontrol):
@@ -26,9 +27,16 @@ def generate_feed(profilecontrol):
                     grouped[uploadeddate][p.uploader][p.album] += 1
 
     feedentries = []
+    today = datetime.today().date()
     for date, up in grouped.items():
         for uploader, alb in up.items():
             for album, count in alb.items():
-                feedentries.append((date, uploader, album, count))
+                if date == today:
+                    daytext = "today"
+                elif date == today - timedelta(days=1):
+                    daytext = "yesterday"
+                else:
+                    daytext = "{} days ago".format(abs((today - date).days))
+                feedentries.append((daytext, uploader, album, count))
 
     return feedentries

@@ -33,7 +33,7 @@
     {% for item in feed %}
     <p><a href="{% url 'show_profile' item.1.user.id %}">{{ item.1 }}</a> uploaded {{ item.3 }} photo{{ item.3|pluralize:"s" }}
         to
-        <a href="{% url 'show_album' item.2.id %}">{{ item.2 }}</a> on {{ item.0 }}</p>
+        <a href="{% url 'show_album' item.2.id %}">{{ item.2 }}</a> {{ item.0 }}</p>
     {% endfor %}
 </div>
 
