@@ -93,10 +93,8 @@ class profilecontroller(genericcontroller):
 
     def get_feed(self):
         """
-        Creates a feed of friend activity for the user to view
-        :return: A list of photos
-        We do not want to keep this as a list of photos
-        eventually we want like "so and so added # photos to album blah X hours ago"
+        Returns all photos from friends that the user has permission to view
+        :return: A list of photo model objects
         """
         # initialize our controllers
         friendcontrol = friendcontroller(self.uprofile.user.id)

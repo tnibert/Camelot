@@ -8,7 +8,8 @@ def generate_feed(profilecontrol):
     Generate a feed of the number of photos uploaded by a particular uploader to a particular album on
     a given day
     :param profilecontrol: a profilecontroller object
-    :return: a list of tuples in order of date, uploader, album, and the count of photos
+    :return: a list of tuples in order of day string (relative to current), uploader, album, and the count of photos
+             under the previous criteria
     """
     feedphotos = profilecontrol.get_feed()
     grouped = OrderedDict()
