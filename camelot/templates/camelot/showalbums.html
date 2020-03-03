@@ -10,17 +10,18 @@
 
 <div>
     {% for album in albums %}
-        <div class="gallery">
-            <div>
-            <a href="{% url 'show_album' album.id %}">
-                {% if album.temp %}
-                    <img class="{{ album.myphotorotation }} midrot" src="{% url 'show_thumb' album.temp %}" alt="{{ album.name }}" height="150">
-                {% else %}
-                    <img src="{% static 'img/defaultalbum.png' %}" alt="{{ album.name }}" height="150">
-                {% endif %}
-            </a></div>
+        <div class="gallery-wrap">
+            <div class="gallery">
+                <div>
+                <a href="{% url 'show_album' album.id %}">
+                    {% if album.temp %}
+                        <img class="{{ album.myphotorotation }} midrot" src="{% url 'show_thumb' album.temp %}" alt="{{ album.name }}" height="150">
+                    {% else %}
+                        <img src="{% static 'img/defaultalbum.png' %}" alt="{{ album.name }}" height="150">
+                    {% endif %}
+                </a></div>
                 <div class="desc">{{ album.name }}<br>{{ album.description }}</div>
-            </a>
+            </div>
         </div>
     {% endfor %}
 </div>
@@ -30,6 +31,7 @@
     <h3>Contributed Albums:</h3>
 
     {% for album in contrib %}
+    <div class="gallery-wrap">
         <div class="gallery">
             <div>
             <a href="{% url 'show_album' id=album.id contribid=userid %}">
@@ -42,6 +44,7 @@
                 <div class="desc">{{ album.name }}<br>{{ album.description }}</div>
             </a>
         </div>
+    </div>
     {% endfor %}
 </div>
 {% endif %}
