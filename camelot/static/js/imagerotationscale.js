@@ -2,7 +2,7 @@ $(window).on("load", function(){
     $('.rotate90').each(function() {
         // NB: because this is a rotated image, width and height will be swapped
 
-        var maxWidth = 190;    // Max height for the image
+        var maxWidth = 240;    // Max height for the image
 
         var width = $(this).width();    // Current image width
         var height = $(this).height();  // Current image height
