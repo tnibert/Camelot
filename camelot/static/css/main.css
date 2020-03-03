@@ -126,7 +126,6 @@ table.logincontent {
 }*/
 
 /* for rotations of images */
-/* this seems to sufficiently work for now */
 /* todo: we may want to create separate css for in photo presentation and album presentation */
 .rotate90 {
    -webkit-transform: rotate(90deg) translateY(-100%) scale(0.75);
@@ -144,14 +143,6 @@ table.logincontent {
 
     height: 100%;
     width: 100%;
-}
-
-.midrot {
-   /* I don't know how these values will do with a variety of pictures */
-   padding-bottom: 20%;
-   padding-top:20%;
-
-   /*width: 70%;*/
 }
 
 .picprofile {
