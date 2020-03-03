@@ -12,11 +12,6 @@ h1 {
 
 /* these are used in presentphoto.html */
 
-/*#imgpresent{
-    max-width:90%;
-    max-height:70%;
-}*/
-
 table.gal-img {
     margin:auto;
 }
@@ -51,12 +46,11 @@ table.gal-img img {
 
 div.gallery {
     margin: 5px;
-    border: 1px solid #ccc;
-    float: left;
-    width: 180px;
+    margin:auto;
+    height: 100%;
 }
 
-div.gallery:hover {
+div.gallery-wrap:hover {
     border: 1px solid #777;
 }
 
@@ -66,12 +60,21 @@ div.gallery a {
 }
 
 div.gallery img {
-    width: 100%;
-    height: auto;
+    padding: 1px;
+}
+
+div.gallery-wrap {
+    padding:10px;
+    float:left;
+    text-align:center;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #ccc;
 }
 
 div.desc {
-    padding: 15px;
+    padding-top: 2px;
     text-align: center;
 }
 
@@ -89,12 +92,10 @@ div.desc {
 
 #logintable {
     margin: 0 auto;
-    /*overflow: auto;*/
 }
 
 .logintable {
     margin: auto;
-    /*padding-left: 41%;*/
     text-align:center;
 }
 
@@ -103,8 +104,6 @@ input.logininput {
 }
 
 #loginpageoptions {
-    /*margin: auto;
-    padding-left: 44%;*/
     text-align:center;
     margin-right: 2%;
 }
@@ -127,34 +126,28 @@ table.logincontent {
 }*/
 
 /* for rotations of images */
-/* this seems to sufficiently work for now */
 /* todo: we may want to create separate css for in photo presentation and album presentation */
 .rotate90 {
-   -webkit-transform: rotate(90deg) translateY(-100%);
-   -moz-transform: rotate(90deg) translateY(-100%);
-   -o-transform: rotate(90deg) translateY(-100%);
-   -ms-transform: rotate(90deg) translateY(-100%);
-   transform: rotate(90deg) translateY(-100%);
-
+   -webkit-transform: rotate(90deg) translateY(-122%) scale(0.75);
+   -moz-transform: rotate(90deg) translateY(-122%) scale(0.75);
+   -o-transform: rotate(90deg) translateY(-122%) scale(0.75);
+   -ms-transform: rotate(90deg) translateY(-122%) scale(0.75);
+   transform: rotate(90deg) translateY(-122%) scale(0.75);
+   /*transform-origin: 45% 75%; ?*/
    transform-origin: top left;
    /* IE 10+, Firefox, etc. */
    -webkit-transform-origin: top left;
    /* Chrome */
    -ms-transform-origin: top left;
 
-}
-
-.midrot {
-   /* I don't know how these values will do with a variety of pictures */
-   padding-bottom: 20%;
-   padding-top:18%;
-
-   width: 70%;
+    height: 100%;
+    width: 100%;
 }
 
 .picprofile {
     padding-bottom:5%;
 }
+
 /*https://www.quora.com/How-can-you-rotate-images-using-JavaScript - some good css info*/
 /*.rotate180 {
     -webkit-transform: rotate(180deg);
