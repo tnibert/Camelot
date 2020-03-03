@@ -128,12 +128,11 @@ table.logincontent {
 /* for rotations of images */
 /* todo: we may want to create separate css for in photo presentation and album presentation */
 .rotate90 {
-   -webkit-transform: rotate(90deg) translateY(-100%) scale(0.75);
-   -moz-transform: rotate(90deg) translateY(-100%) scale(0.75);
-   -o-transform: rotate(90deg) translateY(-100%) scale(0.75);
-   -ms-transform: rotate(90deg) translateY(-100%) scale(0.75);
-   transform: rotate(90deg) translateY(-100%) scale(0.75);
-   /* todo: center */
+   -webkit-transform: rotate(90deg) translateY(-122%) scale(0.75);
+   -moz-transform: rotate(90deg) translateY(-122%) scale(0.75);
+   -o-transform: rotate(90deg) translateY(-122%) scale(0.75);
+   -ms-transform: rotate(90deg) translateY(-122%) scale(0.75);
+   transform: rotate(90deg) translateY(-122%) scale(0.75);
    /*transform-origin: 45% 75%; ?*/
    transform-origin: top left;
    /* IE 10+, Firefox, etc. */
@@ -148,6 +147,7 @@ table.logincontent {
 .picprofile {
     padding-bottom:5%;
 }
+
 /*https://www.quora.com/How-can-you-rotate-images-using-JavaScript - some good css info*/
 /*.rotate180 {
     -webkit-transform: rotate(180deg);
