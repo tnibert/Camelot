@@ -12,11 +12,6 @@ h1 {
 
 /* these are used in presentphoto.html */
 
-/*#imgpresent{
-    max-width:90%;
-    max-height:70%;
-}*/
-
 table.gal-img {
     margin:auto;
 }
@@ -51,15 +46,11 @@ table.gal-img img {
 
 div.gallery {
     margin: 5px;
-    border: 1px solid #ccc;
     margin:auto;
     height: 100%;
-    /*overflow: hidden;*/
-    /*width: auto;*/
-    /*float: left;*/
 }
 
-div.gallery:hover {
+div.gallery-wrap:hover {
     border: 1px solid #777;
 }
 
@@ -69,32 +60,22 @@ div.gallery a {
 }
 
 div.gallery img {
-    /*width: 75%;*/
-    /*height: 75%;*/
-    /*max-width:100%;
-    max-height:100%;*/
     padding: 1px;
-    /*align: center;*/
 }
 
 div.gallery-wrap {
     padding:10px;
-    display:inline-block;
     float:left;
     text-align:center;
     height: 200px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #ccc;
 }
 
 div.desc {
     padding-top: 2px;
     text-align: center;
-}
-
-/* todo: rotated images must have text at bottom of gallery div */
-div.desc span{
-    position:relative;
-    bottom:0;
-    right:0;
 }
 
 /* used in login page */
@@ -111,12 +92,10 @@ div.desc span{
 
 #logintable {
     margin: 0 auto;
-    /*overflow: auto;*/
 }
 
 .logintable {
     margin: auto;
-    /*padding-left: 41%;*/
     text-align:center;
 }
 
@@ -125,8 +104,6 @@ input.logininput {
 }
 
 #loginpageoptions {
-    /*margin: auto;
-    padding-left: 44%;*/
     text-align:center;
     margin-right: 2%;
 }

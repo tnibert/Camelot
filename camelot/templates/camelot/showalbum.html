@@ -22,8 +22,8 @@
                     <a href="{% url 'present_photo' photo.id %}">
                         <img class="{{ photo.myrotation }} midrot"src="{% url 'show_thumb' photo.id %}" alt="{{ photo.description }}">
                     </a>
-                    <div class="desc"><span>{{ photo.description }}</span></div>
                 </div>
+                <div class="desc"><span>{{ photo.description }}</span></div>
             </div>
         {% endfor %}
         </div>
