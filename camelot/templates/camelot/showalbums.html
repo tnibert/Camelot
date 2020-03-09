@@ -1,6 +1,8 @@
 {% extends 'camelot/baseloggedin.html' %}
 {% load staticfiles %}
 {% block content2 %}
+<script src="{% static 'js/jquery-3.3.1.js' %}"></script>
+<script src="{% static 'js/imagerotationscale.js' %}"></script>
 <ul>
     <li><a href="{% url 'show_profile' userid %}">Back To Profile</a></li>
     {% if request.user.id == userid %}
@@ -15,9 +17,9 @@
                 <div>
                 <a href="{% url 'show_album' album.id %}">
                     {% if album.temp %}
-                        <img class="{{ album.myphotorotation }} midrot" src="{% url 'show_thumb' album.temp %}" alt="{{ album.name }}" height="150">
+                        <img class="{{ album.myphotorotation }} midrot" src="{% url 'show_thumb' album.temp %}" alt="{{ album.name }}">
                     {% else %}
-                        <img src="{% static 'img/defaultalbum.png' %}" alt="{{ album.name }}" height="150">
+                        <img src="{% static 'img/defaultalbum.png' %}" alt="{{ album.name }}">
                     {% endif %}
                 </a></div>
                 <div class="desc">{{ album.name }}<br>{{ album.description }}</div>
@@ -36,9 +38,9 @@
             <div>
             <a href="{% url 'show_album' id=album.id contribid=userid %}">
                 {% if album.temp %}
-                    <img class="{{ album.myphotorotation }}" src="{% url 'show_thumb' album.temp %}" alt="{{ album.name }}" height="150">
+                    <img class="{{ album.myphotorotation }}" src="{% url 'show_thumb' album.temp %}" alt="{{ album.name }}">
                 {% else %}
-                    <img src="{% static 'img/defaultalbum.png' %}" alt="{{ album.name }}" height="150">
+                    <img src="{% static 'img/defaultalbum.png' %}" alt="{{ album.name }}">
                 {% endif %}
             </a></div>
                 <div class="desc">{{ album.name }}<br>{{ album.description }}</div>
