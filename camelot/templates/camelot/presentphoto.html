@@ -12,7 +12,7 @@
             <li><a href="{% url 'delete_photo' photo.id %}">Delete Photo</a></li>
         {% endif %}
     </ul>
-    <div>
+    <div id="photoplusnav">
         <a id="prev" href="{% url 'present_photo' previous %}"><img src="{% static 'img/arrowleft.svg' %}" alt="Previous"></a>
         <table class="gal-img">
             <tr>

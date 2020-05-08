@@ -1,0 +1,9 @@
+@media screen and (min-width: 741px) {
+    #prev {
+        margin-left: 12%
+    }
+
+    #next{
+        margin-right: 12%;
+    }
+}
