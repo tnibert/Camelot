@@ -11,6 +11,7 @@ from io import BytesIO
 from PIL import Image
 import shutil
 
+
 class albumcontroller(genericcontroller):
     """
     Class for accessing albums for a given user

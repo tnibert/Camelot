@@ -31,6 +31,7 @@ from ..logs import log_exception
 Album views
 """
 
+
 @login_required
 def create_album(request):
 
@@ -146,7 +147,6 @@ def display_album(request, id, contribid=None, api=False):
         retdict = {'photos': photos, 'album': album, 'contribid': contribid}
 
         return render(request, 'camelot/showalbum.html', retdict)
-
 
 
 def display_photo(request, photoid):
