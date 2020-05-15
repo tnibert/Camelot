@@ -70,6 +70,7 @@ class UploadPhotoForm(forms.Form):
                 forms.CharField(label="Description", max_length=MAXPHOTODESC, required=False)
     """
 
+
 class EditProfileForm(forms.Form):
     # need to have existing fields filled in by default on form display
     displayname = forms.CharField(label='Display Name', max_length=MAXDISPLAYNAME)

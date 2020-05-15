@@ -11,10 +11,10 @@ from ..view.album import *
 from .helperfunctions import complete_add_friends
 from ..constants import *
 from ..constants2 import *
-
 import os
 import shutil
 from unittest import mock
+
 
 class AlbumControllerTests(TestCase):
     # this setUp code needs to be made universal

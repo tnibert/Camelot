@@ -1,6 +1,7 @@
 from ..controllers.friendcontroller import friendcontroller
 from ..controllers.utilities import get_profile_from_uid
-# add friends
+
+
 def complete_add_friends(requesterid, requesteeid):
     """
     Execute a full friend request and confirm for testing
