@@ -121,7 +121,6 @@ class albumcontroller(genericcontroller):
         :param fi: the image file
         :return: reference to the newly created photo object
         """
-
         album = self.return_album(albumid)
 
         # check that user has permission to add to album
@@ -346,12 +345,13 @@ def collate_owner_and_contrib(album):
 
 def ThumbFromBuffer(buf, filename, baseheight=THUMBHEIGHT):
     """
-    Take an image buffer, scale, and return a thumbnail
+    Take an image buffer, scale and exif rotate, and return a thumbnail
     :param buf: raw image data buffer
     :param filename: file name to save as
     :return: PIL Image thumbnail
     """
     img = Image.open(BytesIO(buf.read()))
+    img = exif_rotate_image(img)
 
     # if the image is smaller than our target height, don't resize it
     # this will leave us double saving sometimes, but right now, we need to do that for png uniformity

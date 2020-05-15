@@ -1,5 +1,4 @@
 from django.contrib.auth.models import User
-from PIL import Image
 from PIL.ExifTags import TAGS
 
 
@@ -9,6 +8,35 @@ def get_profile_from_uid(id):
 
 def get_profid_from_username(username):
     return User.objects.get(username__iexact=username)
+
+
+# todo: migrate existing front end rotated images
+def exif_rotate_image(img):
+    """
+    Rotate an image according to its exif tag
+    For reference: http://sylvana.net/jpegcrop/exif_orientation.html
+    :param img: the image to check and rotate
+    :return: the image rotated as per exif information
+    """
+    if 'exif' in img.info:
+        # exif orientations are values 1 - 8
+        # we are only handling the simple rotations
+        # no reflections for now
+        mapping = {
+            3: 180,
+            6: 270,
+            8: 90
+        }
+
+        exif = get_exif(img)
+        orientation = exif['Orientation']
+        if orientation not in mapping.keys():
+            return img
+
+        return img.rotate(mapping[orientation], expand=True)
+
+    else:
+        return img
 
 
 def get_exif(img):
@@ -27,48 +55,19 @@ def get_exif(img):
 
 def get_rotation(photo):
     """
-    Get the rotation of an image from exif tags
+    This previously got the rotation of an image from exif tags or db.  Now it returns an empty string
+    because we will not rotate the image on the front end anymore.
+
     Note: orientation of 1 is right side up
     If we don't have the exiforientation set in the DB, open the file and check the exif tag,
-    update the field.  This let's us avoid a migration.  Maybe it's lazy... meh, it's open source, if you don't like it fix it
-    ^^^ that being said I'm still not sure if I'm going to keep it that way or migrate it
+    update the field.  This let's us avoid a migration.
+
+    todo: Remove this function, calls to it, and css rotations
+
     :param photo: django ORM photo model
     :return: css tag name of the rotation
     """
-    rotation = ""
-    if photo is None:
-        return rotation
-    if photo.exiforientation is None:
-        # if we haven't created our orientation in the db, create it
-        try:
-            with Image.open(photo.filename) as img:
-                if 'exif' in img.info:
-                    exif = get_exif(img)
-                    #print(exif)
-                    try:
-                        assert isinstance(exif['Orientation'], int)
-                        photo.exiforientation = exif['Orientation']
-                    except KeyError:
-                        photo.exiforientation = 1
-
-                else:
-                    photo.exiforientation = 1
-
-        except FileNotFoundError as e:
-            # todo: maybe delete the file from the db?
-            photo.exiforientation = 1
-        photo.save()
-
-    #print("Checking orientation")
-    # these are the class names in the css
-    if photo.exiforientation == 6:
-        rotation = "rotate90"
-    elif photo.exiforientation == 8:
-        rotation = "rotate270"
-    elif photo.exiforientation == 3:
-        rotation = "rotate180"
-    #print("Got orientation")
-    return rotation
+    return ""
 
 
 class AlreadyExistsException(Exception):

@@ -185,15 +185,13 @@ def display_photo(request, photoid):
 @login_required
 def add_photo(request, id):
     """
-    Add a photo to an album
-    Presents form or processes on POST
+    Presents form to add a photo to album (upload handled through API)
     :param request:
     :param id: id of the album to add photo to
     :return:
     """
     # todo: add more checking for correct values,
     # todo: add ability to select multiple files in file picker and auto fill form
-
     # https://docs.djangoproject.com/en/2.0/topics/http/file-uploads/
     albumcontrol = albumcontroller(request.user.id)
     # will raise PermissionException if user does not have permission to view
@@ -297,6 +295,7 @@ def delete_photo(request, photoid):
         retdict = {'confirmform': confirm, 'photo': photo}
         return render(request, "camelot/confirmdelete.html", retdict)
 
+
 # I don't like how similar the code between show albums and show album is
 @login_required
 def delete_album(request, albumid):
@@ -362,6 +361,7 @@ def manage_album_permissions(request, albumid):
 
     return render(request, "camelot/managealbumpermission.html", retdict)
 
+
 @login_required
 def update_access_type(request, id):
     """
@@ -387,6 +387,7 @@ def update_access_type(request, id):
             return redirect("manage_album", id)
 
     raise Http404
+
 
 @login_required
 def add_groups(request, albumid):
@@ -426,6 +427,7 @@ def add_groups(request, albumid):
 
     # if not a post, we 404
     raise Http404
+
 
 @login_required
 def add_contrib(request, albumid):
