@@ -134,28 +134,6 @@ class AlbumControllerTests(TestCase):
         #with open('wishlist.doc') as fp:
         #    c.post('/customers/wishes/', {'name': 'fred', 'attachment
 
-    def test_get_rotation(self):
-        if not os.path.exists(self.testdir):
-            os.makedirs(self.testdir)
-        os.chdir(self.testdir)
-
-        myalbum = self.albumcontrol.create_album("image add test", "lalala")
-
-        try:
-            # todo: add a test image with exif rotation tag
-            # todo: flesh out this test a bit
-            with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
-                myphoto = self.albumcontrol.add_photo_to_album(myalbum.id, "generic description", fi)
-                assert myphoto.exiforientation is None
-                assert get_rotation(myphoto) == ""
-                myphoto.refresh_from_db()
-                assert myphoto.exiforientation == 1
-
-        finally:
-            # clean up
-            os.chdir("..")
-            shutil.rmtree(self.testdir)
-
     def test_add_image_to_other_user_album_controller(self):
         """
         User should not be able to add image to another user's album
