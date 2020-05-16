@@ -1,10 +1,12 @@
-//https://stackoverflow.com/questions/6142025/dynamically-add-field-to-a-form
+// https://stackoverflow.com/questions/6142025/dynamically-add-field-to-a-form
+// https://simpleisbetterthancomplex.com/tutorial/2016/11/22/django-multiple-file-upload-using-ajax.html
+// todo: reset uploading text on failure
+// todo: can fail to update description and hang on this screen during upload
 
 $(document).ready(function(){
 
     // submit photos via API calls
     $("form").on('submit', function (e) {
-        // todo: https://simpleisbetterthancomplex.com/tutorial/2016/11/22/django-multiple-file-upload-using-ajax.html
         var photos = new FormData(); //new FormData(document.getElementById("uploadphotosform"));
 
         photos.append('image', $('#id_file')[0].files[0]);
@@ -14,22 +16,6 @@ $(document).ready(function(){
         var albumid = document.getElementById("albumid").value;
 
         var csrftoken = getCookie('csrftoken');
-
-        /*oForm = document.getElementById("uploadphotosform");
-        console.log(oForm.elements.length);
-        console.log(oForm.elements);
-        for (var prop in oForm.elements) {
-            console.log(prop.value);
-        }*/
-
-        /*var oReq = new XMLHttpRequest();
-        oReq.open("POST", "api/upload/id", true);
-        oReq.onload = function(oEvent) {
-        if (oReq.status == 201) {
-            oOutput.innerHTML = "Uploaded!";
-        } else {
-            oOutput.innerHTML = "Error " + oReq.status + " occurred when trying to upload your file.<br \/>";
-        }*/
 
         $.ajaxSetup({
             beforeSend: function(xhr, settings) {
@@ -58,20 +44,7 @@ $(document).ready(function(){
                 201: function (response) {
                     console.log("Uploaded!");
                     var photoid = response.id;
-                    /*$.ajax({
-                            type: 'POST',
-                            data: descriptions,
-                            url: '/api/update/photo/desc/' + photoid,
-                            dataType: 'json',
-                            contentType: false,
-                            processData: false,
-                            statusCode: {
-                                204: function() {
-                                    console.log("Desc updated!");
-                                    window.location.href = '/album/' + albumid + '/';
-                                }
-                            }
-                    });*/
+
                     var xhr = new XMLHttpRequest();
                     // define success check
                     xhr.onreadystatechange = function() {
