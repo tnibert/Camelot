@@ -29,7 +29,7 @@ def exif_rotate_image(img):
         }
 
         exif = get_exif(img)
-        orientation = exif['Orientation']
+        orientation = exif.get('Orientation')
         if orientation not in mapping.keys():
             return img
 
