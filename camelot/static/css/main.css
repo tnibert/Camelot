@@ -123,57 +123,9 @@ table.logincontent {
     height: 200px;
 }*/
 
-/* for rotations of images */
-/* todo: we may want to create separate css for in photo presentation and album presentation */
-.rotate90 {
-   -webkit-transform: rotate(90deg) translateY(-122%) scale(0.75);
-   -moz-transform: rotate(90deg) translateY(-122%) scale(0.75);
-   -o-transform: rotate(90deg) translateY(-122%) scale(0.75);
-   -ms-transform: rotate(90deg) translateY(-122%) scale(0.75);
-   transform: rotate(90deg) translateY(-122%) scale(0.75);
-   /*transform-origin: 45% 75%; ?*/
-   transform-origin: top left;
-   /* IE 10+, Firefox, etc. */
-   -webkit-transform-origin: top left;
-   /* Chrome */
-   -ms-transform-origin: top left;
-
-    height: 100%;
-    width: 100%;
-}
-
 .picprofile {
     padding-bottom:5%;
 }
-
-/*https://www.quora.com/How-can-you-rotate-images-using-JavaScript - some good css info*/
-/*.rotate180 {
-    -webkit-transform: rotate(180deg);
-    -moz-transform: rotate(180deg);
-    -o-transform: rotate(180deg);
-    -ms-transform: rotate(180deg);
-    transform: rotate(180deg);
-
-    transform-origin: top left;
-    /* IE 10+, Firefox, etc.
-    -webkit-transform-origin: top left;
-    /* Chrome
-    -ms-transform-origin: top left;
-}
-.rotate270 {
-    -webkit-transform: rotate(270deg);
-    -moz-transform: rotate(270deg);
-    -o-transform: rotate(270deg);
-    -ms-transform: rotate(270deg);
-    transform: rotate(270deg);
-
-    transform-origin: top left;
-    /* IE 10+, Firefox, etc.
-    -webkit-transform-origin: top left;
-    /* Chrome
-    -ms-transform-origin: top left;
-}*/
-
 
 /* used in user home page */
 #feed {
