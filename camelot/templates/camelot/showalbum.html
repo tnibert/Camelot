@@ -2,25 +2,23 @@
 
 {% block content2 %}
 {% load staticfiles %}
-<script src="{% static 'js/jquery-3.3.1.js' %}"></script>
-<script src="{% static 'js/imagerotationscale.js' %}"></script>
     <ul>
         <li><a href="{% url 'show_albums' contribid %}">Back To Albums</a></li>
         {% if request.user.profile == album.owner or request.user.profile in album.contributors.all %}
-        <li><a href="{% url 'upload_photos' album.id %}">Add New Photos</a></li>
-        <li><a href="{% url 'manage_album' album.id %}">Manage Album Access</a></li>
+            <li><a href="{% url 'upload_photos' album.id %}">Add New Photos</a></li>
+            <li><a href="{% url 'manage_album' album.id %}">Manage Album Access</a></li>
         {% endif %}
         {% if request.user.profile == album.owner %}
-        <li><a href="{% url 'delete_album' album.id %}">Delete Album</a></li>
+            <li><a href="{% url 'delete_album' album.id %}">Delete Album</a></li>
         {% endif %}
     </ul>
         <div class="galcollect">
         {% for photo in photos %}
-            <!-- need to add more space between photos -->
+            {# need to add more space between photos #}
             <div class="gallery-wrap">
                 <div class="gallery">
                     <a href="{% url 'present_photo' photo.id %}">
-                        <img class="{{ photo.myrotation }} midrot" src="{% url 'show_thumb' photo.id %}" alt="{{ photo.description }}">
+                        <img class="midrot" src="{% url 'show_thumb' photo.id %}" alt="{{ photo.description }}">
                     </a>
                 </div>
                 <div class="desc"><span>{{ photo.description }}</span></div>

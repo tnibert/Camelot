@@ -8,7 +8,7 @@ from django.template.loader import render_to_string
 from random import randint
 from ..controllers.albumcontroller import albumcontroller, collate_owner_and_contrib
 from ..controllers.friendcontroller import are_friends
-from ..controllers.utilities import PermissionException, get_rotation
+from ..controllers.utilities import PermissionException
 from ..forms import AlbumCreateForm, UploadPhotoForm, EditAlbumAccesstypeForm, MyGroupSelectForm, AddContributorForm, DeleteConfirmForm
 from ..constants import *
 from ..controllers.utilities import *
@@ -79,8 +79,6 @@ def display_albums(request, userid, api=False):
             # we check if this exists in the template and if not, render a default image
             randindex = randint(0, len(photos)-1)
             album.temp = photos[randindex].id
-            album.myphotorotation = get_rotation(photos[randindex])
-            #print(album.myphotorotation)
 
     # create dictionary to render
     retdict = {}
@@ -131,14 +129,6 @@ def display_album(request, id, contribid=None, api=False):
 
     # return for html rendering
     else:
-        for photo in photos:
-
-            try:
-                photo.myrotation = get_rotation(photo)
-            except Exception as e:
-                print(e)
-                print(type(e))
-
         # for back link navigation to contributors
         # if the id provided is not valid, set to the album owner
         if not contribid or int(contribid) not in [x.id for x in collate_owner_and_contrib(album)]:
@@ -170,13 +160,10 @@ def display_photo(request, photoid):
     # find index of our photo in the queryset
     i = list(albumphotos.values_list('id', flat=True)).index(int(photoid))
 
-    rotation = get_rotation(photo)
-
     retdict = {
         'next': albumphotos[i+1].id if i < (len(albumphotos) - 1) else albumphotos[0].id,
         'previous': albumphotos[i-1].id if i > 0 else albumphotos[(len(albumphotos)-1)].id,
-        'photo': photo,
-        'rotation': rotation
+        'photo': photo
     }
 
     return render(request, 'camelot/presentphoto.html', retdict)

@@ -53,23 +53,6 @@ def get_exif(img):
     return ret
 
 
-def get_rotation(photo):
-    """
-    This previously got the rotation of an image from exif tags or db.  Now it returns an empty string
-    because we will not rotate the image on the front end anymore.
-
-    Note: orientation of 1 is right side up
-    If we don't have the exiforientation set in the DB, open the file and check the exif tag,
-    update the field.  This let's us avoid a migration.
-
-    todo: Remove this function, calls to it, and css rotations
-
-    :param photo: django ORM photo model
-    :return: css tag name of the rotation
-    """
-    return ""
-
-
 class AlreadyExistsException(Exception):
     pass
 
