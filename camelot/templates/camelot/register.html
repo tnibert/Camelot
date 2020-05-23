@@ -1,11 +1,14 @@
 {% extends 'camelot/baseloggedin.html' %}
 {% block content2 %}
 <h2>Sign up</h2>
-  <form method="post">
-    {% csrf_token %}
-    <div id="registerform">
-        {{ form.as_p }}
-    </div>
-    <button type="submit">Sign up</button>
-  </form>
+<form method="post">
+  {% csrf_token %}
+  <div id="registerform">
+      {{ form.as_p }}
+      <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+      <div class="g-recaptcha" data-sitekey="{{ recaptchakey }}"></div>
+  </div>
+  <br>
+  <button type="submit">Sign up</button>
+</form>
 {% endblock %}

@@ -25,8 +25,12 @@ SECRET_KEY = 'cx4bt-jn)oc03@wii_(o9%y-c&gq)@^*8xzb-kstu^5_u!xs43'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# what hosts can be used to access (first is for mobile testing)
+ALLOWED_HOSTS = ["192.168.1.3", "127.0.0.1"]
 
+# debug recaptcha keys
+GOOGLE_RECAPTCHA_SECRET_KEY = "6LeyOvsUAAAAABxbfc4fVD6-RjlLC0LsILjKghA9a"
+GOOGLE_RECAPTCHA_PUBLIC_KEY = "6LeyOvsUAAAAALEYITByFgL4v_RAGU2e1ixzS6kE"
 
 # Application definition
 
