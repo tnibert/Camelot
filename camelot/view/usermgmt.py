@@ -1,14 +1,21 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.template.loader import render_to_string
+from django.conf import settings
+from functools import wraps
 #import logging
 from ..forms import SignUpForm, SearchForm
 from ..tokens import account_activation_token
 from ..controllers.friendcontroller import friendcontroller
 from ..friendfeed import generate_feed
+from ..controllers.profilecontroller import profilecontroller
+import requests
 
 #logger = logging.getLogger(__name__)
 
@@ -75,17 +82,42 @@ def user_logout(request):
 User registration
 """
 
-from django.contrib.sites.shortcuts import get_current_site
-from django.utils.encoding import force_bytes, force_text
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.template.loader import render_to_string
 
-from ..controllers.profilecontroller import profilecontroller
+def check_recaptcha(view_func):
+    """
+    Decorator to check recaptcha
+    from https://simpleisbetterthancomplex.com/tutorial/2017/02/21/how-to-add-recaptcha-to-django-site.html
+    :param view_func:
+    :return:
+    """
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        request.recaptcha_is_valid = None
+        if request.method == 'POST':
+            recaptcha_response = request.POST.get('g-recaptcha-response')
+            data = {
+                'secret': settings.GOOGLE_RECAPTCHA_SECRET_KEY,
+                'response': recaptcha_response
+            }
+            r = requests.post('https://www.google.com/recaptcha/api/siteverify', data=data)
+            result = r.json()
+            if result['success']:
+                request.recaptcha_is_valid = True
+            else:
+                request.recaptcha_is_valid = False
+                messages.add_message(request, messages.ERROR, 'Invalid reCAPTCHA. Please try again.')
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
 
 
-# user registration function with email confirmation
+@check_recaptcha
 def register(request):
-    if request.method == 'POST':
+    """
+    User registration function with email confirmation
+    :param request:
+    :return:
+    """
+    if request.method == 'POST' and request.recaptcha_is_valid is True:
         form = SignUpForm(request.POST)
         if form.is_valid():
             try:
@@ -119,7 +151,9 @@ def register(request):
 
     form = SignUpForm()
 
-    return render(request, 'camelot/register.html', {'form': form})
+    return render(request,
+                  'camelot/register.html',
+                  {'form': form, 'recaptchakey': settings.GOOGLE_RECAPTCHA_PUBLIC_KEY})
 
 
 def account_activation_sent(request):
