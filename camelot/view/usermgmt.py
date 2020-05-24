@@ -11,6 +11,7 @@ from django.conf import settings
 from functools import wraps
 #import logging
 from ..forms import SignUpForm, SearchForm
+from ..models import Profile
 from ..tokens import account_activation_token
 from ..controllers.friendcontroller import friendcontroller
 from ..friendfeed import generate_feed
@@ -119,6 +120,7 @@ def register(request):
     """
     if request.method == 'POST' and request.recaptcha_is_valid is True:
         form = SignUpForm(request.POST)
+
         if form.is_valid():
             try:
                 User.objects.get(username__iexact=form.cleaned_data['username'])
@@ -143,11 +145,16 @@ def register(request):
                     #logger.warning(e)
                     messages.add_message(request, messages.INFO, 'Error sending confirmation email')
                     # why does this render work, but the bottom one requires a request?
-                    return render('camelot/register.html', {'form': form})
+                    return render('camelot/register.html', {'form': form,
+                                                            'recaptchakey': settings.GOOGLE_RECAPTCHA_PUBLIC_KEY})
 
                 return redirect('account_activation_sent')
 
             messages.add_message(request, messages.INFO, 'Username already exists')
+        else:
+            # there was some error, rerender with errors displayed to user
+            return render(request, 'camelot/register.html',
+                          {'form': form, 'recaptchakey': settings.GOOGLE_RECAPTCHA_PUBLIC_KEY})
 
     form = SignUpForm()
 
@@ -157,6 +164,7 @@ def register(request):
 
 
 def account_activation_sent(request):
+    # todo: add more description to this html (check your spam folder)
     return render(request, 'camelot/account_activation_sent.html')
 
 
@@ -168,7 +176,9 @@ def activate(request, uidb64, token):
         user = None
 
     if user is not None and account_activation_token.check_token(user, token):
+        # activate the account
         user.is_active = True
+        #Profile.objects.create(user=user, dname=user.username)
         user.profile.email_confirmed = True
         user.save()
 
