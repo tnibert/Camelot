@@ -169,6 +169,15 @@ def account_activation_sent(request):
 
 
 def activate(request, uidb64, token):
+    """
+    Profile for the user is created here
+    If the profile endpoint is attempted to be accessed before creation (via url)
+    then a 500 will be raised on that access
+    :param request:
+    :param uidb64:
+    :param token:
+    :return:
+    """
     try:
         uid = force_text(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
@@ -176,10 +185,17 @@ def activate(request, uidb64, token):
         user = None
 
     if user is not None and account_activation_token.check_token(user, token):
-        # activate the account
-        user.is_active = True
-        #Profile.objects.create(user=user, dname=user.username)
+        # activate the account and create the profile
+
+        # the following is just in case a profile was created in the previous ppp version
+        try:
+            user.profile
+        except Profile.DoesNotExist:
+            # create() saves to db
+            Profile.objects.create(user=user, dname=user.username)
+
         user.profile.email_confirmed = True
+        user.is_active = True
         user.save()
 
         # create default groups

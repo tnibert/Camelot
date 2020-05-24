@@ -1,21 +1,21 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from .datavalidation.validationfunctions import validate_image_fsize
 from .constants import *
-from .models import FriendGroup
+from django.contrib.auth.models import User
 from .controllers.groupcontroller import groupcontroller
 from .controllers.friendcontroller import friendcontroller
 
 
-# https://docs.djangoproject.com/en/dev/ref/validators/
 def validate_email(value):
     """
     Validate that email address of newly created user is not already registered
+    https://docs.djangoproject.com/en/dev/ref/validators/
     :param value:
     :return:
     """
+    # this will raise django.contrib.auth.models.MultipleObjectsReturned if email is not unique
     try:
         email = User.objects.get(email=value)
     except User.DoesNotExist:
