@@ -7,6 +7,7 @@ from ..controllers.utilities import PermissionException
 from .helperfunctions import complete_add_friends
 from ..models import FriendGroup
 
+
 class GroupControllerTests(FriendGroupControllerTests):
 
     """

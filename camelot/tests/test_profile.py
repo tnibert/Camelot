@@ -2,15 +2,15 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.contrib.auth.models import User
 from django.shortcuts import reverse
-
 import os
 import shutil
-
 from ..controllers.profilecontroller import profilecontroller
 from ..controllers.groupcontroller import groupcontroller
 from ..controllers.albumcontroller import albumcontroller
 from .helperfunctions import complete_add_friends
 from ..constants import *
+from ..view.profile import *
+
 
 class ProfileControllerTests(TestCase):
     def setUp(self):
@@ -146,8 +146,6 @@ class ProfileControllerTests(TestCase):
             shutil.rmtree(self.testdir)
 
 
-from ..view.profile import *
-
 class ProfileViewTestsLoggedIn(TestCase):
     def setUp(self):
         # create user
@@ -214,6 +212,7 @@ class ProfileViewTestsLoggedIn(TestCase):
         self.u.profile.refresh_from_db()
         assert self.u.profile.description == description
         assert self.u.profile.dname == dname
+
 
 class ProfileViewTestsNotLoggedIn(TestCase):
     def setUp(self):

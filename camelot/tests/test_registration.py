@@ -1,6 +1,9 @@
 from django.test import TestCase
 from django.http import HttpRequest
-from ..view.usermgmt import check_recaptcha, register
+from django.shortcuts import reverse
+from django.contrib.auth.models import User
+from ..view.usermgmt import check_recaptcha
+from ..models import Profile
 
 
 class RegistrationTests(TestCase):
@@ -31,4 +34,16 @@ class RegistrationTests(TestCase):
         Todo: mock recaptcha
         """
         # test GET
-        assert register(HttpRequest()).status_code == 200
+        response = self.client.get(reverse('user_register'), follow=True)
+        assert response.status_code == 200
+        assert len(User.objects.all()) == 0
+        assert len(Profile.objects.all()) == 0
+
+        # test POST - inhibited by recaptcha
+        #response = self.client.post(reverse('user_register'), follow=True)
+        #assert response.status_code == 200
+        #assert len(User.objects.all()) == 1
+        #assert len(Profile.objects.all()) == 0
+
+    def test_activate(self):
+        pass
