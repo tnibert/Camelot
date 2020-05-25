@@ -4,21 +4,19 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.sites.shortcuts import get_current_site
-from django.utils.encoding import force_bytes, force_text
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.template.loader import render_to_string
+from django.utils.encoding import force_text
+from django.utils.http import urlsafe_base64_decode
 from django.conf import settings
 from functools import wraps
-#import logging
 from ..forms import SignUpForm, SearchForm
 from ..models import Profile
 from ..tokens import account_activation_token
 from ..controllers.friendcontroller import friendcontroller
 from ..friendfeed import generate_feed
 from ..controllers.profilecontroller import profilecontroller
+from ..user_emailing import send_registration_email
+from ..logs import log_exception
 import requests
-
-#logger = logging.getLogger(__name__)
 
 
 """
@@ -93,6 +91,11 @@ def check_recaptcha(view_func):
     """
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):
+        # if we are not in production, do not use recaptcha
+        if settings.DEBUG is True:
+            request.recaptcha_is_valid = True
+            return view_func(request, *args, **kwargs)
+
         request.recaptcha_is_valid = None
         if request.method == 'POST':
             recaptcha_response = request.POST.get('g-recaptcha-response')
@@ -129,20 +132,14 @@ def register(request):
                 user.is_active = False
                 user.save()
 
-                current_site = get_current_site(request)
-                subject = 'Activate Your PicPicPanda Account'
-                message = render_to_string('camelot/account_activation_email.html', {
-                    'user': user,
-                    'domain': current_site.domain,
-                    'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
-                    'token': account_activation_token.make_token(user),
-                })
                 try:
-                    user.email_user(subject, message)
+                    send_registration_email(user, get_current_site(request).domain)
                 except Exception as e:
+                    log_exception(__name__, e)
+
                     # did not send email correctly, roll back
                     user.delete()
-                    #logger.warning(e)
+
                     messages.add_message(request, messages.INFO, 'Error sending confirmation email')
                     # why does this render work, but the bottom one requires a request?
                     return render('camelot/register.html', {'form': form,

@@ -1,9 +1,11 @@
 from django.test import TestCase
-from django.http import HttpRequest
+from django.core import mail
 from django.shortcuts import reverse
 from django.contrib.auth.models import User
-from ..view.usermgmt import check_recaptcha
+from datetime import datetime, timedelta
 from ..models import Profile
+from ..user_emailing import REMINDER, EXPIRE, remind_stale_reg, remind_all_stale_reg, send_registration_email
+from ..forms import SignUpForm
 
 
 class RegistrationTests(TestCase):
@@ -12,38 +14,75 @@ class RegistrationTests(TestCase):
     todo: improve
     """
 
-    def test_recaptcha_check_empty_request(self):
-        @check_recaptcha
-        def recap_test(request):
-            assert request.recaptcha_is_valid is not True
-        recap_test(HttpRequest())
-
-    def test_recaptcha_check_keymismatch(self):
-        @check_recaptcha
-        def recap_test(request):
-            assert request.recaptcha_is_valid is not True
-
-        with self.settings(GOOGLE_RECAPTCHA_SECRET_KEY='test1'):
-            recap_test(HttpRequest())
-
-        with self.settings(GOOGLE_RECAPTCHA_PUBLIC_KEY='test2'):
-            recap_test(HttpRequest())
+    def setUp(self):
+        self.regdata = {'username': 'test1',
+                        'email': 'user4@test.com',
+                        'password1': 'blahblah123',
+                        'password2': 'blahblah123'}
 
     def test_register(self):
-        """
-        Todo: mock recaptcha
-        """
         # test GET
         response = self.client.get(reverse('user_register'), follow=True)
         assert response.status_code == 200
         assert len(User.objects.all()) == 0
         assert len(Profile.objects.all()) == 0
 
-        # test POST - inhibited by recaptcha
-        #response = self.client.post(reverse('user_register'), follow=True)
-        #assert response.status_code == 200
-        #assert len(User.objects.all()) == 1
-        #assert len(Profile.objects.all()) == 0
+        # test POST
+        with self.settings(DEBUG=True):
+            response = self.client.post(reverse('user_register'), self.regdata, follow=True)
+        assert response.status_code == 200
+        assert len(User.objects.all()) == 1
+        assert len(Profile.objects.all()) == 0
+
+        # test failure to send mail in POST
+
+    def test_send_registration_email(self):
+        testuser = SignUpForm(data=self.regdata).save(commit=False)
+        testuser.is_active = False
+        testuser.save()
+
+        with self.settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
+            send_registration_email(testuser, "picpicpanda.com")
+            self.assertEqual(len(mail.outbox), 1)
+            self.assertEqual(mail.outbox[0].subject, 'Activate Your PicPicPanda Account')
+            #print(mail.outbox[0].body)
 
     def test_activate(self):
         pass
+
+
+class ExpirationTests(TestCase):
+    def setUp(self):
+        remind_date = datetime.now() - timedelta(days=REMINDER + 1)
+        expire_date = datetime.now() - timedelta(days=EXPIRE + 1)
+
+        # create users
+        self.remind1 = User.objects.create_user({'username': 'to_remind',
+                                                 'email': 'user@test.com',
+                                                 'password': 'secret',
+                                                 'is_active': False,
+                                                 'date_joined': remind_date})
+        self.remind1.save()
+
+        self.expire1 = User.objects.create_user({'username': 'to expire',
+                                                 'email': 'user2@test.com',
+                                                 'password': 'secret',
+                                                 'is_active': False,
+                                                 'date_joined': expire_date})
+        self.expire1.save()
+
+        self.noaction1 = User.objects.create_user({'username': 'no dramas',
+                                                   'email': 'user3@test.com',
+                                                   'password': 'secret',
+                                                   'is_active': False,
+                                                   'date_joined': datetime.now()})
+        self.noaction1.save()
+
+    def test_remind_stale_reg(self):
+        #remind_stale_reg()
+        pass
+
+    def test_remind_all_stale_reg(self):
+        pass
+
+
