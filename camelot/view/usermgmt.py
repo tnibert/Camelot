@@ -176,6 +176,7 @@ def activate(request, uidb64, token):
     :param token:
     :return:
     """
+    # todo: unit test
     try:
         uid = force_text(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
@@ -184,23 +185,32 @@ def activate(request, uidb64, token):
 
     if user is not None and account_activation_token.check_token(user, token):
         # activate the account and create the profile
-
-        # the following is just in case a profile was created in the previous ppp version
-        try:
-            user.profile
-        except Profile.DoesNotExist:
-            # create() saves to db
-            Profile.objects.create(user=user, dname=user.username)
-
-        user.profile.email_confirmed = True
-        user.is_active = True
-        user.save()
-
-        # create default groups
-        profilecontrol = profilecontroller(uid)
-        profilecontrol.create_default_groups()
+        activate_user_no_check(user)
 
         #login(request, user)
         return redirect('user_home')
     else:
         return render(request, 'camelot/account_activation_invalid.html')
+
+
+def activate_user_no_check(user):
+    """
+    Activate the user, create profile
+    This is not an endpoint
+    :param user: orm User object
+    :return:
+    """
+    # the following try except is just in case a profile was created in the previous ppp version
+    try:
+        user.profile
+    except Profile.DoesNotExist:
+        # create() saves to db
+        Profile.objects.create(user=user, dname=user.username)
+
+    user.profile.email_confirmed = True
+    user.is_active = True
+    user.save()
+
+    # create default groups
+    profilecontrol = profilecontroller(user.id)
+    profilecontrol.create_default_groups()

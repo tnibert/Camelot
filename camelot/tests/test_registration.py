@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from ..models import Profile
 from ..user_emailing import REMINDER, EXPIRE, remind_stale_reg, remind_all_stale_reg, send_registration_email
 from ..forms import SignUpForm
+from ..view.usermgmt import activate_user_no_check
 
 
 class RegistrationTests(TestCase):
@@ -36,13 +37,27 @@ class RegistrationTests(TestCase):
         # outbox can be cleared with mail.outbox = []
         self.assertEqual(len(mail.outbox), 1)
 
-        # test reregister with same email address
+        # test reregister with same email address, inactive user
+        # registration email will be resent
         with self.settings(DEBUG=True):
             response = self.client.post(reverse('user_register'), self.regdata, follow=True)
-            self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(len(mail.outbox), 2)
         assert response.status_code == 200
         assert len(User.objects.all()) == 1
         assert len(Profile.objects.all()) == 0
+
+        # test reregister with same email address, active user
+        # registration email will not be resent
+        # first activate the user
+        user = User.objects.get(email=self.regdata['email'], username=self.regdata['username'])
+        activate_user_no_check(user)
+        with self.settings(DEBUG=True):
+            response = self.client.post(reverse('user_register'), self.regdata, follow=True)
+        self.assertEqual(len(mail.outbox), 2)
+        assert response.status_code == 200
+        assert len(User.objects.all()) == 1
+        assert len(Profile.objects.all()) == 1
+        assert isinstance(user.profile, Profile)
 
         # todo: test failure to send mail in POST
 
@@ -57,8 +72,25 @@ class RegistrationTests(TestCase):
         self.assertEqual(mail.outbox[0].subject, 'Activate Your PicPicPanda Account')
         #print(mail.outbox[0].body)
 
-    def test_activate(self):
+    def test_activate_endpoint(self):
         pass
+
+    def test_activate_user_no_check(self):
+        with self.settings(DEBUG=True):
+            response = self.client.post(reverse('user_register'), self.regdata, follow=True)
+
+        assert len(User.objects.all()) == 1
+        assert len(Profile.objects.all()) == 0
+
+        user = User.objects.get(email=self.regdata['email'], username=self.regdata['username'])
+        with self.assertRaises(Profile.DoesNotExist):
+            user.profile
+
+        activate_user_no_check(user)
+
+        assert len(User.objects.all()) == 1
+        assert len(Profile.objects.all()) == 1
+        assert isinstance(user.profile, Profile)
 
 
 class ExpirationTests(TestCase):
