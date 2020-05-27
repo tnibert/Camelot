@@ -33,19 +33,29 @@ class RegistrationTests(TestCase):
         assert response.status_code == 200
         assert len(User.objects.all()) == 1
         assert len(Profile.objects.all()) == 0
+        # outbox can be cleared with mail.outbox = []
+        self.assertEqual(len(mail.outbox), 1)
 
-        # test failure to send mail in POST
+        # test reregister with same email address
+        with self.settings(DEBUG=True):
+            response = self.client.post(reverse('user_register'), self.regdata, follow=True)
+            self.assertEqual(len(mail.outbox), 2)
+        assert response.status_code == 200
+        assert len(User.objects.all()) == 1
+        assert len(Profile.objects.all()) == 0
+
+        # todo: test failure to send mail in POST
 
     def test_send_registration_email(self):
         testuser = SignUpForm(data=self.regdata).save(commit=False)
         testuser.is_active = False
         testuser.save()
 
-        with self.settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
-            send_registration_email(testuser, "picpicpanda.com")
-            self.assertEqual(len(mail.outbox), 1)
-            self.assertEqual(mail.outbox[0].subject, 'Activate Your PicPicPanda Account')
-            #print(mail.outbox[0].body)
+        # tests run with setting EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'
+        send_registration_email(testuser, "picpicpanda.com")
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, 'Activate Your PicPicPanda Account')
+        #print(mail.outbox[0].body)
 
     def test_activate(self):
         pass

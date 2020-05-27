@@ -126,6 +126,7 @@ def register(request):
 
         if form.is_valid():
             try:
+                # todo: move this check to validator function
                 User.objects.get(username__iexact=form.cleaned_data['username'])
             except User.DoesNotExist:
                 user = form.save(commit=False)

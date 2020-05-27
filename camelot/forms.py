@@ -1,11 +1,14 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
 from .datavalidation.validationfunctions import validate_image_fsize
 from .constants import *
-from django.contrib.auth.models import User
+from .constants2 import SITEDOMAIN
 from .controllers.groupcontroller import groupcontroller
 from .controllers.friendcontroller import friendcontroller
+from .logs import log_exception
+from .user_emailing import send_registration_email
 
 
 def validate_email(value):
@@ -17,12 +20,23 @@ def validate_email(value):
     """
     # this will raise django.contrib.auth.models.MultipleObjectsReturned if email is not unique
     try:
-        email = User.objects.get(email=value)
+        user = User.objects.get(email=value)
     except User.DoesNotExist:
         # if a user doesn't exist with the email, we pass
         return
+
+    # if the email address has been registered previously,
+    # we will silently send another registration email
+    # and prevent the form from validating
+    if user.is_active is False:
+        try:
+            # todo: send a different message
+            send_registration_email(user, SITEDOMAIN)
+        except Exception as e:
+            log_exception(__name__, e)
+
     # if a user does exist with the email, raise
-    raise ValidationError("Email address already registered")
+    raise ValidationError("Email address not available")
 
 
 class SignUpForm(UserCreationForm):
