@@ -2,7 +2,7 @@ from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from .tokens import account_activation_token
-#from .constants2 import SITEDOMAIN
+from .constants2 import SITEDOMAIN
 
 
 def send_registration_email(user, domain, htmlfile='camelot/account_activation_email.html'):
@@ -36,12 +36,11 @@ def send_registration_email(user, domain, htmlfile='camelot/account_activation_e
 
 def remind_stale_reg(users, htmltemplate):
     """
-    Is this function necessary?
-    Do we want to separate the emailing from register()? yes
+    Email registration reminders to a list of users
+    This is intended to be invoked separately to the app
     :param users: list of User objects
-    :param msg:
+    :param htmltemplate: string of the template filename to use for the email body
     :return: string to be emailed to user
     """
-    pass
-    #for user in users:
-    #    send_registration_email(user, SITEDOMAIN, htmlfile=htmltemplate)
+    for user in users:
+        send_registration_email(user, SITEDOMAIN, htmlfile=htmltemplate)

@@ -93,35 +93,35 @@ class RegistrationTests(TestCase):
         assert isinstance(user.profile, Profile)
 
 
-class ExpirationTests(TestCase):
+class ReminderTests(TestCase):
     def setUp(self):
-        remind_date = datetime.now() - timedelta(days=7 + 1)
-        expire_date = datetime.now() - timedelta(days=14 + 1)
+        remind_date = datetime.now() - timedelta(days=8)
+        expire_date = datetime.now() - timedelta(days=15)
 
         # create users
-        self.remind1 = User.objects.create_user({'username': 'to_remind',
+        self.remind1 = User.objects.create_user(**{'username': 'to_remind',
                                                  'email': 'user@test.com',
                                                  'password': 'secret',
                                                  'is_active': False,
                                                  'date_joined': remind_date})
         self.remind1.save()
 
-        self.expire1 = User.objects.create_user({'username': 'to expire',
+        self.expire1 = User.objects.create_user(**{'username': 'to expire',
                                                  'email': 'user2@test.com',
                                                  'password': 'secret',
                                                  'is_active': False,
                                                  'date_joined': expire_date})
         self.expire1.save()
 
-        self.noaction1 = User.objects.create_user({'username': 'no dramas',
+        self.noaction1 = User.objects.create_user(**{'username': 'no dramas',
                                                    'email': 'user3@test.com',
                                                    'password': 'secret',
                                                    'is_active': False,
                                                    'date_joined': datetime.now()})
         self.noaction1.save()
 
+        self.users = [self.remind1, self.expire1, self.noaction1]
+
     def test_remind_stale_reg(self):
-        #remind_stale_reg()
-        pass
-
-
+        remind_stale_reg(self.users, 'camelot/account_activation_reminder.html')
+        self.assertEqual(len(mail.outbox), 3)
