@@ -4,7 +4,7 @@ from django.shortcuts import reverse
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta
 from ..models import Profile
-from ..user_emailing import REMINDER, EXPIRE, remind_stale_reg, remind_all_stale_reg, send_registration_email
+from ..user_emailing import remind_stale_reg, send_registration_email
 from ..forms import SignUpForm
 from ..view.usermgmt import activate_user_no_check
 
@@ -95,8 +95,8 @@ class RegistrationTests(TestCase):
 
 class ExpirationTests(TestCase):
     def setUp(self):
-        remind_date = datetime.now() - timedelta(days=REMINDER + 1)
-        expire_date = datetime.now() - timedelta(days=EXPIRE + 1)
+        remind_date = datetime.now() - timedelta(days=7 + 1)
+        expire_date = datetime.now() - timedelta(days=14 + 1)
 
         # create users
         self.remind1 = User.objects.create_user({'username': 'to_remind',
@@ -122,9 +122,6 @@ class ExpirationTests(TestCase):
 
     def test_remind_stale_reg(self):
         #remind_stale_reg()
-        pass
-
-    def test_remind_all_stale_reg(self):
         pass
 
 

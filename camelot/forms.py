@@ -30,8 +30,7 @@ def validate_email(value):
     # and prevent the form from validating
     if user.is_active is False:
         try:
-            # todo: send a different message
-            send_registration_email(user, SITEDOMAIN)
+            send_registration_email(user, SITEDOMAIN, htmlfile='camelot/account_activation_reminder.html')
         except Exception as e:
             log_exception(__name__, e)
 

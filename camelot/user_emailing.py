@@ -2,21 +2,19 @@ from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from .tokens import account_activation_token
-
-# number of days for reminder and expire
-REMINDER = 7
-EXPIRE = 14
+#from .constants2 import SITEDOMAIN
 
 
-def send_registration_email(user, domain):
+def send_registration_email(user, domain, htmlfile='camelot/account_activation_email.html'):
     """
     Send out registration email to user
     :param user: user object
     :param domain: the website we are sending from
+    :param htmlfile: filename of the html file to format for registration
     :return:
     """
     subject = 'Activate Your PicPicPanda Account'
-    message = render_to_string('camelot/account_activation_email.html', {
+    message = render_to_string(htmlfile, {
         'user': user,
         'domain': domain,
         'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
@@ -36,23 +34,14 @@ def send_registration_email(user, domain):
     #)
 
 
-def remind_stale_reg(user, msg):
+def remind_stale_reg(users, htmltemplate):
     """
     Is this function necessary?
     Do we want to separate the emailing from register()? yes
-    :param user: What do we want to pass here?
+    :param users: list of User objects
     :param msg:
     :return: string to be emailed to user
     """
     pass
-    # email the user with the message and link
-
-
-def remind_all_stale_reg():
-    """
-
-    :return: list of all usernames emailed
-    """
-    pass
-    # query for inactive users registers past threshold
-    # call remind_stale_reg() for all users in query
+    #for user in users:
+    #    send_registration_email(user, SITEDOMAIN, htmlfile=htmltemplate)
