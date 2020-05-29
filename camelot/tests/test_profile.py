@@ -33,7 +33,7 @@ class ProfileControllerTests(TestCase):
         self.u2.save()
         activate_user_no_check(self.u2)
         self.u2.profile.description = "Hajimemashite yoroshiku onegaishimasu"
-        self.u2.save()
+        self.u2.profile.save()
 
         self.profilecontrol1 = profilecontroller(self.u.id)
         self.profilecontrol2 = profilecontroller(self.u2.id)
