@@ -10,6 +10,7 @@ from ..controllers.albumcontroller import albumcontroller
 from .helperfunctions import complete_add_friends
 from ..constants import *
 from ..view.profile import *
+from ..view.usermgmt import activate_user_no_check
 
 
 class ProfileControllerTests(TestCase):
@@ -19,6 +20,8 @@ class ProfileControllerTests(TestCase):
             'email': 'user@test.com',
             'password': 'secret'}
         self.u = User.objects.create_user(**self.credentials)
+        self.u.save()
+        activate_user_no_check(self.u)
         self.u.profile.description = "I don't think therefore I am"
         self.u.save()
 
@@ -27,6 +30,8 @@ class ProfileControllerTests(TestCase):
             'email': 'user2@test.com',
             'password': 'secret'}
         self.u2 = User.objects.create_user(**self.credentials)
+        self.u2.save()
+        activate_user_no_check(self.u2)
         self.u2.profile.description = "Hajimemashite yoroshiku onegaishimasu"
         self.u2.save()
 
@@ -155,6 +160,8 @@ class ProfileViewTestsLoggedIn(TestCase):
             'password': 'secret'}
         self.u = User.objects.create_user(**self.credentials)
         self.u.save()
+
+        activate_user_no_check(self.u)
 
         # send login data
         response = self.client.post('', self.credentials, follow=True)

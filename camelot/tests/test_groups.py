@@ -2,10 +2,13 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.shortcuts import reverse
 from .test_friendship import FriendGroupControllerTests
+from django.test.client import RequestFactory
 from ..controllers.groupcontroller import groupcontroller, is_in_group
 from ..controllers.utilities import PermissionException
 from .helperfunctions import complete_add_friends
 from ..models import FriendGroup
+from ..view.usermgmt import activate_user_no_check
+from ..view.group import *
 
 
 class GroupControllerTests(FriendGroupControllerTests):
@@ -166,9 +169,6 @@ class GroupControllerTests(FriendGroupControllerTests):
         assert is_in_group(newgroup, self.friend.profile)
 
 
-from django.test.client import RequestFactory
-from ..view.group import *
-
 class GroupViewTests(TestCase):
     def setUp(self):
         # this is identical for the setup to albumviewtests, need to share code
@@ -178,6 +178,7 @@ class GroupViewTests(TestCase):
             'password': 'secret'}
         self.u = User.objects.create_user(**self.credentials)
         self.u.save()
+        activate_user_no_check(self.u)
 
         self.credentials = {
             'username': 'testuser2',
@@ -185,6 +186,7 @@ class GroupViewTests(TestCase):
             'password': 'secret'}
         self.u2 = User.objects.create_user(**self.credentials)
         self.u2.save()
+        activate_user_no_check(self.u2)
 
         # send login data
         #response = self.client.post('', self.credentials, follow=True)

@@ -3,15 +3,14 @@ from django.test.client import RequestFactory
 from django.contrib.auth.models import User, AnonymousUser
 from django.shortcuts import reverse
 from django.http import Http404
-
 import os
 import shutil
-
 from ..controllers.albumcontroller import albumcontroller, collate_owner_and_contrib
 from ..controllers.groupcontroller import groupcontroller
 from ..controllers.utilities import PermissionException
 from ..constants import *
 from ..view import album
+from ..view.usermgmt import activate_user_no_check
 from .helperfunctions import complete_add_friends
 
 """
@@ -62,6 +61,7 @@ Requirements:
 #class test_controller_permissions(TestCase):
 #    pass
 
+
 class PermissionTestCase(TestCase):
     """
     Scaffolding for permissions tests
@@ -73,6 +73,7 @@ class PermissionTestCase(TestCase):
             'password': 'secret'}
         self.u = User.objects.create_user(**self.credentials)
         self.u.save()
+        activate_user_no_check(self.u)
 
         self.credentials2 = {
             'username': 'testuser2',
@@ -80,6 +81,7 @@ class PermissionTestCase(TestCase):
             'password': 'secret'}
         self.u2 = User.objects.create_user(**self.credentials2)
         self.u2.save()
+        activate_user_no_check(self.u2)
 
         # send login data
         # response = self.client.post('', self.credentials, follow=True)
@@ -450,6 +452,7 @@ class test_manage_page_permissions(PermissionTestCase):
             'password': 'secret'}
         self.u3 = User.objects.create_user(**self.credentials3)
         self.u3.save()
+        activate_user_no_check(self.u3)
 
     def test_get(self):
         """
