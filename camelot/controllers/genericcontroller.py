@@ -1,5 +1,6 @@
 from .utilities import *
 
+
 class genericcontroller:
 
     def __init__(self, uid=None):
@@ -11,12 +12,12 @@ class genericcontroller:
             self.uprofile = None
 
     # may not belong here, but let's just drop it here for a sec
-    def validate_permission(self):
-        """
-        check if the user has permission to access the material
-        :return: boolean specifying if permission is granted
-        """
-        return True
+    #def validate_permission(self):
+    #    """
+    #    check if the user has permission to access the material
+    #    :return: boolean specifying if permission is granted
+    #    """
+    #    return True
 
     # maybe we do this... it's basically the same process in all of the controllers
     # we should wrap it though
