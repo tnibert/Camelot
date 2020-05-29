@@ -85,12 +85,15 @@ class RegistrationTests(TestCase):
         user = User.objects.get(email=self.regdata['email'], username=self.regdata['username'])
         with self.assertRaises(Profile.DoesNotExist):
             user.profile
+        assert user.is_active is False
 
         activate_user_no_check(user)
-
+        user.refresh_from_db()
+        assert user.is_active is True
         assert len(User.objects.all()) == 1
         assert len(Profile.objects.all()) == 1
         assert isinstance(user.profile, Profile)
+        assert user.profile.email_confirmed is True
 
 
 class ReminderTests(TestCase):

@@ -209,6 +209,7 @@ def activate_user_no_check(user):
 
     user.profile.email_confirmed = True
     user.is_active = True
+    user.profile.save()
     user.save()
 
     # create default groups
