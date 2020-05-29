@@ -3,6 +3,7 @@ from .utilities import *
 from .genericcontroller import genericcontroller
 from .friendcontroller import are_friends
 
+
 class groupcontroller(genericcontroller):
     """
     Default groups should include something like all_friends, public, private

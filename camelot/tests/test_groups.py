@@ -131,16 +131,17 @@ class GroupControllerTests(FriendGroupControllerTests):
         # will return self.u's groups
         ret1 = self.groupcontrol.return_groups()
 
-        assert len(ret1) == 1
-        assert ret1[0] == newgroup1
+        # will have new group plus default groups
+        assert len(ret1) == 4
+        assert newgroup1 in ret1
 
         # create a group for second user
         name2 = "Test New Group 2"
         newgroup2 = self.groupcontrol2.create(name2)
         # will return self.friend's groups
         ret2 = self.groupcontrol.return_groups(self.friend.profile)
-        assert len(ret2) == 1
-        assert ret2[0] == newgroup2
+        assert len(ret2) == 4
+        assert newgroup2 in ret2
 
         # create a second group for self.friend
         name3 = "Test New Group 3"
@@ -149,9 +150,9 @@ class GroupControllerTests(FriendGroupControllerTests):
         # self.u will access
         ret3 = self.groupcontrol.return_groups(self.friend.profile)
 
-        assert len(ret3) == 2
-        assert ret3[0] == newgroup2
-        assert ret3[1] == newgroup3
+        assert len(ret3) == 5
+        assert newgroup2 in ret3
+        assert newgroup3 in ret3
 
         # todo: test none case
 
