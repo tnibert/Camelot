@@ -73,7 +73,26 @@ class RegistrationTests(TestCase):
         #print(mail.outbox[0].body)
 
     def test_activate_endpoint(self):
-        pass
+        # register user
+        with self.settings(DEBUG=True):
+            response = self.client.post(reverse('user_register'), self.regdata, follow=True)
+        assert response.status_code == 200
+
+        assert len(User.objects.all()) == 1
+        assert len(Profile.objects.all()) == 0
+
+        # get activation url
+        assert len(mail.outbox) == 1
+        activate_url = mail.outbox[0].body.split("\n")[7].split("/")
+        activate_url[2] = "127.0.0.1"
+        activate_url = "/".join(activate_url)
+
+        # activate the user
+        response = self.client.post(activate_url, follow=True)
+        assert response.status_code == 200
+
+        assert len(User.objects.all()) == 1
+        assert len(Profile.objects.all()) == 1
 
     def test_activate_user_no_check(self):
         with self.settings(DEBUG=True):
