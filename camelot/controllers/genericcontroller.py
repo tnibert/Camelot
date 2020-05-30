@@ -1,4 +1,6 @@
+from django.http import Http404
 from .utilities import *
+from ..models import Profile
 
 
 class genericcontroller:
@@ -7,7 +9,10 @@ class genericcontroller:
         # beware of problems in albumcontroller, friendcontroller, etc of uprofile not existing
         # get the current user profile
         if uid:
-            self.uprofile = get_profile_from_uid(uid)
+            try:
+                self.uprofile = get_profile_from_uid(uid)
+            except Profile.DoesNotExist as e:
+                raise Http404
         else:
             self.uprofile = None
 

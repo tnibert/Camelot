@@ -51,6 +51,20 @@ class AlbumControllerTests(TestCase):
         self.testdir = "testdir"
 
     def test_get_profile_from_uid(self):
+        credentials = {
+            'username': 'testuser3',
+            'email': 'user3@test.com',
+            'password': 'secret'}
+        test_u = User.objects.create_user(credentials)
+        test_u.save()
+        with self.assertRaises(Profile.DoesNotExist):
+            profile = get_profile_from_uid(test_u.id)
+
+        activate_user_no_check(test_u)
+        profile = get_profile_from_uid(test_u.id)
+        self.assertEqual(profile.user, test_u)
+        self.assertEqual(test_u.profile, profile)
+
         profile = get_profile_from_uid(self.u.id)
         self.assertEqual(profile.user, self.u)
         self.assertEqual(self.u.profile, profile)
