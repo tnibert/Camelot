@@ -23,10 +23,10 @@
 
                 </div>
         </form>
-        <ul id="loginpageoptions">
-            <li><a href="{% url 'user_register' %}">Register</a></li>
-            <li><a href="{% url 'password_reset' %}"> I Forgot My Password</a></li>
-        </ul>
+        <p id="loginpageoptions">
+            <a href="{% url 'user_register' %}"><span>Create An Account</span></a><br>
+            <a href="{% url 'password_reset' %}"><span>I Forgot My Password</span></a>
+        </p>
     </div>
 </div>
 <div id="sitemap"></div>
