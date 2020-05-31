@@ -29,7 +29,8 @@ class RegistrationTests(TestCase):
         errormessages = {
             "email": "Email address unavailable, please check your email",  # if reminder sent
             "no_email": "Email address not available",  # if no reminder sent
-            "username": "A user with that username already exists.",  # if username error caught in django default
+            "email_fromdjango": "Enter a valid email address.",  # if error came from django validator
+            "username": "A user with that username already exists.",  # if username error caught in django validator
             "username_case": "Username already exists",  # if username error caught in custom validator
             "email_err": "Error sending confirmation email, please try again"
         }
@@ -51,7 +52,17 @@ class RegistrationTests(TestCase):
         assert len(User.objects.all()) == 0
         assert len(Profile.objects.all()) == 0
 
-        # test POST
+        # test invalid email address in post
+        testbademail = self.regdata.copy()
+        testbademail["email"] = "notanemail"
+        with self.settings(DEBUG=True):
+            response = self.client.post(reverse('user_register'), testbademail)
+        assert response.status_code == 200
+        assert errormessages["email_fromdjango"] in response.content.decode()
+        assert len(User.objects.all()) == 0
+        assert len(Profile.objects.all()) == 0
+
+        # test POST success
         with self.settings(DEBUG=True):
             response = self.client.post(reverse('user_register'), self.regdata)
         assert response.status_code == 302
