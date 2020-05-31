@@ -22,6 +22,8 @@ class RegistrationTests(TestCase):
                         'password2': 'blahblah123'}
 
     def test_register(self):
+        # this could be parameterized...
+
         # test GET
         response = self.client.get(reverse('user_register'), follow=True)
         assert response.status_code == 200
@@ -39,22 +41,87 @@ class RegistrationTests(TestCase):
 
         # test reregister with same email address, inactive user
         # registration email will be resent
+        sameemailregdata = self.regdata.copy()
+        sameemailregdata['username'] = 'test2'
+
+        errormessages = {
+            "email": "Email address unavailable, please check your email",  # if reminder sent
+            "no_email": "Email address not available",                      # if no reminder sent
+            "username": "A user with that username already exists."
+        }
+
         with self.settings(DEBUG=True):
-            response = self.client.post(reverse('user_register'), self.regdata, follow=True)
+            response = self.client.post(reverse('user_register'), sameemailregdata, follow=True)
+        assert errormessages["email"] in response.content.decode()
+        assert errormessages["username"] not in response.content.decode()
+        assert errormessages["no_email"] not in response.content.decode()
         self.assertEqual(len(mail.outbox), 2)
         assert response.status_code == 200
         assert len(User.objects.all()) == 1
         assert len(Profile.objects.all()) == 0
 
-        # test reregister with same email address, active user
-        # registration email will not be resent
-        # first activate the user
-        user = User.objects.get(email=self.regdata['email'], username=self.regdata['username'])
-        activate_user_no_check(user)
+        # test reregister with same username, inactive user
+        sameusernameregdata = self.regdata.copy()
+        sameusernameregdata['email'] = 'different@different.com'
+
         with self.settings(DEBUG=True):
-            response = self.client.post(reverse('user_register'), self.regdata, follow=True)
+            response = self.client.post(reverse('user_register'), sameusernameregdata, follow=True)
+        assert errormessages["username"] in response.content.decode()
+        assert errormessages["email"] not in response.content.decode()
+        assert errormessages["no_email"] not in response.content.decode()
         self.assertEqual(len(mail.outbox), 2)
         assert response.status_code == 200
+        assert len(User.objects.all()) == 1
+        assert len(Profile.objects.all()) == 0
+
+        # test reregister with both duplicate, inactive user
+        with self.settings(DEBUG=True):
+            response = self.client.post(reverse('user_register'), self.regdata, follow=True)
+        assert response.status_code == 200
+        assert errormessages["username"] in response.content.decode()
+        assert errormessages["email"] in response.content.decode()
+        assert errormessages["no_email"] not in response.content.decode()
+        assert len(User.objects.all()) == 1
+        assert len(Profile.objects.all()) == 0
+        self.assertEqual(len(mail.outbox), 3)
+
+        # activate the user
+        user = User.objects.get(email=self.regdata['email'], username=self.regdata['username'])
+        activate_user_no_check(user)
+
+        # test reregister with same email address, active user
+        # registration email will not be resent
+        with self.settings(DEBUG=True):
+            response = self.client.post(reverse('user_register'), sameemailregdata, follow=True)
+        self.assertEqual(len(mail.outbox), 3)
+        assert response.status_code == 200
+        assert errormessages["username"] not in response.content.decode()
+        assert errormessages["email"] not in response.content.decode()
+        assert errormessages["no_email"] in response.content.decode()
+        assert len(User.objects.all()) == 1
+        assert len(Profile.objects.all()) == 1
+        assert isinstance(user.profile, Profile)
+
+        # test reregister with same username, active user
+        with self.settings(DEBUG=True):
+            response = self.client.post(reverse('user_register'), sameusernameregdata, follow=True)
+        self.assertEqual(len(mail.outbox), 3)
+        assert response.status_code == 200
+        assert errormessages["username"] in response.content.decode()
+        assert errormessages["email"] not in response.content.decode()
+        assert errormessages["no_email"] not in response.content.decode()
+        assert len(User.objects.all()) == 1
+        assert len(Profile.objects.all()) == 1
+        assert isinstance(user.profile, Profile)
+
+        # test reregister with both duplicate, active user
+        with self.settings(DEBUG=True):
+            response = self.client.post(reverse('user_register'), self.regdata, follow=True)
+        self.assertEqual(len(mail.outbox), 3)
+        assert response.status_code == 200
+        assert errormessages["username"] in response.content.decode()
+        assert errormessages["email"] not in response.content.decode()
+        assert errormessages["no_email"] in response.content.decode()
         assert len(User.objects.all()) == 1
         assert len(Profile.objects.all()) == 1
         assert isinstance(user.profile, Profile)

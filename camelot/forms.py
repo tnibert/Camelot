@@ -34,6 +34,8 @@ def validate_email(value):
         except Exception as e:
             log_exception(__name__, e)
 
+        raise ValidationError("Email address unavailable, please check your email")
+
     # if a user does exist with the email, raise
     raise ValidationError("Email address not available")
 
