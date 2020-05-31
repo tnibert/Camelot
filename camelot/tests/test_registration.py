@@ -47,8 +47,9 @@ class RegistrationTests(TestCase):
         errormessages = {
             "email": "Email address unavailable, please check your email",  # if reminder sent
             "no_email": "Email address not available",                      # if no reminder sent
-            "username": "A user with that username already exists.",
-            "username_case": "Username already exists"
+            "username": "A user with that username already exists.",        # if username error caught in django default
+            "username_case": "Username already exists",                     # if username error caught in custom validator
+            "email_err": "Error sending confirmation email, please try again"
         }
 
         with self.settings(DEBUG=True):
@@ -67,7 +68,8 @@ class RegistrationTests(TestCase):
 
         with self.settings(DEBUG=True):
             response = self.client.post(reverse('user_register'), sameusernameregdata)
-        assert errormessages["username"] in response.content.decode()
+        assert errormessages["username_case"] in response.content.decode()
+        assert errormessages["username"] not in response.content.decode()
         assert errormessages["email"] not in response.content.decode()
         assert errormessages["no_email"] not in response.content.decode()
         self.assertEqual(len(mail.outbox), 2)
@@ -94,7 +96,8 @@ class RegistrationTests(TestCase):
         with self.settings(DEBUG=True):
             response = self.client.post(reverse('user_register'), self.regdata)
         assert response.status_code == 200
-        assert errormessages["username"] in response.content.decode()
+        assert errormessages["username_case"] in response.content.decode()
+        assert errormessages["username"] not in response.content.decode()
         assert errormessages["email"] in response.content.decode()
         assert errormessages["no_email"] not in response.content.decode()
         assert len(User.objects.all()) == 1
@@ -123,7 +126,8 @@ class RegistrationTests(TestCase):
             response = self.client.post(reverse('user_register'), sameusernameregdata)
         self.assertEqual(len(mail.outbox), 3)
         assert response.status_code == 200
-        assert errormessages["username"] in response.content.decode()
+        assert errormessages["username_case"] in response.content.decode()
+        assert errormessages["username"] not in response.content.decode()
         assert errormessages["email"] not in response.content.decode()
         assert errormessages["no_email"] not in response.content.decode()
         assert len(User.objects.all()) == 1
@@ -135,14 +139,15 @@ class RegistrationTests(TestCase):
             response = self.client.post(reverse('user_register'), self.regdata)
         self.assertEqual(len(mail.outbox), 3)
         assert response.status_code == 200
-        assert errormessages["username"] in response.content.decode()
+        assert errormessages["username_case"] in response.content.decode()
+        assert errormessages["username"] not in response.content.decode()
         assert errormessages["email"] not in response.content.decode()
         assert errormessages["no_email"] in response.content.decode()
         assert len(User.objects.all()) == 1
         assert len(Profile.objects.all()) == 1
         assert isinstance(user.profile, Profile)
 
-        # todo: test failure to send mail in POST
+        # todo: test failure to send mail in POST, mock exception from send_registration_email()
 
     def test_send_registration_email(self):
         testuser = SignUpForm(data=self.regdata).save(commit=False)

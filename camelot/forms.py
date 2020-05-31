@@ -40,8 +40,23 @@ def validate_email(value):
     raise ValidationError("Email address not available")
 
 
+def validate_username(value):
+    """
+    Ensure that usernames that are the same with differing cases are invalid
+    :param value:
+    :return:
+    """
+    try:
+        User.objects.get(username__iexact=value)
+    except User.DoesNotExist:
+        return
+
+    raise ValidationError("Username already exists")
+
+
 class SignUpForm(UserCreationForm):
     email = forms.EmailField(help_text='Required', validators=[validate_email])
+    username = forms.CharField(help_text='Required', validators=[validate_username])
 
     class Meta:
         model = User

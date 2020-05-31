@@ -125,30 +125,25 @@ def register(request):
         form = SignUpForm(request.POST)
 
         if form.is_valid():
+            user = form.save(commit=False)
+            user.is_active = False
+            user.save()
+
             try:
-                # todo: move this check to validator function
-                User.objects.get(username__iexact=form.cleaned_data['username'])
-            except User.DoesNotExist:
-                user = form.save(commit=False)
-                user.is_active = False
-                user.save()
+                send_registration_email(user, get_current_site(request).domain)
+            except Exception as e:
+                log_exception(__name__, e)
 
-                try:
-                    send_registration_email(user, get_current_site(request).domain)
-                except Exception as e:
-                    log_exception(__name__, e)
+                # did not send email correctly, roll back
+                user.delete()
 
-                    # did not send email correctly, roll back
-                    user.delete()
+                messages.add_message(request, messages.INFO, 'Error sending confirmation email, please try again')
+                # why does this render work, but the bottom one requires a request?
+                return render('camelot/register.html', {'form': form,
+                                                        'recaptchakey': settings.GOOGLE_RECAPTCHA_PUBLIC_KEY})
 
-                    messages.add_message(request, messages.INFO, 'Error sending confirmation email')
-                    # why does this render work, but the bottom one requires a request?
-                    return render('camelot/register.html', {'form': form,
-                                                            'recaptchakey': settings.GOOGLE_RECAPTCHA_PUBLIC_KEY})
+            return redirect('account_activation_sent')
 
-                return redirect('account_activation_sent')
-
-            messages.add_message(request, messages.INFO, 'Username already exists')
         else:
             # there was some error, rerender with errors displayed to user
             return render(request, 'camelot/register.html',
