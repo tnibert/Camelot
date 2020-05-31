@@ -138,8 +138,8 @@ def register(request):
                 user.delete()
 
                 messages.add_message(request, messages.INFO, 'Error sending confirmation email, please try again')
-                # why does this render work, but the bottom one requires a request?
-                return render('camelot/register.html', {'form': form,
+
+                return render(request, 'camelot/register.html', {'form': form,
                                                         'recaptchakey': settings.GOOGLE_RECAPTCHA_PUBLIC_KEY})
 
             return redirect('account_activation_sent')

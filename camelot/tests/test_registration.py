@@ -3,6 +3,7 @@ from django.core import mail
 from django.shortcuts import reverse
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta
+from unittest import mock
 from ..models import Profile
 from ..user_emailing import remind_stale_reg, send_registration_email
 from ..forms import SignUpForm
@@ -24,9 +25,29 @@ class RegistrationTests(TestCase):
     def test_register(self):
         # this could be parameterized...
 
+        # for error cases
+        errormessages = {
+            "email": "Email address unavailable, please check your email",  # if reminder sent
+            "no_email": "Email address not available",  # if no reminder sent
+            "username": "A user with that username already exists.",  # if username error caught in django default
+            "username_case": "Username already exists",  # if username error caught in custom validator
+            "email_err": "Error sending confirmation email, please try again"
+        }
+
         # test GET
         response = self.client.get(reverse('user_register'))
         assert response.status_code == 200
+        assert len(User.objects.all()) == 0
+        assert len(Profile.objects.all()) == 0
+
+        # test failure to send mail in POST
+        with mock.patch('camelot.view.usermgmt.send_registration_email') as m:
+            m.side_effect = Exception("failed to send email")
+            with self.settings(DEBUG=True):
+                response = self.client.post(reverse('user_register'), self.regdata)
+
+        assert response.status_code == 200
+        assert errormessages["email_err"] in response.content.decode()
         assert len(User.objects.all()) == 0
         assert len(Profile.objects.all()) == 0
 
@@ -43,14 +64,6 @@ class RegistrationTests(TestCase):
         # registration email will be resent
         sameemailregdata = self.regdata.copy()
         sameemailregdata['username'] = 'test2'
-
-        errormessages = {
-            "email": "Email address unavailable, please check your email",  # if reminder sent
-            "no_email": "Email address not available",                      # if no reminder sent
-            "username": "A user with that username already exists.",        # if username error caught in django default
-            "username_case": "Username already exists",                     # if username error caught in custom validator
-            "email_err": "Error sending confirmation email, please try again"
-        }
 
         with self.settings(DEBUG=True):
             response = self.client.post(reverse('user_register'), sameemailregdata)
@@ -146,8 +159,6 @@ class RegistrationTests(TestCase):
         assert len(User.objects.all()) == 1
         assert len(Profile.objects.all()) == 1
         assert isinstance(user.profile, Profile)
-
-        # todo: test failure to send mail in POST, mock exception from send_registration_email()
 
     def test_send_registration_email(self):
         testuser = SignUpForm(data=self.regdata).save(commit=False)
