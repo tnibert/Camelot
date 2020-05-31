@@ -25,15 +25,15 @@ class RegistrationTests(TestCase):
         # this could be parameterized...
 
         # test GET
-        response = self.client.get(reverse('user_register'), follow=True)
+        response = self.client.get(reverse('user_register'))
         assert response.status_code == 200
         assert len(User.objects.all()) == 0
         assert len(Profile.objects.all()) == 0
 
         # test POST
         with self.settings(DEBUG=True):
-            response = self.client.post(reverse('user_register'), self.regdata, follow=True)
-        assert response.status_code == 200
+            response = self.client.post(reverse('user_register'), self.regdata)
+        assert response.status_code == 302
         assert len(User.objects.all()) == 1
         assert len(Profile.objects.all()) == 0
         # outbox can be cleared with mail.outbox = []
@@ -47,11 +47,12 @@ class RegistrationTests(TestCase):
         errormessages = {
             "email": "Email address unavailable, please check your email",  # if reminder sent
             "no_email": "Email address not available",                      # if no reminder sent
-            "username": "A user with that username already exists."
+            "username": "A user with that username already exists.",
+            "username_case": "Username already exists"
         }
 
         with self.settings(DEBUG=True):
-            response = self.client.post(reverse('user_register'), sameemailregdata, follow=True)
+            response = self.client.post(reverse('user_register'), sameemailregdata)
         assert errormessages["email"] in response.content.decode()
         assert errormessages["username"] not in response.content.decode()
         assert errormessages["no_email"] not in response.content.decode()
@@ -65,7 +66,7 @@ class RegistrationTests(TestCase):
         sameusernameregdata['email'] = 'different@different.com'
 
         with self.settings(DEBUG=True):
-            response = self.client.post(reverse('user_register'), sameusernameregdata, follow=True)
+            response = self.client.post(reverse('user_register'), sameusernameregdata)
         assert errormessages["username"] in response.content.decode()
         assert errormessages["email"] not in response.content.decode()
         assert errormessages["no_email"] not in response.content.decode()
@@ -74,9 +75,24 @@ class RegistrationTests(TestCase):
         assert len(User.objects.all()) == 1
         assert len(Profile.objects.all()) == 0
 
+        # test reregister with same username, different case, inactive user
+        sameusernamediffcaseregdata = sameusernameregdata.copy()
+        sameusernamediffcaseregdata['username'] = sameusernamediffcaseregdata['username'].upper()
+
+        with self.settings(DEBUG=True):
+            response = self.client.post(reverse('user_register'), sameusernamediffcaseregdata)
+        assert response.status_code == 200
+        assert errormessages["username_case"] in response.content.decode()
+        assert errormessages["username"] not in response.content.decode()
+        assert errormessages["email"] not in response.content.decode()
+        assert errormessages["no_email"] not in response.content.decode()
+        self.assertEqual(len(mail.outbox), 2)
+        assert len(User.objects.all()) == 1
+        assert len(Profile.objects.all()) == 0
+
         # test reregister with both duplicate, inactive user
         with self.settings(DEBUG=True):
-            response = self.client.post(reverse('user_register'), self.regdata, follow=True)
+            response = self.client.post(reverse('user_register'), self.regdata)
         assert response.status_code == 200
         assert errormessages["username"] in response.content.decode()
         assert errormessages["email"] in response.content.decode()
@@ -92,7 +108,7 @@ class RegistrationTests(TestCase):
         # test reregister with same email address, active user
         # registration email will not be resent
         with self.settings(DEBUG=True):
-            response = self.client.post(reverse('user_register'), sameemailregdata, follow=True)
+            response = self.client.post(reverse('user_register'), sameemailregdata)
         self.assertEqual(len(mail.outbox), 3)
         assert response.status_code == 200
         assert errormessages["username"] not in response.content.decode()
@@ -104,7 +120,7 @@ class RegistrationTests(TestCase):
 
         # test reregister with same username, active user
         with self.settings(DEBUG=True):
-            response = self.client.post(reverse('user_register'), sameusernameregdata, follow=True)
+            response = self.client.post(reverse('user_register'), sameusernameregdata)
         self.assertEqual(len(mail.outbox), 3)
         assert response.status_code == 200
         assert errormessages["username"] in response.content.decode()
@@ -116,7 +132,7 @@ class RegistrationTests(TestCase):
 
         # test reregister with both duplicate, active user
         with self.settings(DEBUG=True):
-            response = self.client.post(reverse('user_register'), self.regdata, follow=True)
+            response = self.client.post(reverse('user_register'), self.regdata)
         self.assertEqual(len(mail.outbox), 3)
         assert response.status_code == 200
         assert errormessages["username"] in response.content.decode()
@@ -142,8 +158,8 @@ class RegistrationTests(TestCase):
     def test_activate_endpoint(self):
         # register user
         with self.settings(DEBUG=True):
-            response = self.client.post(reverse('user_register'), self.regdata, follow=True)
-        assert response.status_code == 200
+            response = self.client.post(reverse('user_register'), self.regdata)
+        assert response.status_code == 302
 
         assert len(User.objects.all()) == 1
         assert len(Profile.objects.all()) == 0
@@ -163,7 +179,7 @@ class RegistrationTests(TestCase):
 
     def test_activate_user_no_check(self):
         with self.settings(DEBUG=True):
-            response = self.client.post(reverse('user_register'), self.regdata, follow=True)
+            response = self.client.post(reverse('user_register'), self.regdata)
 
         assert len(User.objects.all()) == 1
         assert len(Profile.objects.all()) == 0
