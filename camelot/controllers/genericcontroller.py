@@ -1,4 +1,7 @@
+from django.http import Http404
 from .utilities import *
+from ..models import Profile
+
 
 class genericcontroller:
 
@@ -6,17 +9,20 @@ class genericcontroller:
         # beware of problems in albumcontroller, friendcontroller, etc of uprofile not existing
         # get the current user profile
         if uid:
-            self.uprofile = get_profile_from_uid(uid)
+            try:
+                self.uprofile = get_profile_from_uid(uid)
+            except Profile.DoesNotExist as e:
+                raise Http404
         else:
             self.uprofile = None
 
     # may not belong here, but let's just drop it here for a sec
-    def validate_permission(self):
-        """
-        check if the user has permission to access the material
-        :return: boolean specifying if permission is granted
-        """
-        return True
+    #def validate_permission(self):
+    #    """
+    #    check if the user has permission to access the material
+    #    :return: boolean specifying if permission is granted
+    #    """
+    #    return True
 
     # maybe we do this... it's basically the same process in all of the controllers
     # we should wrap it though

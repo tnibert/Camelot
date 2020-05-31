@@ -1,17 +1,30 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_delete
 from django.dispatch import receiver
 from django.utils import timezone
 from os import unlink
 from .constants import *
 from .constants2 import *
+from .logs import log_exception
+
+"""
+I want to add a unique constraint to User
+However this requires a custom user class inheriting from AbstractUser
+Migrating the User table to a custom user is... not pretty
+see https://code.djangoproject.com/ticket/25313
+Also:
+https://www.caktusgroup.com/blog/2019/04/26/how-switch-custom-django-user-model-mid-project/
+https://stackoverflow.com/questions/53461410/make-user-email-unique-django
+
+We will need to do several things for work around this, and eventually we want to make this migration
+"""
 
 
-# verify enforcement of unique user email
-
-# one to one relationship with User
 class Profile(models.Model):
+    """
+    one to one relationship with User
+    """
     description = models.CharField(max_length=1000, default="")
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     email_confirmed = models.BooleanField(default=False)
@@ -28,13 +41,6 @@ class Profile(models.Model):
             return self.user.username
         else:
             return self.dname
-
-
-@receiver(post_save, sender=User)
-def update_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance, dname=instance.username)
-    instance.profile.save()
 
 
 # investigate constraints
@@ -98,21 +104,25 @@ class Photo(models.Model):
     exiforientation = models.IntegerField(default=None, null=True, blank=True)
 
 
-# receiver to delete the file on disk when we delete a photo from database
 @receiver(post_delete, sender=Photo)
 def delete_photo_file(sender, instance, *args, **kwargs):
+    """
+    Receiver to delete the file on disk when we delete a photo from database.
+    :param sender:
+    :param instance:
+    :param args:
+    :param kwargs:
+    :return:
+    """
     try:
         unlink(instance.filename)
-    except FileNotFoundError:
-        # todo: log
-        pass
+    except FileNotFoundError as e:
+        log_exception(__name__, e)
     try:
         unlink(instance.thumb)
-    except FileNotFoundError:
-        # todo: log
-        pass
+    except FileNotFoundError as e:
+        log_exception(__name__, e)
     try:
         unlink(instance.midsize)
-    except FileNotFoundError:
-        # todo: log
-        pass
+    except FileNotFoundError as e:
+        log_exception(__name__, e)

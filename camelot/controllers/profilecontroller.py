@@ -69,7 +69,7 @@ class profilecontroller(genericcontroller):
             groupcontrol.create("Coworkers")
             groupcontrol.create("School Friends")
         except Exception as e:
-            raise(e)
+            raise e
         return True
 
     def set_profile_pic(self, photoid):

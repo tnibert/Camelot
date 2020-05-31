@@ -2,8 +2,12 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
 from django.shortcuts import reverse
-
+from ..controllers.friendcontroller import friendcontroller, are_friends
+from ..models import Friendship
 from .helperfunctions import complete_add_friends
+from ..view.usermgmt import activate_user_no_check
+from ..view import friend
+
 
 class FriendGroupControllerTests(TestCase):
 
@@ -34,22 +38,24 @@ class FriendGroupControllerTests(TestCase):
 
         self.u = User.objects.create_user(**self.credentials)
         self.u.save()
+        activate_user_no_check(self.u)
 
         self.friend = User.objects.create_user(**self.friendcredentials)
         self.friend.save()
+        activate_user_no_check(self.friend)
 
         self.friend2 = User.objects.create_user(**self.friend2credentials)
         self.friend2.save()
+        activate_user_no_check(self.friend2)
 
         self.friend3 = User.objects.create_user(**self.friend3credentials)
         self.friend3.save()
+        activate_user_no_check(self.friend3)
 
         self.friendcontrol = friendcontroller(self.u.id)
         self.otherfriendcontrol = friendcontroller(self.friend.id)
         self.otherfriendcontrol2 = friendcontroller(self.friend2.id)
 
-from ..controllers.friendcontroller import friendcontroller, are_friends
-from ..models import Friendship
 
 class FriendshipTests(FriendGroupControllerTests):
 
@@ -193,8 +199,6 @@ class FriendshipTests(FriendGroupControllerTests):
         assert len(qset) == 1
 
 
-from ..view import friend
-
 class FriendViewTests(TestCase):
 
     def setUp(self):
@@ -204,6 +208,7 @@ class FriendViewTests(TestCase):
             'password': 'secret'}
         self.u = User.objects.create_user(**self.credentials)
         self.u.save()
+        activate_user_no_check(self.u)
 
         self.credentials2 = {
             'username': 'testuser2',
@@ -211,6 +216,7 @@ class FriendViewTests(TestCase):
             'password': 'secret'}
         self.u2 = User.objects.create_user(**self.credentials2)
         self.u2.save()
+        activate_user_no_check(self.u2)
 
         self.factory = RequestFactory()
 

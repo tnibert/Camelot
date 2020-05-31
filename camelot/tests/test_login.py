@@ -2,13 +2,9 @@ from django.test import TestCase, Client
 from django.test.client import RequestFactory
 from django.shortcuts import reverse
 from django.contrib.messages import get_messages
-
 from django.contrib.auth.models import User
-
 from ..view.usermgmt import *
 
-# these need to be expanded out into user management tests
-# probably in an additional test case class
 
 class LoginTests(TestCase):
     def setUp(self):
@@ -18,6 +14,7 @@ class LoginTests(TestCase):
             'password': 'secret'}
         self.u = User.objects.create_user(**self.credentials)
         self.u.save()
+        activate_user_no_check(self.u)
 
         self.factory = RequestFactory()
 

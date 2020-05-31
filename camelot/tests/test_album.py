@@ -8,6 +8,7 @@ from ..controllers.albumcontroller import *
 from ..controllers.groupcontroller import groupcontroller
 from ..controllers.utilities import *
 from ..view.album import *
+from ..view.usermgmt import activate_user_no_check
 from .helperfunctions import complete_add_friends
 from ..constants import *
 from ..constants2 import *
@@ -25,6 +26,7 @@ class AlbumControllerTests(TestCase):
             'password': 'secret'}
         self.u = User.objects.create_user(**self.credentials)
         self.u.save()
+        activate_user_no_check(self.u)
 
         self.credentials = {
             'username': 'testuser2',
@@ -32,6 +34,7 @@ class AlbumControllerTests(TestCase):
             'password': 'secret'}
         self.u2 = User.objects.create_user(**self.credentials)
         self.u2.save()
+        activate_user_no_check(self.u2)
 
         # send login data
         response = self.client.post('', self.credentials, follow=True)
@@ -48,6 +51,20 @@ class AlbumControllerTests(TestCase):
         self.testdir = "testdir"
 
     def test_get_profile_from_uid(self):
+        credentials = {
+            'username': 'testuser3',
+            'email': 'user3@test.com',
+            'password': 'secret'}
+        test_u = User.objects.create_user(credentials)
+        test_u.save()
+        with self.assertRaises(Profile.DoesNotExist):
+            profile = get_profile_from_uid(test_u.id)
+
+        activate_user_no_check(test_u)
+        profile = get_profile_from_uid(test_u.id)
+        self.assertEqual(profile.user, test_u)
+        self.assertEqual(test_u.profile, profile)
+
         profile = get_profile_from_uid(self.u.id)
         self.assertEqual(profile.user, self.u)
         self.assertEqual(self.u.profile, profile)
@@ -173,7 +190,6 @@ class AlbumControllerTests(TestCase):
         finally:
             os.chdir("..")
             shutil.rmtree(self.testdir)
-
 
     def test_update_photo_description(self):
         if not os.path.exists(self.testdir):
@@ -568,6 +584,7 @@ class AlbumViewTests(TestCase):
             'password': 'secret'}
         self.u = User.objects.create_user(**self.credentials)
         self.u.save()
+        activate_user_no_check(self.u)
 
         self.credentials2 = {
             'username': 'testuser2',
@@ -575,6 +592,7 @@ class AlbumViewTests(TestCase):
             'password': 'secret'}
         self.u2 = User.objects.create_user(**self.credentials2)
         self.u2.save()
+        activate_user_no_check(self.u2)
 
         # send login data
         response = self.client.post('', self.credentials, follow=True)

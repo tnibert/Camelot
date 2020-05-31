@@ -2,10 +2,14 @@ language: python
 python:
   - "3.5"
   - "3.6"
+  - "3.7"
+  - "3.8"
 env:
   - DJANGO=2.0.1
   - DJANGO=2.0.2
   - DJANGO=2.0.8
+  - DJANGO=2.2.12
+  - DJANGO=3.0.6
 # command to install dependencies
 install:
   - pip install -r requirements.txt

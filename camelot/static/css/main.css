@@ -103,11 +103,10 @@ input.logininput {
 
 #loginpageoptions {
     text-align:center;
-    margin-right: 2%;
 }
 
-#loginpageoptions li {
-    list-style-type: none;
+#loginpageoptions a {
+    padding-bottom: 0.2em;
 }
 
 #sitemap {
@@ -137,6 +136,11 @@ table.logincontent {
 
 #homenav {
     flex: 0 0 50%;
+}
+
+.yourprofileurl {
+    padding-top: 1em;
+    padding-bottom: 1em;
 }
 
 .sidebyside {

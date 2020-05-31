@@ -4,21 +4,19 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.sites.shortcuts import get_current_site
-from django.utils.encoding import force_bytes, force_text
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.template.loader import render_to_string
+from django.utils.encoding import force_text
+from django.utils.http import urlsafe_base64_decode
 from django.conf import settings
 from functools import wraps
-#import logging
 from ..forms import SignUpForm, SearchForm
 from ..models import Profile
 from ..tokens import account_activation_token
 from ..controllers.friendcontroller import friendcontroller
 from ..friendfeed import generate_feed
 from ..controllers.profilecontroller import profilecontroller
+from ..user_emailing import send_registration_email
+from ..logs import log_exception
 import requests
-
-#logger = logging.getLogger(__name__)
 
 
 """
@@ -93,6 +91,11 @@ def check_recaptcha(view_func):
     """
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):
+        # if we are not in production, do not use recaptcha
+        if settings.DEBUG is True:
+            request.recaptcha_is_valid = True
+            return view_func(request, *args, **kwargs)
+
         request.recaptcha_is_valid = None
         if request.method == 'POST':
             recaptcha_response = request.POST.get('g-recaptcha-response')
@@ -122,35 +125,25 @@ def register(request):
         form = SignUpForm(request.POST)
 
         if form.is_valid():
+            user = form.save(commit=False)
+            user.is_active = False
+            user.save()
+
             try:
-                User.objects.get(username__iexact=form.cleaned_data['username'])
-            except User.DoesNotExist:
-                user = form.save(commit=False)
-                user.is_active = False
-                user.save()
+                send_registration_email(user, get_current_site(request).domain)
+            except Exception as e:
+                log_exception(__name__, e)
 
-                current_site = get_current_site(request)
-                subject = 'Activate Your PicPicPanda Account'
-                message = render_to_string('camelot/account_activation_email.html', {
-                    'user': user,
-                    'domain': current_site.domain,
-                    'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
-                    'token': account_activation_token.make_token(user),
-                })
-                try:
-                    user.email_user(subject, message)
-                except Exception as e:
-                    # did not send email correctly, roll back
-                    user.delete()
-                    #logger.warning(e)
-                    messages.add_message(request, messages.INFO, 'Error sending confirmation email')
-                    # why does this render work, but the bottom one requires a request?
-                    return render('camelot/register.html', {'form': form,
-                                                            'recaptchakey': settings.GOOGLE_RECAPTCHA_PUBLIC_KEY})
+                # did not send email correctly, roll back
+                user.delete()
 
-                return redirect('account_activation_sent')
+                messages.add_message(request, messages.INFO, 'Error sending confirmation email, please try again')
 
-            messages.add_message(request, messages.INFO, 'Username already exists')
+                return render(request, 'camelot/register.html', {'form': form,
+                                                        'recaptchakey': settings.GOOGLE_RECAPTCHA_PUBLIC_KEY})
+
+            return redirect('account_activation_sent')
+
         else:
             # there was some error, rerender with errors displayed to user
             return render(request, 'camelot/register.html',
@@ -169,6 +162,15 @@ def account_activation_sent(request):
 
 
 def activate(request, uidb64, token):
+    """
+    Profile for the user is created here
+    If the profile endpoint is attempted to be accessed before creation (via url)
+    then a 500 will be raised on that access
+    :param request:
+    :param uidb64:
+    :param token:
+    :return:
+    """
     try:
         uid = force_text(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
@@ -176,17 +178,34 @@ def activate(request, uidb64, token):
         user = None
 
     if user is not None and account_activation_token.check_token(user, token):
-        # activate the account
-        user.is_active = True
-        #Profile.objects.create(user=user, dname=user.username)
-        user.profile.email_confirmed = True
-        user.save()
-
-        # create default groups
-        profilecontrol = profilecontroller(uid)
-        profilecontrol.create_default_groups()
+        # activate the account and create the profile
+        activate_user_no_check(user)
 
         #login(request, user)
         return redirect('user_home')
     else:
         return render(request, 'camelot/account_activation_invalid.html')
+
+
+def activate_user_no_check(user):
+    """
+    Activate the user, create profile
+    This is not an endpoint
+    :param user: orm User object
+    :return:
+    """
+    # the following try except is just in case a profile was created in the previous ppp version
+    try:
+        user.profile
+    except Profile.DoesNotExist:
+        # create() saves to db
+        Profile.objects.create(user=user, dname=user.username)
+
+    user.profile.email_confirmed = True
+    user.is_active = True
+    user.profile.save()
+    user.save()
+
+    # create default groups
+    profilecontrol = profilecontroller(user.id)
+    profilecontrol.create_default_groups()

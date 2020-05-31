@@ -1,32 +1,62 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
 from .datavalidation.validationfunctions import validate_image_fsize
 from .constants import *
-from .models import FriendGroup
+from .constants2 import SITEDOMAIN
 from .controllers.groupcontroller import groupcontroller
 from .controllers.friendcontroller import friendcontroller
+from .logs import log_exception
+from .user_emailing import send_registration_email
 
 
-# https://docs.djangoproject.com/en/dev/ref/validators/
 def validate_email(value):
     """
     Validate that email address of newly created user is not already registered
+    https://docs.djangoproject.com/en/dev/ref/validators/
+    :param value:
+    :return:
+    """
+    # this will raise django.contrib.auth.models.MultipleObjectsReturned if email is not unique
+    try:
+        user = User.objects.get(email=value)
+    except User.DoesNotExist:
+        # if a user doesn't exist with the email, we pass
+        return
+
+    # if the email address has been registered previously,
+    # we will silently send another registration email
+    # and prevent the form from validating
+    if user.is_active is False:
+        try:
+            send_registration_email(user, SITEDOMAIN, htmlfile='camelot/account_activation_reminder.html')
+        except Exception as e:
+            log_exception(__name__, e)
+
+        raise ValidationError("Email address unavailable, please check your email")
+
+    # if a user does exist with the email, raise
+    raise ValidationError("Email address not available")
+
+
+def validate_username(value):
+    """
+    Ensure that usernames that are the same with differing cases are invalid
     :param value:
     :return:
     """
     try:
-        email = User.objects.get(email=value)
+        User.objects.get(username__iexact=value)
     except User.DoesNotExist:
-        # if a user doesn't exist with the email, we pass
         return
-    # if a user does exist with the email, raise
-    raise ValidationError("Email address already registered")
+
+    raise ValidationError("Username already exists")
 
 
 class SignUpForm(UserCreationForm):
     email = forms.EmailField(help_text='Required', validators=[validate_email])
+    username = forms.CharField(help_text='Required', validators=[validate_username])
 
     class Meta:
         model = User

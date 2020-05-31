@@ -2,10 +2,14 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.shortcuts import reverse
 from .test_friendship import FriendGroupControllerTests
+from django.test.client import RequestFactory
 from ..controllers.groupcontroller import groupcontroller, is_in_group
 from ..controllers.utilities import PermissionException
 from .helperfunctions import complete_add_friends
 from ..models import FriendGroup
+from ..view.usermgmt import activate_user_no_check
+from ..view.group import *
+
 
 class GroupControllerTests(FriendGroupControllerTests):
 
@@ -127,16 +131,17 @@ class GroupControllerTests(FriendGroupControllerTests):
         # will return self.u's groups
         ret1 = self.groupcontrol.return_groups()
 
-        assert len(ret1) == 1
-        assert ret1[0] == newgroup1
+        # will have new group plus default groups
+        assert len(ret1) == 4
+        assert newgroup1 in ret1
 
         # create a group for second user
         name2 = "Test New Group 2"
         newgroup2 = self.groupcontrol2.create(name2)
         # will return self.friend's groups
         ret2 = self.groupcontrol.return_groups(self.friend.profile)
-        assert len(ret2) == 1
-        assert ret2[0] == newgroup2
+        assert len(ret2) == 4
+        assert newgroup2 in ret2
 
         # create a second group for self.friend
         name3 = "Test New Group 3"
@@ -145,9 +150,9 @@ class GroupControllerTests(FriendGroupControllerTests):
         # self.u will access
         ret3 = self.groupcontrol.return_groups(self.friend.profile)
 
-        assert len(ret3) == 2
-        assert ret3[0] == newgroup2
-        assert ret3[1] == newgroup3
+        assert len(ret3) == 5
+        assert newgroup2 in ret3
+        assert newgroup3 in ret3
 
         # todo: test none case
 
@@ -165,9 +170,6 @@ class GroupControllerTests(FriendGroupControllerTests):
         assert is_in_group(newgroup, self.friend.profile)
 
 
-from django.test.client import RequestFactory
-from ..view.group import *
-
 class GroupViewTests(TestCase):
     def setUp(self):
         # this is identical for the setup to albumviewtests, need to share code
@@ -177,6 +179,7 @@ class GroupViewTests(TestCase):
             'password': 'secret'}
         self.u = User.objects.create_user(**self.credentials)
         self.u.save()
+        activate_user_no_check(self.u)
 
         self.credentials = {
             'username': 'testuser2',
@@ -184,6 +187,7 @@ class GroupViewTests(TestCase):
             'password': 'secret'}
         self.u2 = User.objects.create_user(**self.credentials)
         self.u2.save()
+        activate_user_no_check(self.u2)
 
         # send login data
         #response = self.client.post('', self.credentials, follow=True)

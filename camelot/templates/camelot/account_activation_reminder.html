@@ -1,0 +1,16 @@
+{% autoescape off %}
+Hi {{ user.username }},
+
+You are receiving this message because a second attempt was made to register your email address with PicPicPanda.
+Since this email address has already been registered, but not activated, we've sent you this email in case you would like to confirm your registration.
+
+Please click on the link below if you would like to confirm your registration:
+
+https://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+
+After confirming, you may login with the original username and password registered with.  If you have forgotten your original password, please click "I forgot my password" on the main page.
+
+Kind regards,
+
+The PicPicPanda Team
+{% endautoescape %}

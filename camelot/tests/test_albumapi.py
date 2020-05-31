@@ -8,6 +8,7 @@ import os
 import shutil
 from ..controllers.albumcontroller import albumcontroller
 from .helperfunctions import complete_add_friends
+from ..view.usermgmt import activate_user_no_check
 
 
 class albumAPItests(TestCase):
@@ -19,6 +20,7 @@ class albumAPItests(TestCase):
             'password': 'secret'}
         self.u = User.objects.create_user(**self.credentials)
         self.u.save()
+        activate_user_no_check(self.u)
 
         self.credentials2 = {
             'username': 'testuser2',
@@ -26,6 +28,8 @@ class albumAPItests(TestCase):
             'password': 'secret'}
         self.u2 = User.objects.create_user(**self.credentials2)
         self.u2.save()
+        activate_user_no_check(self.u2)
+
 
         # send login data
         response = self.client.post('', self.credentials, follow=True)

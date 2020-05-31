@@ -2,15 +2,16 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.contrib.auth.models import User
 from django.shortcuts import reverse
-
 import os
 import shutil
-
 from ..controllers.profilecontroller import profilecontroller
 from ..controllers.groupcontroller import groupcontroller
 from ..controllers.albumcontroller import albumcontroller
 from .helperfunctions import complete_add_friends
 from ..constants import *
+from ..view.profile import *
+from ..view.usermgmt import activate_user_no_check
+
 
 class ProfileControllerTests(TestCase):
     def setUp(self):
@@ -19,6 +20,8 @@ class ProfileControllerTests(TestCase):
             'email': 'user@test.com',
             'password': 'secret'}
         self.u = User.objects.create_user(**self.credentials)
+        self.u.save()
+        activate_user_no_check(self.u)
         self.u.profile.description = "I don't think therefore I am"
         self.u.save()
 
@@ -27,8 +30,10 @@ class ProfileControllerTests(TestCase):
             'email': 'user2@test.com',
             'password': 'secret'}
         self.u2 = User.objects.create_user(**self.credentials)
-        self.u2.profile.description = "Hajimemashite yoroshiku onegaishimasu"
         self.u2.save()
+        activate_user_no_check(self.u2)
+        self.u2.profile.description = "Hajimemashite yoroshiku onegaishimasu"
+        self.u2.profile.save()
 
         self.profilecontrol1 = profilecontroller(self.u.id)
         self.profilecontrol2 = profilecontroller(self.u2.id)
@@ -146,8 +151,6 @@ class ProfileControllerTests(TestCase):
             shutil.rmtree(self.testdir)
 
 
-from ..view.profile import *
-
 class ProfileViewTestsLoggedIn(TestCase):
     def setUp(self):
         # create user
@@ -157,6 +160,8 @@ class ProfileViewTestsLoggedIn(TestCase):
             'password': 'secret'}
         self.u = User.objects.create_user(**self.credentials)
         self.u.save()
+
+        activate_user_no_check(self.u)
 
         # send login data
         response = self.client.post('', self.credentials, follow=True)
@@ -214,6 +219,7 @@ class ProfileViewTestsLoggedIn(TestCase):
         self.u.profile.refresh_from_db()
         assert self.u.profile.description == description
         assert self.u.profile.dname == dname
+
 
 class ProfileViewTestsNotLoggedIn(TestCase):
     def setUp(self):
