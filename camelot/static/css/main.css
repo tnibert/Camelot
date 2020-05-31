@@ -139,6 +139,11 @@ table.logincontent {
     flex: 0 0 50%;
 }
 
+.yourprofileurl {
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+
 .sidebyside {
     display: flex;
 }
