@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from datetime import datetime, timedelta
 from unittest import mock
 from ..models import Profile
-from ..user_emailing import remind_stale_reg, send_registration_email
+from ..user_emailing import remind_stale_reg, send_registration_email, remind_stale_email_list
 from ..forms import SignUpForm
 from ..view.usermgmt import activate_user_no_check
 
@@ -238,14 +238,14 @@ class ReminderTests(TestCase):
                                                  'date_joined': remind_date})
         self.remind1.save()
 
-        self.expire1 = User.objects.create_user(**{'username': 'to expire',
+        self.expire1 = User.objects.create_user(**{'username': 'to_expire',
                                                  'email': 'user2@test.com',
                                                  'password': 'secret',
                                                  'is_active': False,
                                                  'date_joined': expire_date})
         self.expire1.save()
 
-        self.noaction1 = User.objects.create_user(**{'username': 'no dramas',
+        self.noaction1 = User.objects.create_user(**{'username': 'no_dramas',
                                                    'email': 'user3@test.com',
                                                    'password': 'secret',
                                                    'is_active': False,
@@ -257,3 +257,13 @@ class ReminderTests(TestCase):
     def test_remind_stale_reg(self):
         remind_stale_reg(self.users, 'camelot/account_activation_reminder.html')
         self.assertEqual(len(mail.outbox), 3)
+
+    def test_remind_stale_email_list(self):
+        emails = [u.email for u in self.users]
+        emails.append("notanemail@notindb.com")
+        activate_user_no_check(self.noaction1)
+
+        remind_stale_email_list(emails, 'camelot/account_activation_reminder.html')
+        self.assertEqual(len(mail.outbox), 2)
+        assert self.remind1.username in mail.outbox[0].body
+        assert self.expire1.username in mail.outbox[1].body

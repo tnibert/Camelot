@@ -1,6 +1,8 @@
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
+from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.models import User
 from .tokens import account_activation_token
 from .constants2 import SITEDOMAIN
 
@@ -44,3 +46,25 @@ def remind_stale_reg(users, htmltemplate):
     """
     for user in users:
         send_registration_email(user, SITEDOMAIN, htmlfile=htmltemplate)
+
+
+def remind_stale_email_list(email_addresses, htmltemplate):
+    """
+    send reminder for email registration to a list of email addresses plain text
+    :param email_addresses: list of email addresses to send to
+    :return:
+    """
+    users = []
+    for address in email_addresses:
+        try:
+            u = User.objects.get(email=address)
+        except ObjectDoesNotExist:
+            print("Address not in db: {}".format(address))
+            continue
+
+        if u.is_active is False:
+            users.append(u)
+        else:
+            print("Account is active: {}".format(address))
+
+    remind_stale_reg(users, htmltemplate)
