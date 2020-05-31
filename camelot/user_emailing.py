@@ -48,23 +48,23 @@ def remind_stale_reg(users, htmltemplate):
         send_registration_email(user, SITEDOMAIN, htmlfile=htmltemplate)
 
 
-def remind_stale_email_list(email_addresses, htmltemplate):
+def remind_stale_email_list(usernames, htmltemplate):
     """
     send reminder for email registration to a list of email addresses plain text
-    :param email_addresses: list of email addresses to send to
+    :param usernames: list of usernames to send email to
     :return:
     """
     users = []
-    for address in email_addresses:
+    for name in usernames:
         try:
-            u = User.objects.get(email=address)
+            u = User.objects.get(username=name)
         except ObjectDoesNotExist:
-            print("Address not in db: {}".format(address))
+            print("User not in db: {}".format(name))
             continue
 
         if u.is_active is False:
             users.append(u)
         else:
-            print("Account is active: {}".format(address))
+            print("Account is active: {}".format(name))
 
     remind_stale_reg(users, htmltemplate)

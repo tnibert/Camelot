@@ -259,11 +259,11 @@ class ReminderTests(TestCase):
         self.assertEqual(len(mail.outbox), 3)
 
     def test_remind_stale_email_list(self):
-        emails = [u.email for u in self.users]
-        emails.append("notanemail@notindb.com")
+        usernames = [u.username for u in self.users]
+        usernames.append("notindb")
         activate_user_no_check(self.noaction1)
 
-        remind_stale_email_list(emails, 'camelot/account_activation_reminder.html')
+        remind_stale_email_list(usernames, 'camelot/account_activation_reminder.html')
         self.assertEqual(len(mail.outbox), 2)
         assert self.remind1.username in mail.outbox[0].body
         assert self.expire1.username in mail.outbox[1].body
