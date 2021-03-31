@@ -7,9 +7,8 @@ $(document).ready(function(){
 
     // submit photos via API calls
     $("form").on('submit', function (e) {
-        var photos = new FormData(); //new FormData(document.getElementById("uploadphotosform"));
+        var photos = new FormData(this);
 
-        photos.append('image', $('#id_file')[0].files[0]);
         console.log($('#id_description')[0].value);
         var inputdesc = $('#id_description')[0].value;
 

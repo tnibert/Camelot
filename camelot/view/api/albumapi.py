@@ -31,15 +31,16 @@ def upload_photo(request, id):
 
         albumcontrol = return_album_controller(request.user.id, id)
 
-        rawimg = io.BytesIO()
-        rawimg.write(request.FILES['image'].read())
+        for fi in request.FILES.getlist("file"):
+            rawimg = io.BytesIO()
+            rawimg.write(fi.read()) # (request.FILES['image'].read())
 
-        # todo: validate image, running into issues using bytesio object, no attrib size
-        # validate size
-        # validate is image -> http://effbot.org/imagingbook/image.htm#tag-Image.Image.verify
-        validate_image(rawimg)
+            # todo: validate image, running into issues using bytesio object, no attrib size
+            # validate size
+            # validate is image -> http://effbot.org/imagingbook/image.htm#tag-Image.Image.verify
+            validate_image(rawimg)
 
-        photoid = albumcontrol.add_photo_to_album(id, '', rawimg).id
+            photoid = albumcontrol.add_photo_to_album(id, '', rawimg).id
         return JsonResponse({"id": photoid}, status=201)
 
     else:
