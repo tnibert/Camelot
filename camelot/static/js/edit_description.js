@@ -1,14 +1,29 @@
 $(document).ready(function(){
 
     // todo: currently multiple inputs can be opened at once, desired behavior?
-    $('.edit-desc').click(function(){
-        console.log("clicked edit desc");
-        var input = document.createElement("INPUT");
-        input.type = "text";
-        $(this).replaceWith("<input type='text' onKeyPress='checkEnter(event)' />");
-    });
+    $('.edit-desc').click(promptForDesc);
 
 });
+
+function promptForDesc() {
+    console.log("clicked edit desc");
+    var originaltext = $(this).text();
+    console.log(originaltext);
+    var input = $("<input type='text' autofocus='autofocus' onKeyPress='checkEnter(event)' />");
+    input.val(originaltext);
+    input.focusout(function () {
+        $(event.target).replaceWith(createSpanRestore(originaltext));
+    });
+    $(this).replaceWith(input);
+    input.focus();
+}
+
+function createSpanRestore(t) {
+    var spanRestore = $("<span class='edit-desc'></span>");
+    spanRestore.click(promptForDesc);
+    spanRestore.text(t);
+    return spanRestore;
+}
 
 // http://jennifermadden.com/javascript/stringEnterKeyDetector.html
 // todo: this is not just a check, change function name and return values
@@ -32,7 +47,7 @@ function checkEnter(e) { //e is event object passed from function invocation
         var photoid = $(e.target).siblings(".photoid").val();
         console.log(photoid);
 
-        // todo: send new description via api
+        // send new description to api
         var xhr = new XMLHttpRequest();
         // define success check
         xhr.onreadystatechange = function() {
@@ -41,9 +56,7 @@ function checkEnter(e) { //e is event object passed from function invocation
                     console.log('successful description update');
                     //window.location.href = '/album/' + albumid + '/';
                     // replace text on screen
-                    var span = document.createElement("SPAN");
-                    span.textContent = new_desc;
-                    $(e.target).replaceWith(span);
+                    $(e.target).replaceWith(createSpanRestore(new_desc));
                 } else {
                     console.log('failed description update');
                     alert('Failed to update photo description.');
