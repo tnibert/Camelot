@@ -1,4 +1,3 @@
-console.log("loaded");
 $(document).ready(function(){
 
     // todo: currently multiple inputs can be opened at once, desired behavior?
@@ -12,6 +11,7 @@ $(document).ready(function(){
 });
 
 // http://jennifermadden.com/javascript/stringEnterKeyDetector.html
+// todo: this is not just a check, change function name and return values
 function checkEnter(e) { //e is event object passed from function invocation
     var characterCode; //literal character code will be stored in this variable
 
@@ -29,12 +29,38 @@ function checkEnter(e) { //e is event object passed from function invocation
         var new_desc = $(e.target).val();
         console.log(new_desc);
 
-        // todo: send new description via api
+        var photoid = $(e.target).siblings(".photoid").val();
+        console.log(photoid);
 
-        // replace text on screen
-        var span = document.createElement("SPAN");
-        span.textContent = new_desc;
-        $(e.target).replaceWith(span);
+        // todo: send new description via api
+        var xhr = new XMLHttpRequest();
+        // define success check
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 204) {
+                    console.log('successful description update');
+                    //window.location.href = '/album/' + albumid + '/';
+                    // replace text on screen
+                    var span = document.createElement("SPAN");
+                    span.textContent = new_desc;
+                    $(e.target).replaceWith(span);
+                } else {
+                    console.log('failed description update');
+                    alert('Failed to update photo description.');
+                    // todo: do we actually want to reload?
+                    window.location.href = '/album/' + $("#albumid").val() + '/';
+                }
+            }
+        }
+        xhr.open("POST", '/api/update/photo/desc/' + photoid, true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        var csrftoken = getCookie('csrftoken');
+        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        var data = JSON.stringify({"description": new_desc});
+        xhr.send(data);
+
+        console.log("Desc update sent!");
+
         return false;
     }
     else{
