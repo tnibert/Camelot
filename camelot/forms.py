@@ -68,6 +68,9 @@ class AlbumCreateForm(forms.Form):
     description = forms.CharField(label='Photo album description', max_length=300, required=False)
 
 
+# todo: are we even still using this? no, we are not
+# are validators out of use? yes, they are
+# todo: manually validate in api endpoint
 class UploadPhotoForm(forms.Form):
     # todo: django security doc identifies potential vulnerability with uploading html file with valid png header
     # https://docs.djangoproject.com/en/2.0/topics/security/#user-uploaded-content-security

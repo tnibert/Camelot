@@ -189,9 +189,7 @@ def add_photo(request, id):
     if albumcontrol.uprofile not in uploaders or albumcontrol.uprofile is None:
         raise PermissionException
 
-    form = UploadPhotoForm()
-
-    return render(request, 'camelot/uploadphoto.html', {'form': form, 'albumid': id})
+    return render(request, 'camelot/uploadphoto.html', {'albumid': id})
 
 
 def make_photo_etag(request, *args, **kwargs):

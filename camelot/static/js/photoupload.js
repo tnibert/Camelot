@@ -9,9 +9,6 @@ $(document).ready(function(){
     $("form").on('submit', function (e) {
         var photos = new FormData(this);
 
-        //console.log($('#id_description')[0].value);
-        var inputdesc = "" //$('#id_description')[0].value;
-
         var albumid = document.getElementById("albumid").value;
 
         var csrftoken = getCookie('csrftoken');
