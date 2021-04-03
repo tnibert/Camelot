@@ -7,25 +7,38 @@ $(document).ready(function(){
 
     // submit photos via API calls
     $("form").on('submit', function (e) {
+
+        //stop form submission
+        e.preventDefault();
+
+        // gather data
         var photos = new FormData(this);
-
+        var photofiles = photos.getAll("file");
         var albumid = document.getElementById("albumid").value;
-
         var csrftoken = getCookie('csrftoken');
 
+        // replace submit button with "uploading..."
+        var myAnchor = document.getElementById("sendupload");
+        var mySpan = document.createElement("span");
+        mySpan.innerHTML = "Uploading...";
+        myAnchor.parentNode.replaceChild(mySpan, myAnchor);
+
+        // upload photos
+        photofiles.forEach(function (file) {
+            console.log("uploading " + String(file));
+    	    uploadPhoto(file, csrftoken, albumid);
+        });
+
+        /*
         $.ajaxSetup({
             beforeSend: function(xhr, settings) {
                 // use csrf token
-                if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                if (!(/^http:..test(settings.url) || /^https:..test(settings.url))) {
                     // Only send the token to relative URLs i.e. locally.
                     xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
                 }
                 
-                // replace submit button with "uploading..."
-                var myAnchor = document.getElementById("sendupload");
-                var mySpan = document.createElement("span");
-                mySpan.innerHTML = "Uploading...";
-                myAnchor.parentNode.replaceChild(mySpan, myAnchor);
+
             }
         });
 
@@ -57,9 +70,8 @@ $(document).ready(function(){
         }).done(function (response) {
             console.log("In done...");
         });
+        */
 
-        //stop form submission
-        e.preventDefault();
     });
 });
 
@@ -75,4 +87,25 @@ function DuplicateIn() {
 
   if (formInvalid)
     alert('One or Two fields are empty. Please fill up all fields');
+}
+
+function uploadPhoto(file, token, album_id) {
+  	var formData = new FormData();
+    var xhr = new XMLHttpRequest();
+
+    xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 201) {
+                    console.log('successful photo upload');
+                } else {
+                    console.log('failed to upload photo');
+                    //window.location.href = '/album/' + $("#albumid").val() + '/';
+                }
+            }
+        }
+
+    formData.set('image', file);
+    xhr.open("POST", '/api/upload/' + album_id);
+    xhr.setRequestHeader("X-CSRFToken", token);
+    xhr.send(formData);
 }
