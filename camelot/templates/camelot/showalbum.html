@@ -2,6 +2,12 @@
 
 {% block content2 %}
 {% load staticfiles %}
+    <input type="hidden" id="albumid" name="albumid" value="{{ album.id }}">
+    {% csrf_token %}
+    <script src="{% static 'js/jquery-3.3.1.js' %}"></script>
+    {# todo: add edit on single photo view #}
+    <script src="{% static 'js/get_cookie.js' %}"></script>
+    <script src="{% static 'js/edit_description.js' %}"></script>
     <ul>
         <li><a href="{% url 'show_albums' contribid %}">Back To Albums</a></li>
         {% if request.user.profile == album.owner or request.user.profile in album.contributors.all %}
@@ -21,7 +27,14 @@
                         <img class="midrot" src="{% url 'show_thumb' photo.id %}" alt="{{ photo.description }}">
                     </a>
                 </div>
-                <div class="desc"><span>{{ photo.description }}</span></div>
+                <div class="desc">
+                    {% if photo.desc_edit_perm == True %}
+                        <span class="edit-desc">{{ photo.description }}</span>
+                    {% else %}
+                        <span>{{ photo.description }}</span>
+                    {% endif %}
+                    <input type="hidden" class="photoid" name="photoid" value="{{ photo.id }}">
+                </div>
             </div>
         {% endfor %}
         </div>

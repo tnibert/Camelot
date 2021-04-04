@@ -2,7 +2,6 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
-from .datavalidation.validationfunctions import validate_image_fsize
 from .constants import *
 from .constants2 import SITEDOMAIN
 from .controllers.groupcontroller import groupcontroller
@@ -66,39 +65,6 @@ class SignUpForm(UserCreationForm):
 class AlbumCreateForm(forms.Form):
     albumname = forms.CharField(label='Photo album name', max_length=70)
     description = forms.CharField(label='Photo album description', max_length=300, required=False)
-
-
-class UploadPhotoForm(forms.Form):
-    # todo: django security doc identifies potential vulnerability with uploading html file with valid png header
-    # https://docs.djangoproject.com/en/2.0/topics/security/#user-uploaded-content-security
-    file = forms.ImageField(validators=[validate_image_fsize])
-    description = forms.CharField(max_length=MAXPHOTODESC, required=False)
-
-    """
-    extra_field_count = forms.CharField(widget=forms.HiddenInput())
-    
-    def __init__(self, *args, **kwargs):
-        #print("In Form Init")
-        self.extra_fields = int(kwargs.pop('extra', 0))
-
-        super(UploadPhotoForm, self).__init__(*args, **kwargs)
-        self.fields['extra_field_count'].initial = self.extra_fields
-
-        self.fields['file'] = forms.ImageField(validators=[validate_image_fsize])
-        self.fields['desc_0'] = forms.CharField(max_length=MAXPHOTODESC, required=False)
-        self.fields['file'].label = "File"
-        self.fields['desc_0'].label = "Description"
-
-        # this loop should only be entered after a post with extra fields
-        for index in range(int(self.extra_fields)):
-            #print("In form for loop index " + str(index))
-            # generate extra fields in the number specified via extra_fields
-            # we can use label variable here
-            self.fields['file'.format(index=index+1)] = \
-                forms.ImageField(label="File", validators=[validate_image_fsize])
-            self.fields['desc_{index}'.format(index=index+1)] = \
-                forms.CharField(label="Description", max_length=MAXPHOTODESC, required=False)
-    """
 
 
 class EditProfileForm(forms.Form):

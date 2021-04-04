@@ -9,7 +9,7 @@ from random import randint
 from ..controllers.albumcontroller import albumcontroller, collate_owner_and_contrib
 from ..controllers.friendcontroller import are_friends
 from ..controllers.utilities import PermissionException
-from ..forms import AlbumCreateForm, UploadPhotoForm, EditAlbumAccesstypeForm, MyGroupSelectForm, AddContributorForm, DeleteConfirmForm
+from ..forms import AlbumCreateForm, EditAlbumAccesstypeForm, MyGroupSelectForm, AddContributorForm, DeleteConfirmForm
 from ..constants import *
 from ..controllers.utilities import *
 from ..models import Profile, FriendGroup, Photo
@@ -115,7 +115,7 @@ def display_album(request, id, contribid=None, api=False):
     albumcontrol = albumcontroller(request.user.id)
     album = albumcontrol.return_album(id)
     # query db for photos in album
-    photos = albumcontrol.get_photos_for_album(album)
+    photos = list(albumcontrol.get_photos_for_album(album))
 
     # return for api
     if api:
@@ -133,6 +133,15 @@ def display_album(request, id, contribid=None, api=False):
         # if the id provided is not valid, set to the album owner
         if not contribid or int(contribid) not in [x.id for x in collate_owner_and_contrib(album)]:
             contribid = album.owner.id
+
+        # do we allow description editing or not?
+        for photo in photos:
+            try:
+                albumcontrol.check_permission_to_update_photo_description(photo)
+                photo.desc_edit_perm = True
+            except PermissionException:
+                photo.desc_edit_perm = False
+                continue
 
         retdict = {'photos': photos, 'album': album, 'contribid': contribid}
 
@@ -189,9 +198,7 @@ def add_photo(request, id):
     if albumcontrol.uprofile not in uploaders or albumcontrol.uprofile is None:
         raise PermissionException
 
-    form = UploadPhotoForm()
-
-    return render(request, 'camelot/uploadphoto.html', {'form': form, 'albumid': id})
+    return render(request, 'camelot/uploadphoto.html', {'albumid': id})
 
 
 def make_photo_etag(request, *args, **kwargs):

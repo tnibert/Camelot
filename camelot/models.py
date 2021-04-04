@@ -92,7 +92,7 @@ class Photo(models.Model):
     filename = models.CharField(max_length=200, default='')
     thumb = models.CharField(max_length=200, null=False)
     midsize = models.CharField(max_length=200, null=False)
-    description = models.CharField(max_length=150)      # these length values should be defined elsewhere
+    description = models.CharField(max_length=MAXPHOTODESC)
     # foreign key - album
     album = models.ForeignKey(Album, on_delete=models.CASCADE)
     # set default on delete may not be appropriate

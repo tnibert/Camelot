@@ -5,12 +5,12 @@
 {# maybe make the following input field readonly https://www.w3schools.com/tags/att_input_readonly.asp #}
 <input type="hidden" id="albumid" name="albumid" value="{{ albumid }}">
 <script src="{% static 'js/jquery-3.3.1.js' %}"></script>
+<script src="{% static 'js/get_cookie.js' %}"></script>
 <script src="{% static 'js/photoupload.js' %}"></script>
 <form id="uploadphotosform" method="post" enctype='multipart/form-data'>
+    {# todo: change to type=image #}
+    <p><label for="id_file">Files:</label> <input type="file" name="file" required="" id="id_file" multiple></p>
     {% csrf_token %}
-    <div id="forms">
-        {{ form.as_p }}
-    </div>
 
     <input id="sendupload" type="submit" value="Submit" />
 </form>
