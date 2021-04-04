@@ -9,11 +9,12 @@ function promptForDesc() {
     console.log("clicked edit desc");
     var originaltext = $(this).text();
     console.log(originaltext);
-    var input = $("<input type='text' autofocus='autofocus' onKeyPress='checkEnter(event)' />");
+    var input = $("<input type='text' autofocus='autofocus' />");
     input.val(originaltext);
     input.focusout(function () {
         $(event.target).replaceWith(createSpanRestore(originaltext));
     });
+    input.keypress(checkEnter);
     $(this).replaceWith(input);
     input.focus();
 }
@@ -27,7 +28,8 @@ function createSpanRestore(t) {
 
 // http://jennifermadden.com/javascript/stringEnterKeyDetector.html
 // todo: this is not just a check, change function name and return values
-function checkEnter(e) { //e is event object passed from function invocation
+// todo: check for escape character?
+function checkEnter(e) {
     var characterCode; //literal character code will be stored in this variable
 
     if(e && e.which) { //if which property of event object is supported (NN4)
@@ -54,14 +56,14 @@ function checkEnter(e) { //e is event object passed from function invocation
             if (xhr.readyState === 4) {
                 if (xhr.status === 204) {
                     console.log('successful description update');
-                    //window.location.href = '/album/' + albumid + '/';
                     // replace text on screen
                     $(e.target).replaceWith(createSpanRestore(new_desc));
                 } else {
                     console.log('failed description update');
-                    alert('Failed to update photo description.');
+                    alert('Failed to update photo description: ' + xhr.status);
                     // todo: do we actually want to reload?
                     window.location.href = '/album/' + $("#albumid").val() + '/';
+                    //$(e.target).replaceWith(createSpanRestore("test"));
                 }
             }
         }

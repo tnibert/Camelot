@@ -75,9 +75,8 @@ div.desc {
 .edit-desc {
     display: inline-block;
     min-width: 50%;
-    min-height: 1em;
+    min-height: 1.3em;
 }
-
 
 /*div.galcollect {
     padding-bottom:10px;
