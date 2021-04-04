@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.core import mail
 from django.shortcuts import reverse
 from django.contrib.auth.models import User
+from unittest import skip
 from datetime import datetime, timedelta
 from unittest import mock
 from ..models import Profile
@@ -10,6 +11,7 @@ from ..forms import SignUpForm
 from ..view.usermgmt import activate_user_no_check
 
 
+@skip("Temporarily disabled registration")
 class RegistrationTests(TestCase):
     """
     These tests are quite poor
@@ -225,6 +227,7 @@ class RegistrationTests(TestCase):
         assert user.profile.email_confirmed is True
 
 
+@skip("Temporarily disabled registration")
 class ReminderTests(TestCase):
     def setUp(self):
         remind_date = datetime.now() - timedelta(days=8)
