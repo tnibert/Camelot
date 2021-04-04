@@ -9,7 +9,7 @@ from random import randint
 from ..controllers.albumcontroller import albumcontroller, collate_owner_and_contrib
 from ..controllers.friendcontroller import are_friends
 from ..controllers.utilities import PermissionException
-from ..forms import AlbumCreateForm, UploadPhotoForm, EditAlbumAccesstypeForm, MyGroupSelectForm, AddContributorForm, DeleteConfirmForm
+from ..forms import AlbumCreateForm, EditAlbumAccesstypeForm, MyGroupSelectForm, AddContributorForm, DeleteConfirmForm
 from ..constants import *
 from ..controllers.utilities import *
 from ..models import Profile, FriendGroup, Photo
