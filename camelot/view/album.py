@@ -115,7 +115,7 @@ def display_album(request, id, contribid=None, api=False):
     albumcontrol = albumcontroller(request.user.id)
     album = albumcontrol.return_album(id)
     # query db for photos in album
-    photos = albumcontrol.get_photos_for_album(album)
+    photos = list(albumcontrol.get_photos_for_album(album))
 
     # return for api
     if api:
@@ -133,6 +133,15 @@ def display_album(request, id, contribid=None, api=False):
         # if the id provided is not valid, set to the album owner
         if not contribid or int(contribid) not in [x.id for x in collate_owner_and_contrib(album)]:
             contribid = album.owner.id
+
+        # do we allow description editing or not?
+        for photo in photos:
+            try:
+                albumcontrol.check_permission_to_update_photo_description(photo)
+                photo.desc_edit_perm = True
+            except PermissionException:
+                photo.desc_edit_perm = False
+                continue
 
         retdict = {'photos': photos, 'album': album, 'contribid': contribid}
 

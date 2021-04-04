@@ -17,7 +17,6 @@ class albumcontroller(genericcontroller):
     Class for accessing albums for a given user
     This will make life easier in the long run
     All of this will need user permission checks at some point - in view layer... actually maybe in this layer
-    All of this will need exception catching (in view layer? probably not I'm now thinking) as well
 
     Get a better handle on what objects are returned by the ORM and add docstrings to everything
     """
@@ -209,10 +208,19 @@ class albumcontroller(genericcontroller):
         except:
             raise
 
-    def update_photo_description(self, photo, desc):
-        # check permissions - must be either photo uploader or album owner to change description
+    def check_permission_to_update_photo_description(self, photo):
+        """
+        Must be either photo uploader or album owner to change description
+        todo: this is technical debt, need to rework permissions system to be not ad hoc
+        need a unified approach
+        :param photo:
+        :return: None, raise PermissionException if not allowed
+        """
         if (self.uprofile != photo.uploader and self.uprofile != photo.album.owner) or self.uprofile is None:
             raise PermissionException
+
+    def update_photo_description(self, photo, desc):
+        self.check_permission_to_update_photo_description(photo)
 
         photo.description = desc
         photo.save()

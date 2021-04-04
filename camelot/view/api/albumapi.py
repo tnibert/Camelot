@@ -59,9 +59,7 @@ def update_photo_description(request, photoid):
         albumcontrol = albumcontroller(request.user.id)
         photo = albumcontrol.return_photo(photoid)
 
-        # check permissions - must be either photo uploader or album owner to change description
-        if (albumcontrol.uprofile != photo.uploader and albumcontrol.uprofile != photo.album.owner) or albumcontrol.uprofile is None:
-            raise PermissionException
+        albumcontrol.check_permission_to_update_photo_description(photo)
 
         jsdat = request.body.decode('utf8')
         data = json.loads(jsdat)

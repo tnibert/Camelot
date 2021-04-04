@@ -29,7 +29,11 @@
                     </a>
                 </div>
                 <div class="desc">
-                    <span class="edit-desc">{{ photo.description }}</span>
+                    {% if photo.desc_edit_perm == True %}
+                        <span class="edit-desc">{{ photo.description }}</span>
+                    {% else %}
+                        <span>{{ photo.description }}</span>
+                    {% endif %}
                     <input type="hidden" class="photoid" name="photoid" value="{{ photo.id }}">
                 </div>
             </div>
