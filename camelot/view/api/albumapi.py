@@ -23,9 +23,7 @@ def upload_photo(request, id):
         def return_album_controller(userid, albumid):
             albumcontrol = albumcontroller(userid)
             album = albumcontrol.return_album(albumid)
-            uploaders = collate_owner_and_contrib(album)
-            if albumcontrol.uprofile not in uploaders or albumcontrol.uprofile is None:
-                raise PermissionException
+            albumcontrol.check_album_edit_permission(album)
             return albumcontrol
 
         albumcontrol = return_album_controller(request.user.id, id)
@@ -33,7 +31,6 @@ def upload_photo(request, id):
         rawimg = io.BytesIO()
         rawimg.write(request.FILES['image'].read())
 
-        # todo: validate image, running into issues using bytesio object, no attrib size
         # validate size
         # validate is image -> http://effbot.org/imagingbook/image.htm#tag-Image.Image.verify
         validate_image(rawimg)

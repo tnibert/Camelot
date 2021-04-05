@@ -94,7 +94,7 @@ class albumcontroller(genericcontroller):
                 albums.append(album)
 
         return albums
-        
+
     def return_album(self, id):
         """
         Return an album by id, verifying permissions for album
@@ -111,6 +111,10 @@ class albumcontroller(genericcontroller):
         else:
             raise PermissionException
 
+    def check_album_edit_permission(self, album):
+        if not self.uprofile in collate_owner_and_contrib(album):
+            raise PermissionException("User does not have permission to edit album")
+
     def add_photo_to_album(self, albumid, description, fi):
         """
         Saves photo to disk and adds it to the given album
@@ -123,8 +127,7 @@ class albumcontroller(genericcontroller):
         album = self.return_album(albumid)
 
         # check that user has permission to add to album
-        if not ((self.uprofile == album.owner) or (self.uprofile in album.contributors.all())):
-            raise PermissionException("User is not album owner or contributor")
+        self.check_album_edit_permission(album)
 
         # ensure that there is sufficient space on the filesystem, compare threshold to free space
         if MIN_FREE_THRES > shutil.disk_usage(DATA_PARTITION_PATH)[2]:
@@ -216,8 +219,7 @@ class albumcontroller(genericcontroller):
         :param photo:
         :return: None, raise PermissionException if not allowed
         """
-        if (self.uprofile != photo.uploader and self.uprofile != photo.album.owner) or self.uprofile is None:
-            raise PermissionException
+        self.check_album_edit_permission(photo.album)
 
     def update_photo_description(self, photo, desc):
         self.check_permission_to_update_photo_description(photo)

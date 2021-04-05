@@ -115,7 +115,7 @@ def display_album(request, id, contribid=None, api=False):
     albumcontrol = albumcontroller(request.user.id)
     album = albumcontrol.return_album(id)
     # query db for photos in album
-    photos = list(albumcontrol.get_photos_for_album(album))
+    photos = albumcontrol.get_photos_for_album(album)
 
     # return for api
     if api:
@@ -135,15 +135,13 @@ def display_album(request, id, contribid=None, api=False):
             contribid = album.owner.id
 
         # do we allow description editing or not?
-        for photo in photos:
-            try:
-                albumcontrol.check_permission_to_update_photo_description(photo)
-                photo.desc_edit_perm = True
-            except PermissionException:
-                photo.desc_edit_perm = False
-                continue
+        try:
+            albumcontrol.check_album_edit_permission(album)
+            desc_edit_perm = True
+        except PermissionException:
+            desc_edit_perm = False
 
-        retdict = {'photos': photos, 'album': album, 'contribid': contribid}
+        retdict = {'photos': photos, 'album': album, 'contribid': contribid, 'desc_edit_perm': desc_edit_perm}
 
         return render(request, 'camelot/showalbum.html', retdict)
 
@@ -186,17 +184,12 @@ def add_photo(request, id):
     :param id: id of the album to add photo to
     :return:
     """
-    # todo: add more checking for correct values,
-    # todo: add ability to select multiple files in file picker and auto fill form
     # https://docs.djangoproject.com/en/2.0/topics/http/file-uploads/
     albumcontrol = albumcontroller(request.user.id)
     # will raise PermissionException if user does not have permission to view
     album = albumcontrol.return_album(id)
-    uploaders = collate_owner_and_contrib(album)
     # check that user actually has permission to add to this album before showing view
-    # this collation and check may be best in its own function
-    if albumcontrol.uprofile not in uploaders or albumcontrol.uprofile is None:
-        raise PermissionException
+    albumcontrol.check_album_edit_permission(album)
 
     return render(request, 'camelot/uploadphoto.html', {'albumid': id})
 
