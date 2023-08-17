@@ -1,7 +1,7 @@
 {% extends 'camelot/baseloggedin.html' %}
 
 {% block content2 %}
-{% load staticfiles %}
+{% load static %}
 {# maybe make the following input field readonly https://www.w3schools.com/tags/att_input_readonly.asp #}
 <input type="hidden" id="albumid" name="albumid" value="{{ albumid }}">
 <script src="{% static 'js/jquery-3.3.1.js' %}"></script>
