@@ -25,7 +25,7 @@ if os.path.isfile(env_path):
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'cx4bt-jn)oc03@wii_(o9%y-c&gq)@^*8xzb-kstu^5_u!xs43'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -34,8 +34,8 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
 # debug recaptcha keys
-GOOGLE_RECAPTCHA_SECRET_KEY = "6LeyOvsUAAAAABxbfc4fVD6-RjlLC0LsILjKghA9"
-GOOGLE_RECAPTCHA_PUBLIC_KEY = "6LeyOvsUAAAAALEYITByFgL4v_RAGU2e1ixzS6kE"
+GOOGLE_RECAPTCHA_SECRET_KEY = env('GOOGLE_RECAPTCHA_SECRET_KEY')
+GOOGLE_RECAPTCHA_PUBLIC_KEY = env('GOOGLE_RECAPTCHA_PUBLIC_KEY')
 
 # Application definition
 
@@ -88,12 +88,7 @@ WSGI_APPLICATION = 'projectcamelot.wsgi.application'
 DATABASES = {
     # docker-compose up -d
     'default': env.db(default="postgresql://postgres:postgres@127.0.0.1:5433/camelot")
-        #{
-        #'ENGINE': 'django.db.backends.sqlite3',
-        #'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    #}
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
@@ -113,7 +108,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-LOGIN_URL='index'
+LOGIN_URL = 'index'
 
 # just for testing
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -122,15 +117,10 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
@@ -139,4 +129,3 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
