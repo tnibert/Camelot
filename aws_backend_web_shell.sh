@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source .env
+source .env_aws
 
 # need AWS Session Manager dependency
 TASK_ID=$(aws ecs list-tasks --cluster prod --service-name prod-backend-web  --query 'taskArns[0]' --output text  | awk '{split($0,a,"/"); print a[3]}')

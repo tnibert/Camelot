@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# define AWSID and REGION in .env
-source .env
+# define AWSID and REGION
+source .env_aws
 
 case "$1" in
     build)
