@@ -373,7 +373,7 @@ def ThumbFromBuffer(buf, filename, baseheight=THUMBHEIGHT):
     wsize = int((float(img.size[0]) * float(hpercent)))         # we can change 0 to 1 for a square
 
     # will this return approach leak memory?
-    newimg = img.resize((wsize, baseheight), Image.ANTIALIAS).convert('RGB')
+    newimg = img.resize((wsize, baseheight), Image.LANCZOS).convert('RGB')
 
     newimg.save(filename, 'jpeg')
 

@@ -1,7 +1,7 @@
 {% extends 'camelot/baseloggedin.html' %}
 
 {% block content2 %}
-{% load staticfiles %}
+{% load static %}
     <ul>
         <li><a href="{% url 'show_album' photo.album.id %}">Back To Album</a></li>
         <li><a href="{% url 'show_photo_full' photo.id %}">View Full Size</a></li>

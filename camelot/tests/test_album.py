@@ -117,7 +117,7 @@ class AlbumControllerTests(TestCase):
         myalbum = self.albumcontrol.create_album("image add test", "lalala")
 
         try:
-            # double check that our test is sending the right type for fi and that django will sent in rb mode
+            # double check that our test is sending the right type for fi and that django will send in rb mode
             # todo: add a test for png
             with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
                 myphoto = self.albumcontrol.add_photo_to_album(myalbum.id, "generic description", fi)
@@ -277,7 +277,6 @@ class AlbumControllerTests(TestCase):
         if not os.path.exists(self.testdir):
             os.makedirs(self.testdir)
         os.chdir(self.testdir)
-        #print(os.getcwd())
 
         # create album
         myalbum = self.albumcontrol.create_album("delete album test", "lalala")

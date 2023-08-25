@@ -1,7 +1,7 @@
 {% extends 'camelot/baseloggedin.html' %}
 
 {% block content2 %}
-{% load staticfiles %}
+{% load static %}
     <input type="hidden" id="albumid" name="albumid" value="{{ album.id }}">
     {% csrf_token %}
     <script src="{% static 'js/jquery-3.3.1.js' %}"></script>

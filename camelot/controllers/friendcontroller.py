@@ -133,13 +133,13 @@ class friendcontroller(genericcontroller):
         """
         def _defaultsearch(str):
             return Profile.objects.filter(dname__icontains=str)\
-                .union(Profile.objects.filter(user__username__icontains=str)).distinct()
+                .union(Profile.objects.filter(user__username__icontains=str))
 
         def _pgsearch(str):
             # postgres specific search
             # todo: test, maybe create environment with postgres
             return Profile.objects.filter(dname__unaccent__lower__trigram_similar=searchstr)\
-                .union(Profile.objects.filter(user__username__unaccent__lower__trigram_similar=str)).distinct()
+                .union(Profile.objects.filter(user__username__unaccent__lower__trigram_similar=str))
 
         profiles = _defaultsearch(searchstr)
         return profiles
@@ -154,7 +154,6 @@ def are_friends(profile1, profile2, confirmed=True):
                       if False will only return True if friendship is pending
     :return: boolean, True if friends
     """
-    # oh god this is ugly
     try:
         Friendship.objects.get(requester=profile1, requestee=profile2, confirmed=confirmed)
     except Friendship.DoesNotExist:
