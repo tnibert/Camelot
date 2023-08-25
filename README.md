@@ -47,7 +47,7 @@ May the odds be ever in your favor.
 
 #### AWS Deployment
 
-Note that AWS support is not quite production ready.
+Note that AWS support is not quite production ready.  Files won't be persisted.
 
 In order to deploy onto AWS, you need a .env_aws file in the project root directory defining variables:<br>
 $REGION - the region to deploy the application in<br>
@@ -62,7 +62,9 @@ Then from this repository root, run:<br>
 $ ./docker_manage.sh build<br>
 $ ./docker_manage.sh push
 
-You may need to run aws configure first.
+Then login to a shell with ./aws_backend_web_shell.sh and run python manage.py migrate.
+
+You may need to run aws configure first to provide your credentials, if you haven't already.
 
 #### API
 
