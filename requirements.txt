@@ -12,7 +12,7 @@ pytz==2023.3
 requests==2.31.0
 six==1.14.0
 sqlparse==0.4.4
-urllib3==1.26.16
+urllib3==1.26.17
 django-environ==0.8.1
 psycopg2-binary==2.9.3
 whitenoise==6.1.0
