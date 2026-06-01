@@ -86,8 +86,14 @@ WSGI_APPLICATION = 'projectcamelot.wsgi.application'
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
 DATABASES = {
-    # docker-compose up -d
-    'default': env.db(default="postgresql://postgres:postgres@127.0.0.1:5433/camelot")
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('POSTGRES_NAME'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': 'postgres',
+        'PORT': 5432,
+    }
 }
 
 # Password validation

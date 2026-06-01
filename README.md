@@ -1,4 +1,4 @@
-## Camelot
+# Camelot
 
 This is a nice little photo sharing web application to manage photos and share with friends and family.
 I've open sourced it and would like to give it a bit of love and uplift.
@@ -9,29 +9,26 @@ High level project goals:
 - Promote a positive and wholesome photo sharing experience
 - Interoperate with bigger fish
 
-### Run Locally, Not In Docker Container
-
+## Run
+### Create .env
 In order to run the application, you need a .env file in the project root directory defining environment variables SECRET_KEY, GOOGLE_RECAPTCHA_SECRET_KEY, GOOGLE_RECAPTCHA_PUBLIC_KEY.
 
-Then: 
+### Run Locally Using Docker Compose (Recommended)
 ```
-$ pip install -r requirements.txt
+$ docker-compose up --force-recreate --build -d
+$ docker-compose run web python manage.py migrate
+```
+
+### Run Locally, Not In Docker Container
+```
+$ python -m venv venv
+$ source venv/bin/activate
+$ pip install -r requirements.txt --only-binary Pillow --only-binary psycopg2-binary
 $ python manage.py migrate
 $ python manage.py runserver 0:8000
 ```
 
-Recommend creating and sourcing a venv first.<br>
-You may run docker-compose up -d to easily spin up a postgres database on port 5433.  Settings.py is configured for this port.
-
-### Run Locally, In Docker Container
-
-Need same .env file as above.
-```
-$ ./docker_manage.sh build
-$ ./docker_manage.sh run
-```
-
-You will probably run into a problem connecting to the database from the Docker container locally.
+## Deploy
 
 ### Debian Deployment
 

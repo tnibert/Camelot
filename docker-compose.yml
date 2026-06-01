@@ -1,10 +1,22 @@
-version: "3.1"
-
 services:
   postgres:
     image: "postgres:14"
     ports:
-      - "5433:5432"
+      - "5432:5432"
     environment:
       POSTGRES_PASSWORD: "postgres"
       POSTGRES_DB: "camelot"
+  web:
+    build: .
+    command: gunicorn -b 0.0.0.0:8000 projectcamelot.wsgi:application
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=camelot
+    depends_on:
+      - postgres
