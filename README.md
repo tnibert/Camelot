@@ -15,7 +15,7 @@ In order to run the application, you need a .env file in the project root direct
 
 ### Run Locally Using Docker Compose (Recommended)
 ```
-$ docker-compose up --force-recreate --build -d
+$ docker-compose up --force-recreate --remove-orphans --build -d
 $ docker-compose run web python manage.py migrate
 ```
 
@@ -26,6 +26,13 @@ $ source venv/bin/activate
 $ pip install -r requirements.txt --only-binary Pillow --only-binary psycopg2-binary
 $ python manage.py migrate
 $ python manage.py runserver 0:8000
+```
+
+## Run Unit Tests
+### From Docker Compose
+After running `docker compose up`:
+```
+$ docker-compose run web python manage.py test
 ```
 
 ## Deploy
