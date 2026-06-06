@@ -9,6 +9,7 @@ from random import randint
 from ..controllers.albumcontroller import albumcontroller, collate_owner_and_contrib
 from ..controllers.friendcontroller import are_friends
 from ..controllers.utilities import PermissionException
+from ..fileaccess.local import LocalFile
 from ..forms import AlbumCreateForm, EditAlbumAccesstypeForm, MyGroupSelectForm, AddContributorForm, DeleteConfirmForm
 from ..constants import *
 from ..controllers.utilities import *
@@ -245,13 +246,7 @@ def return_photo_file_http(request, photoid, thumb=False, mid=True):
         name = photo.filename
         mime = photo.imgtype
 
-    # we might want to enclose these withs in a try except block, but for now it is ok like this
-    #try:
-    with open(name, "rb") as f:
-        return HttpResponse(f.read(), content_type=mime)
-    # if we don't have a thumb, pass the whole image - it's an option
-    #except FileNotFoundError:
-        # todo: log
+    return HttpResponse(LocalFile(name).read(), content_type=mime)
 
 
 @login_required
