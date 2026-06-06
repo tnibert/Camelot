@@ -229,13 +229,16 @@ class AlbumControllerTests(TestCase):
         try:
             with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
                 ownerphoto = self.albumcontrol.add_photo_to_album(myalbum.id, "owner uploaded", fi)
+                owner_fname = ownerphoto.filename
                 contribphoto1 = self.albumcontrol2.add_photo_to_album(myalbum.id, "contrib uploaded 1", fi)
+                contrib1_fname = contribphoto1.filename
                 contribphoto2 = self.albumcontrol2.add_photo_to_album(myalbum.id, "contrib uploaded 2", fi)
+                contrib2_fname = contribphoto2.filename
 
             # files exist
-            assert os.path.isfile(ownerphoto.filename)
-            assert os.path.isfile(contribphoto1.filename)
-            assert os.path.isfile(contribphoto2.filename)
+            assert os.path.isfile(owner_fname)
+            assert os.path.isfile(contrib1_fname)
+            assert os.path.isfile(contrib2_fname)
 
             # cannot delete any photo as non logged in user
             # todo: add user privilege escalation
@@ -262,9 +265,9 @@ class AlbumControllerTests(TestCase):
             self.assertRaises(Photo.DoesNotExist, contribphoto2.refresh_from_db)
 
             # check that files have actually been deleted on disk
-            assert not os.path.isfile('userphotos/1/1/1')
-            assert not os.path.isfile('userphotos/2/1/2')
-            assert not os.path.isfile('userphotos/2/1/3')
+            assert not os.path.isfile(owner_fname)
+            assert not os.path.isfile(contrib1_fname)
+            assert not os.path.isfile(contrib2_fname)
 
         finally:
             # clean up

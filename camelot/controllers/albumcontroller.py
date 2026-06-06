@@ -229,14 +229,12 @@ class albumcontroller(genericcontroller):
 
         # check permission
         if self.uprofile == photo.album.owner or self.uprofile == photo.uploader:
-
             # remove from db
             status = photo.delete()
             if status[0] == 1:
                 return True
             elif status[0] == 0:
                 return False
-
         else:
             raise PermissionException
 

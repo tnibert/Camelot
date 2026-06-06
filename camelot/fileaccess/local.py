@@ -1,6 +1,6 @@
 import shutil
 from io import BytesIO
-from os import makedirs
+from os import makedirs, unlink
 
 from camelot.constants import MIN_FREE_THRES, DATA_PARTITION_PATH
 from camelot.controllers.utilities import DiskExceededException
@@ -31,3 +31,6 @@ class LocalFile:
     def read(self) -> bytes:
         with open(self.path, "rb") as f:
             return f.read()
+
+    def delete(self):
+        unlink(self.path)

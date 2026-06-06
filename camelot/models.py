@@ -3,9 +3,9 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
 from django.utils import timezone
-from os import unlink
 from .constants import *
 from .constants2 import *
+from .fileaccess.local import LocalFile
 from .logs import log_exception
 
 """
@@ -115,14 +115,14 @@ def delete_photo_file(sender, instance, *args, **kwargs):
     :return:
     """
     try:
-        unlink(instance.filename)
+        LocalFile(instance.filename).delete()
     except FileNotFoundError as e:
         log_exception(__name__, e)
     try:
-        unlink(instance.thumb)
+        LocalFile(instance.thumb).delete()
     except FileNotFoundError as e:
         log_exception(__name__, e)
     try:
-        unlink(instance.midsize)
+        LocalFile(instance.midsize).delete()
     except FileNotFoundError as e:
         log_exception(__name__, e)
