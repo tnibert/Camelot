@@ -142,7 +142,6 @@ class albumcontroller(genericcontroller):
             newphoto.imgtype = Image.MIME[img.format]
 
             # do we need to adjust size parameters in exif tags?
-            # todo: delete all files if any one fails to persist
 
             # for first iteration, must convert img to bytesio
             img_byte_arr = io.BytesIO()
@@ -152,7 +151,12 @@ class albumcontroller(genericcontroller):
                               (newphoto.thumb, ThumbFromBuffer(img)),
                               (newphoto.midsize, ThumbFromBuffer(img, MIDHEIGHT))]:
                 f = LocalFile(key)
-                f.write(data)
+                try:
+                    f.write(data)
+                except Exception as e:  # todo: be more specific
+                    # delete the record and previously written files
+                    self.delete_photo(newphoto)
+                    raise e
 
         # We will not set the rotation in the db with get_rotation() at this point.
         # It will be set upon first photo access.
