@@ -39,6 +39,8 @@ ALLOWED_HOSTS = ["*"]
 GOOGLE_RECAPTCHA_SECRET_KEY = env('GOOGLE_RECAPTCHA_SECRET_KEY')
 GOOGLE_RECAPTCHA_PUBLIC_KEY = env('GOOGLE_RECAPTCHA_PUBLIC_KEY')
 
+SQLITE_TEST_DB = False
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -139,7 +141,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Use in-memory SQLite for testing
-if 'test' in sys.argv:
+if 'test' in sys.argv and SQLITE_TEST_DB:
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': ':memory:'
