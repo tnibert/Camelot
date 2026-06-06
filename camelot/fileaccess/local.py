@@ -8,6 +8,9 @@ from camelot.controllers.utilities import DiskExceededException
 CHUNK_SIZE = 430 # bytes
 
 class LocalFile:
+    """
+    LocalFile abstracts local file system access behind a generic interface.
+    """
     def __init__(self, path: str):
         self.path = path
 
@@ -25,5 +28,6 @@ class LocalFile:
                 destination.write(chunk)
                 chunk = fi.read(CHUNK_SIZE)  # read the next chunk
 
-    def read(self) -> BytesIO:
-        pass
+    def read(self) -> bytes:
+        with open(self.path, "rb") as f:
+            return f.read()
