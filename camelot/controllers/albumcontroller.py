@@ -1,4 +1,7 @@
-from ..models import Album, Photo, Profile
+import io
+
+from ..fileaccess.local import LocalFile
+from ..models import Album, Photo
 from .utilities import *
 from .friendcontroller import are_friends
 from .genericcontroller import genericcontroller
@@ -6,10 +9,8 @@ from .groupcontroller import is_in_group
 from ..constants import *
 from ..constants2 import *
 from django.utils import timezone
-from os import makedirs, unlink
 from io import BytesIO
 from PIL import Image
-import shutil
 
 
 class albumcontroller(genericcontroller):
@@ -111,7 +112,7 @@ class albumcontroller(genericcontroller):
         else:
             raise PermissionException
 
-    def add_photo_to_album(self, albumid, description, fi):
+    def add_photo_to_album(self, albumid, description, fi: io.BytesIO):
         """
         Saves photo to disk and adds it to the given album
         this could be done in something like celery
@@ -126,58 +127,38 @@ class albumcontroller(genericcontroller):
         if not ((self.uprofile == album.owner) or (self.uprofile in album.contributors.all())):
             raise PermissionException("User is not album owner or contributor")
 
-        # ensure that there is sufficient space on the filesystem, compare threshold to free space
-        if MIN_FREE_THRES > shutil.disk_usage(DATA_PARTITION_PATH)[2]:
-            raise DiskExceededException("Don't have enough space to store new photos")
-
         # add file to database
         newphoto = Photo(description=description, album=album, uploader=self.uprofile)
         newphoto.save()
 
         # create filename with primary key
-        # will it reuse ids?  I think it will.  But does that matter?  Maybe not..
-        fname = PREFIX + 'userphotos/{}/{}/{}'.format(self.uprofile.user.id, album.id, newphoto.id)
-        thumbname = PREFIX + 'thumbs/{}/{}/{}.jpg'.format(self.uprofile.user.id, album.id, newphoto.id)
-        midname = PREFIX + 'mid/{}/{}/{}.jpg'.format(self.uprofile.user.id, album.id, newphoto.id)
-
-        # update filename in db now that we have our primary key
-        newphoto.filename = fname
-        newphoto.thumb = thumbname
-        newphoto.midsize = midname
+        # todo: use uuids instead, remove double persisting to db
+        newphoto.filename = 'userphotos/{}/{}/{}'.format(self.uprofile.user.id, album.id, newphoto.id)
+        newphoto.thumb = 'thumbs/{}/{}/{}.jpg'.format(self.uprofile.user.id, album.id, newphoto.id)
+        newphoto.midsize = 'mid/{}/{}/{}.jpg'.format(self.uprofile.user.id, album.id, newphoto.id)
 
         fi.seek(0)
         with Image.open(BytesIO(fi.read())) as img:
             newphoto.imgtype = Image.MIME[img.format]
 
-        # save data structure to db
-        newphoto.save()
+            # do we need to adjust size parameters in exif tags?
+            # todo: delete all files if any one fails to persist
 
-        # well now we definitely depend on python 3.2+
-        makedirs("/".join(fname.split("/")[:-1]), exist_ok=True)
-        makedirs("/".join(thumbname.split("/")[:-1]), exist_ok=True)
-        makedirs("/".join(midname.split("/")[:-1]), exist_ok=True)
+            # for first iteration, must convert img to bytesio
+            img_byte_arr = io.BytesIO()
+            img.save(img_byte_arr, format='PNG')
 
-        # save file in chunks to save memory
-        fi.seek(0)
-        CHUNK_SIZE = 430        # bytes
-        with open(fname, 'wb+') as destination:
-            chunk = fi.read(CHUNK_SIZE)
-            while chunk:  # loop until the chunk is empty (the file is exhausted)
-                destination.write(chunk)
-                chunk = fi.read(CHUNK_SIZE)  # read the next chunk
-
-        # do we need to adjust size parameters in exif tags?
-
-        # save thumbnail
-        fi.seek(0)
-        ThumbFromBuffer(fi, thumbname)
-
-        # save mid size image
-        fi.seek(0)
-        ThumbFromBuffer(fi, midname, MIDHEIGHT)
+            for key, data in [(newphoto.filename, img_byte_arr),
+                              (newphoto.thumb, ThumbFromBuffer(img)),
+                              (newphoto.midsize, ThumbFromBuffer(img, MIDHEIGHT))]:
+                f = LocalFile(key)
+                f.write(data)
 
         # We will not set the rotation in the db with get_rotation() at this point.
         # It will be set upon first photo access.
+
+        # save model to db
+        newphoto.save()
 
         return newphoto
 
@@ -230,8 +211,6 @@ class albumcontroller(genericcontroller):
 
             # delete album from db (cascades to photos, contributor manytomany table, group manytomany table, etc)
             status = album.delete()
-            #print(status[0])
-            #print(status[1])
 
             # this must be greater than or equal to 1 because we are deleting files as well as album
             if status[0] >= 1:
@@ -240,7 +219,6 @@ class albumcontroller(genericcontroller):
                 return False
         else:
             raise PermissionException("Must be album owner to delete album")
-        print("End - we should never reach this")
 
     def delete_photo(self, photo):
         """
@@ -351,30 +329,27 @@ def collate_owner_and_contrib(album):
     return lst
 
 
-def ThumbFromBuffer(buf, filename, baseheight=THUMBHEIGHT):
+def ThumbFromBuffer(buf, baseheight=THUMBHEIGHT) -> BytesIO:
     """
     Take an image buffer, scale and exif rotate, and return a thumbnail
     :param buf: raw image data buffer
-    :param filename: file name to save as
-    :return: PIL Image thumbnail
+    :return: BytesIO object of the scaled and rotated image
     """
-    img = Image.open(BytesIO(buf.read()))
-    img = exif_rotate_image(img)
+    p_img = exif_rotate_image(buf)
+
+    ret = BytesIO()
 
     # if the image is smaller than our target height, don't resize it
     # this will leave us double saving sometimes, but right now, we need to do that for png uniformity
-    # todo; resolve this redundancy
-    if img.size[1] <= baseheight:
-        newimg = img.convert('RGB')
-        newimg.save(filename, 'jpeg')
-        return newimg
+    if p_img.size[1] <= baseheight:
+        newimg = p_img.convert('RGB')
+        newimg.save(ret, 'jpeg')
+        return ret
 
-    hpercent = (baseheight / float(img.size[1]))
-    wsize = int((float(img.size[0]) * float(hpercent)))         # we can change 0 to 1 for a square
+    hpercent = (baseheight / float(p_img.size[1]))
+    wsize = int((float(p_img.size[0]) * float(hpercent)))         # we can change 0 to 1 for a square
 
-    # will this return approach leak memory?
-    newimg = img.resize((wsize, baseheight), Image.LANCZOS).convert('RGB')
+    newimg = p_img.resize((wsize, baseheight), Image.LANCZOS).convert('RGB')
+    newimg.save(ret, 'jpeg')
 
-    newimg.save(filename, 'jpeg')
-
-    return newimg
+    return ret
