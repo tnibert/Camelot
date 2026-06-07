@@ -4,7 +4,6 @@ from django.utils.encoding import force_bytes
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 from .tokens import account_activation_token
-from .constants2 import SITEDOMAIN
 
 
 def send_registration_email(user, domain, htmlfile='camelot/account_activation_email.html'):

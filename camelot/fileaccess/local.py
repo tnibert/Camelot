@@ -2,9 +2,10 @@ import shutil
 from io import BytesIO
 from os import makedirs, unlink
 
-from camelot.constants import MIN_FREE_THRES, DATA_PARTITION_PATH
 from camelot.controllers.utilities import DiskExceededException
 
+MIN_FREE_THRES = 1024 * 1024 * 1024  # 1 GB
+DATA_PARTITION_PATH = "/"
 CHUNK_SIZE = 430 # bytes
 
 class LocalFile:

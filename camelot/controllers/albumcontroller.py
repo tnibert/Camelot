@@ -7,7 +7,6 @@ from .friendcontroller import are_friends
 from .genericcontroller import genericcontroller
 from .groupcontroller import is_in_group
 from ..constants import *
-from ..constants2 import *
 from django.utils import timezone
 from io import BytesIO
 from PIL import Image

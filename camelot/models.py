@@ -4,7 +4,6 @@ from django.db.models.signals import post_delete
 from django.dispatch import receiver
 from django.utils import timezone
 from .constants import *
-from .constants2 import *
 from .fileaccess.local import LocalFile
 from .logs import log_exception
 

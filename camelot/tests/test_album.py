@@ -1,23 +1,18 @@
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.shortcuts import reverse
-from django.contrib.auth.models import User
-from PIL import Image
-from ..models import Album, Photo
 from ..controllers.albumcontroller import *
 from ..controllers.groupcontroller import groupcontroller
-from ..controllers.utilities import *
 from ..view.album import *
 from ..view.usermgmt import activate_user_no_check
 from .helperfunctions import complete_add_friends
 from ..constants import *
-from ..constants2 import *
 import os
 import shutil
 from unittest import mock
 
 """
-todo: remove filesystem accessing unit tests
+todo: remove filesystem access from unit tests
 """
 
 class AlbumControllerTests(TestCase):
