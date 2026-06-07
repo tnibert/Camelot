@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404
 from ..controllers.profilecontroller import profilecontroller
 from ..controllers.utilities import PermissionException, get_profile_from_uid, get_profid_from_username
+from ..fileaccess.local import LocalFile
 
 from ..forms import EditProfileForm
 from ..constants import PREFIX
@@ -52,20 +53,18 @@ def make_profile_pic(request, photoid):
 def return_raw_profile_pic(request, userid):
     """
     Allows profile picture to be displayed publicly
+    todo: add unit test
     :param request:
     :param userid: user to display profile picture of
     :return: http response of raw image data
     """
-    # todo: add unit test
     photo = get_profile_from_uid(userid).profile_pic
     if photo:
-        fname = photo.thumb
+        f = LocalFile(photo.thumb)
     else:
-        fname = PREFIX + "userphotos/defaultprofile.png"
+        f = LocalFile("userphotos/defaultprofile.png")
 
-    with open(fname, "rb") as f:
-        # todo: check that this still works with default image
-        return HttpResponse(f.read(), content_type="image/jpeg")
+    return HttpResponse(f.read(), content_type="image/jpeg")
 
 
 @login_required
