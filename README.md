@@ -11,7 +11,11 @@ High level project goals:
 
 ## Run
 ### Create .env
-In order to run the application, you need a .env file in the project root directory defining environment variables SECRET_KEY, GOOGLE_RECAPTCHA_SECRET_KEY, GOOGLE_RECAPTCHA_PUBLIC_KEY.
+In order to run the application, you need a .env file in the project root directory defining the following environment variables:  
+- SECRET_KEY
+- GOOGLE_RECAPTCHA_SECRET_KEY
+- GOOGLE_RECAPTCHA_PUBLIC_KEY
+- SITE_DOMAIN
 
 ### Run Locally Using Docker Compose (Recommended)
 ```
@@ -30,9 +34,8 @@ $ python manage.py runserver 0:8000
 
 ## Run Unit Tests
 ### From Docker Compose
-After running `docker compose up`:
 ```
-$ docker-compose --remove-orphans run web python manage.py test
+$ docker-compose run web python manage.py test
 ```
 
 ## Deploy
