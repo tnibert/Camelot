@@ -1,6 +1,10 @@
 """
 Define constants that we use throughout the application
 """
+import environ
+
+env = environ.Env()
+SITEDOMAIN = env('SITE_DOMAIN')
 
 # model sizes, will be used in forms and model definitions
 GROUPNAMELEN=30
@@ -8,6 +12,9 @@ MAXPHOTODESC=150
 MAXDISPLAYNAME=100
 MAX_UPLOAD_SIZE=31457280  # 30 MB
 
+MAX_ALBUM_NAME_LEN = 70
+
+# enum
 ALBUM_PUBLIC=1
 ALBUM_ALLFRIENDS=2
 ALBUM_GROUPS=3
@@ -22,6 +29,3 @@ PREFIX=""
 
 THUMBHEIGHT=180
 MIDHEIGHT=600
-
-MIN_FREE_THRES = 1024 * 1024 * 1024  # 1 GB
-DATA_PARTITION_PATH = "/"

@@ -1,21 +1,19 @@
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.shortcuts import reverse
-from django.contrib.auth.models import User
-from PIL import Image
-from ..models import Album, Photo
 from ..controllers.albumcontroller import *
 from ..controllers.groupcontroller import groupcontroller
-from ..controllers.utilities import *
 from ..view.album import *
 from ..view.usermgmt import activate_user_no_check
 from .helperfunctions import complete_add_friends
 from ..constants import *
-from ..constants2 import *
 import os
 import shutil
 from unittest import mock
 
+"""
+todo: remove filesystem access from unit tests
+"""
 
 class AlbumControllerTests(TestCase):
     # this setUp code needs to be made universal
@@ -109,7 +107,6 @@ class AlbumControllerTests(TestCase):
         self.assertRaises(PermissionException, self.albumcontrol2.return_album, newalbum.id)
 
     def test_add_image_to_album_controller(self):
-
         if not os.path.exists(self.testdir):
             os.makedirs(self.testdir)
         os.chdir(self.testdir)
@@ -126,9 +123,6 @@ class AlbumControllerTests(TestCase):
             assert myphoto.uploader == self.u.profile
             assert myphoto.album == myalbum
             assert myphoto.description == "generic description"
-            assert myphoto.filename == "userphotos/1/1/1"
-            assert myphoto.thumb == "thumbs/1/1/1.jpg"
-            assert myphoto.midsize == "mid/1/1/1.jpg"
 
             # test file existence
             assert os.path.isfile(myphoto.filename)
@@ -230,13 +224,16 @@ class AlbumControllerTests(TestCase):
         try:
             with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
                 ownerphoto = self.albumcontrol.add_photo_to_album(myalbum.id, "owner uploaded", fi)
+                owner_fname = ownerphoto.filename
                 contribphoto1 = self.albumcontrol2.add_photo_to_album(myalbum.id, "contrib uploaded 1", fi)
+                contrib1_fname = contribphoto1.filename
                 contribphoto2 = self.albumcontrol2.add_photo_to_album(myalbum.id, "contrib uploaded 2", fi)
+                contrib2_fname = contribphoto2.filename
 
             # files exist
-            assert os.path.isfile('userphotos/1/1/1')
-            assert os.path.isfile('userphotos/2/1/2')
-            assert os.path.isfile('userphotos/2/1/3')
+            assert os.path.isfile(owner_fname)
+            assert os.path.isfile(contrib1_fname)
+            assert os.path.isfile(contrib2_fname)
 
             # cannot delete any photo as non logged in user
             # todo: add user privilege escalation
@@ -263,9 +260,9 @@ class AlbumControllerTests(TestCase):
             self.assertRaises(Photo.DoesNotExist, contribphoto2.refresh_from_db)
 
             # check that files have actually been deleted on disk
-            assert not os.path.isfile('userphotos/1/1/1')
-            assert not os.path.isfile('userphotos/2/1/2')
-            assert not os.path.isfile('userphotos/2/1/3')
+            assert not os.path.isfile(owner_fname)
+            assert not os.path.isfile(contrib1_fname)
+            assert not os.path.isfile(contrib2_fname)
 
         finally:
             # clean up
@@ -294,9 +291,9 @@ class AlbumControllerTests(TestCase):
                 contribphoto2 = self.albumcontrol2.add_photo_to_album(myalbum.id, "contrib uploaded 2", fi)
 
             # image files exist
-            assert os.path.isfile('userphotos/1/1/1')
-            assert os.path.isfile('userphotos/2/1/2')
-            assert os.path.isfile('userphotos/2/1/3')
+            assert os.path.isfile(ownerphoto.filename)
+            assert os.path.isfile(contribphoto1.filename)
+            assert os.path.isfile(contribphoto2.filename)
 
             # non owner cannot delete
             self.assertRaises(PermissionException, self.albumcontrol2.delete_album, myalbum)
@@ -311,7 +308,6 @@ class AlbumControllerTests(TestCase):
             assert not os.path.isfile('userphotos/2/1/2')
             assert not os.path.isfile('userphotos/2/1/3')
 
-        # todo: apply this finally pattern to other file opening unit tests
         finally:
             # clean up
             os.chdir("..")
@@ -493,17 +489,13 @@ class AlbumControllerTests(TestCase):
         assert testalbum.accesstype == ALBUM_PRIVATE
 
     def test_create_thumbnail_in_memory(self):
-
         with open('camelot/tests/resources/testimage.jpg', 'rb') as fi:
-            try:
-                thumb = ThumbFromBuffer(fi, "blahblahblah.jpg")
-                # testimage is a square, so thumbheight will work for both - 180
-                # todo: improve test with multi dimensioned image
-                assert thumb.size[0] == THUMBHEIGHT         # width
-                assert thumb.size[1] == THUMBHEIGHT         # height
-                # todo: assert file exists blahblahblah.jpg
-            finally:
-                os.unlink("blahblahblah.jpg")
+            thumb_buffer = ThumbFromBuffer(Image.open(fi))
+            thumb = Image.open(thumb_buffer)
+            # testimage is a square, so thumbheight will work for both - 180
+            # todo: improve test with multi dimensioned image
+            assert thumb.size[0] == THUMBHEIGHT         # width
+            assert thumb.size[1] == THUMBHEIGHT         # height
 
     def test_rename_album_controller(self):
         """

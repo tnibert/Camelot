@@ -13,7 +13,7 @@ RUN pip install gunicorn==20.1.0
 
 # Install requirements.txt
 COPY requirements.txt /
-RUN pip install --no-cache-dir -r /requirements.txt
+RUN pip install --no-cache-dir -r /requirements.txt --only-binary Pillow --only-binary psycopg2-binary
 
 # Moving application files
 WORKDIR /app

@@ -1,7 +1,7 @@
-## Camelot
+# Camelot
 
 This is a nice little photo sharing web application to manage photos and share with friends and family.
-I've recently open sourced it.  I'd like to give it a bit of love and uplift.
+I've open sourced it and would like to give it a bit of love and uplift.
 
 High level project goals:
 - Implement some form of server federation
@@ -9,64 +9,77 @@ High level project goals:
 - Promote a positive and wholesome photo sharing experience
 - Interoperate with bigger fish
 
-#### Run Locally, Not In Docker Container
+## Run
+### Create .env
+In order to run the application, you need a .env file in the project root directory defining the following environment variables:  
+- SECRET_KEY
+- GOOGLE_RECAPTCHA_SECRET_KEY
+- GOOGLE_RECAPTCHA_PUBLIC_KEY
+- SITE_DOMAIN
 
-In order to run the application, you need a .env file in the project root directory defining variables:<br>
-$SECRET_KEY - django secret key<br>
-$GOOGLE_RECAPTCHA_SECRET_KEY - as it sounds<br>
-$GOOGLE_RECAPTCHA_PUBLIC_KEY - as it sounds
+### Run Locally Using Docker Compose (Recommended)
+```
+$ docker-compose up --remove-orphans -d
+$ docker-compose run web python manage.py migrate
+```
 
-Then:<br>
-$ pip install -r requirements.txt<br>
-$ python manage.py migrate<br>
+### Run Locally, Not In Docker Container
+```
+$ python -m venv venv
+$ source venv/bin/activate
+$ pip install -r requirements.txt --only-binary Pillow --only-binary psycopg2-binary
+$ python manage.py migrate
 $ python manage.py runserver 0:8000
+```
 
-Recommend creating and sourcing a venv first.<br>
-You may run docker-compose up -d to easily spin up a postgres database on port 5433.  Settings.py is configured for this port.
+## Run Unit Tests
+### From Docker Compose
+```
+$ docker-compose run web python manage.py test
+```
 
-#### Run Locally, In Docker Container
+## Deploy
 
-Need same .env file as above.
-
-$ ./docker_manage.sh build<br>
-$ ./docker_manage.sh run
-
-You will probably run into a problem connecting to the database from the Docker container locally.
-
-#### Debian Deployment
+### Debian Deployment
 
 You will need to provide the correct DATABASE_URL in your .env.<br>
 Create file deploy-debian/.env-debian as described in deploy-debian/README.
 
-Then:<br>
-$ cd deploy-debian<br>
-$ ./deploydebian.sh<br>
+Then:
+```
+$ cd deploy-debian
+$ ./deploydebian.sh
 $ ./sslcertsetup.sh
+```
 
 May the odds be ever in your favor.
 
-#### AWS Deployment
+### AWS Deployment
 
 Note that AWS support is not quite production ready.  Files won't be persisted.
 
 In order to deploy onto AWS, you need a .env_aws file in the project root directory defining variables:<br>
-$REGION - the region to deploy the application in<br>
-$AWSID - the AWS user ID which will be deploying the application
+REGION - the region to deploy the application in  
+AWSID - the AWS user ID which will be deploying the application
 
 There is another repository, camelot-infrastructure (https://github.com/tnibert/camelot-infrastructure)
 which contains Terraform code to deploy on AWS.  From that repository root, run:<br>
-$ terraform init<br>
+```
+$ terraform init
 $ terraform apply
+```
 
-Then from this repository root, run:<br>
-$ ./docker_manage.sh build<br>
+Then from this repository root, run:
+```
+$ ./docker_manage.sh build
 $ ./docker_manage.sh push
+```
 
-Then login to a shell with ./aws_backend_web_shell.sh and run python manage.py migrate.
+Then login to a shell with `./aws_backend_web_shell.sh` and run python manage.py migrate.
 
 You may need to run aws configure first to provide your credentials, if you haven't already.
 
-#### API
+### API
 
-The application can be interacted with via an API.<br>
+The application can be interacted with via an API.  
 This functionality is exercised by the script at https://github.com/tnibert/project-camelot-cli.

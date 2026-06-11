@@ -3,7 +3,6 @@ from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from .constants import *
-from .constants2 import SITEDOMAIN
 from .controllers.groupcontroller import groupcontroller
 from .controllers.friendcontroller import friendcontroller
 from .logs import log_exception
