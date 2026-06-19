@@ -1,6 +1,4 @@
-import io
-
-from ..fileaccess.local import LocalFile
+from ..fileaccess.storagebackend import storage_backend
 from ..models import Album, Photo
 from .utilities import *
 from .friendcontroller import are_friends
@@ -111,7 +109,7 @@ class albumcontroller(genericcontroller):
         else:
             raise PermissionException
 
-    def add_photo_to_album(self, albumid, description, fi: io.BytesIO):
+    def add_photo_to_album(self, albumid, description, fi: BytesIO):
         """
         Saves photo to disk and adds it to the given album
         this could be done in something like celery
@@ -143,13 +141,14 @@ class albumcontroller(genericcontroller):
             # do we need to adjust size parameters in exif tags?
 
             # for first iteration, must convert img to bytesio
-            img_byte_arr = io.BytesIO()
+            img_byte_arr = BytesIO()
             img.save(img_byte_arr, format='PNG')
 
+            file_wrapper = storage_backend()
             for key, data in [(newphoto.filename, img_byte_arr),
                               (newphoto.thumb, ThumbFromBuffer(img)),
                               (newphoto.midsize, ThumbFromBuffer(img, MIDHEIGHT))]:
-                f = LocalFile(key)
+                f = file_wrapper(key)
                 try:
                     f.write(data)
                 except Exception as e:  # todo: be more specific
