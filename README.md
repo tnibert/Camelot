@@ -16,6 +16,9 @@ In order to run the application, you need a .env file in the project root direct
 - GOOGLE_RECAPTCHA_SECRET_KEY
 - GOOGLE_RECAPTCHA_PUBLIC_KEY
 - SITE_DOMAIN
+- ENV_DEPLOYMENT - one of either `linux` or `aws`
+  - If set to `aws` must define environment variable:
+    - BUCKET - the S3 bucket to store photos in
 
 ### Run Locally Using Docker Compose (Recommended)
 ```
@@ -40,27 +43,13 @@ $ docker-compose run web python manage.py test
 
 ## Deploy
 
-### Debian Deployment
-
-You will need to provide the correct DATABASE_URL in your .env.<br>
-Create file deploy-debian/.env-debian as described in deploy-debian/README.
-
-Then:
-```
-$ cd deploy-debian
-$ ./deploydebian.sh
-$ ./sslcertsetup.sh
-```
-
-May the odds be ever in your favor.
-
 ### AWS Deployment
 
 Note that AWS support is not quite production ready.  Files won't be persisted.
 
 In order to deploy onto AWS, you need a .env_aws file in the project root directory defining variables:<br>
-REGION - the region to deploy the application in  
-AWSID - the AWS user ID which will be deploying the application
+- REGION - the region to deploy the application in  
+- AWSID - the AWS user ID which will be deploying the application
 
 There is another repository, camelot-infrastructure (https://github.com/tnibert/camelot-infrastructure)
 which contains Terraform code to deploy on AWS.  From that repository root, run:<br>
@@ -79,7 +68,21 @@ Then login to a shell with `./aws_backend_web_shell.sh` and run python manage.py
 
 You may need to run aws configure first to provide your credentials, if you haven't already.
 
-### API
+### Debian Deployment
+
+This method is no longer actively supported.  Your mileage may vary.<br>
+
+You will need to provide the correct DATABASE_URL in your .env.<br>
+Create file deploy-debian/.env-debian as described in deploy-debian/README.
+
+Then:
+```
+$ cd deploy-debian
+$ ./deploydebian.sh
+$ ./sslcertsetup.sh
+```
+
+## API
 
 The application can be interacted with via an API.  
 This functionality is exercised by the script at https://github.com/tnibert/project-camelot-cli.
