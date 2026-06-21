@@ -4,10 +4,10 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404
 from ..controllers.profilecontroller import profilecontroller
 from ..controllers.utilities import PermissionException, get_profile_from_uid, get_profid_from_username
+from ..fileaccess.storagebackend import storage_backend
 from ..fileaccess.local import LocalFile
 
 from ..forms import EditProfileForm
-from ..constants import PREFIX
 
 
 def show_profile(request, userid):
@@ -60,8 +60,9 @@ def return_raw_profile_pic(request, userid):
     """
     photo = get_profile_from_uid(userid).profile_pic
     if photo:
-        f = LocalFile(photo.thumb)
+        f = storage_backend()(photo.thumb)
     else:
+        # default image will always come from local
         f = LocalFile("userphotos/defaultprofile.png")
 
     return HttpResponse(f.read(), content_type="image/jpeg")

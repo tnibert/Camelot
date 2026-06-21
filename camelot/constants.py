@@ -2,9 +2,10 @@
 Define constants that we use throughout the application
 """
 import environ
+from .envvars import ENV_SITE_DOMAIN
 
 env = environ.Env()
-SITEDOMAIN = env('SITE_DOMAIN')
+SITEDOMAIN = env(ENV_SITE_DOMAIN)
 
 # model sizes, will be used in forms and model definitions
 GROUPNAMELEN=30
@@ -29,3 +30,7 @@ PREFIX=""
 
 THUMBHEIGHT=180
 MIDHEIGHT=600
+
+# enum
+DEPLOYMENT_AWS = "aws"
+DEPLOYMENT_LOCAL = "linux"

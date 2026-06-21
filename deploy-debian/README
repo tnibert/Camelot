@@ -1,4 +1,4 @@
-These are scripts to setup Camelot on a Debian server with NGINX and Certbot.  May or may not work out of the box.
+These are scripts to setup Camelot on a Debian server with NGINX and Certbot.  This method is not actively maintained.
 
 Requires variables defined in file .env_debian:
 $USER - username for both postgres and linux

@@ -4,7 +4,7 @@ from django.db.models.signals import post_delete
 from django.dispatch import receiver
 from django.utils import timezone
 from .constants import *
-from .fileaccess.local import LocalFile
+from .fileaccess.storagebackend import storage_backend
 from .logs import log_exception
 
 """
@@ -113,15 +113,16 @@ def delete_photo_file(sender, instance, *args, **kwargs):
     :param kwargs:
     :return:
     """
+    file_wrapper = storage_backend()
     try:
-        LocalFile(instance.filename).delete()
+        file_wrapper(instance.filename).delete()
     except FileNotFoundError as e:
         log_exception(__name__, e)
     try:
-        LocalFile(instance.thumb).delete()
+        file_wrapper(instance.thumb).delete()
     except FileNotFoundError as e:
         log_exception(__name__, e)
     try:
-        LocalFile(instance.midsize).delete()
+        file_wrapper(instance.midsize).delete()
     except FileNotFoundError as e:
         log_exception(__name__, e)

@@ -8,12 +8,11 @@ from django.template.loader import render_to_string
 from random import randint
 from ..controllers.albumcontroller import albumcontroller, collate_owner_and_contrib
 from ..controllers.friendcontroller import are_friends
-from ..controllers.utilities import PermissionException
-from ..fileaccess.local import LocalFile
+from ..fileaccess.storagebackend import storage_backend
 from ..forms import AlbumCreateForm, EditAlbumAccesstypeForm, MyGroupSelectForm, AddContributorForm, DeleteConfirmForm
 from ..constants import *
 from ..controllers.utilities import *
-from ..models import Profile, FriendGroup, Photo
+from ..models import Profile, FriendGroup
 from ..logs import log_exception
 
 #def album_perm_check(func):
@@ -246,7 +245,7 @@ def return_photo_file_http(request, photoid, thumb=False, mid=True):
         name = photo.filename
         mime = photo.imgtype
 
-    return HttpResponse(LocalFile(name).read(), content_type=mime)
+    return HttpResponse(storage_backend()(name).read(), content_type=mime)
 
 
 @login_required
