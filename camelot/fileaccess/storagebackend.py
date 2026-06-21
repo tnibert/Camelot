@@ -3,6 +3,9 @@ from ..envvars import ENV_DEPLOYMENT
 from .s3 import S3File
 from .local import LocalFile
 
+class InvalidStorageBackendException(Exception):
+    pass
+
 def storage_backend():
     """
     Select the destination (local vs S3) based on the environment
@@ -14,4 +17,4 @@ def storage_backend():
     elif env_deployment == DEPLOYMENT_LOCAL:
         return LocalFile
     else:
-        raise Exception("invalid photo destination specified") # todo: more precise exception
+        raise InvalidStorageBackendException("invalid photo destination specified")
