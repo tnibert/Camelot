@@ -12,7 +12,7 @@ class S3File:
     """
     File wrapper class to access files in S3.
     """
-    def __init__(self, path):
+    def __init__(self, path: str):
         self.bucket = env(ENV_BUCKET)
         self.s3_client = boto3.client("s3")
         self.key = path

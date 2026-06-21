@@ -34,3 +34,4 @@ MIDHEIGHT=600
 # enum
 DEPLOYMENT_AWS = "aws"
 DEPLOYMENT_LOCAL = "linux"
+DEPLOYMENT_TEST = "test" # for automated tests

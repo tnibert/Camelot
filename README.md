@@ -38,7 +38,7 @@ $ python manage.py runserver 0:8000
 ## Run Unit Tests
 ### From Docker Compose
 ```
-$ docker-compose run web python manage.py test
+$ docker-compose run web env DEPLOYMENT="test" python manage.py test
 ```
 
 ## Deploy

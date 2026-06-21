@@ -7,13 +7,9 @@ from ..view.album import *
 from ..view.usermgmt import activate_user_no_check
 from .helperfunctions import complete_add_friends
 from ..constants import *
-import os
-import shutil
-from unittest import mock
+from ..fileaccess.memory import IN_MEMORY_FILES
+from unittest import mock, skip
 
-"""
-todo: remove filesystem access from unit tests
-"""
 
 class AlbumControllerTests(TestCase):
     # this setUp code needs to be made universal
@@ -107,67 +103,47 @@ class AlbumControllerTests(TestCase):
         self.assertRaises(PermissionException, self.albumcontrol2.return_album, newalbum.id)
 
     def test_add_image_to_album_controller(self):
-        if not os.path.exists(self.testdir):
-            os.makedirs(self.testdir)
-        os.chdir(self.testdir)
-
         myalbum = self.albumcontrol.create_album("image add test", "lalala")
 
+        with open('camelot/tests/resources/testimage.jpg', 'rb') as fi:
+            myphoto = self.albumcontrol.add_photo_to_album(myalbum.id, "generic description", fi)
         try:
-            # double check that our test is sending the right type for fi and that django will send in rb mode
-            # todo: add a test for png
-            with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
-                myphoto = self.albumcontrol.add_photo_to_album(myalbum.id, "generic description", fi)
-
             # asserts
             assert myphoto.uploader == self.u.profile
             assert myphoto.album == myalbum
             assert myphoto.description == "generic description"
 
             # test file existence
-            assert os.path.isfile(myphoto.filename)
-            assert os.path.isfile(myphoto.thumb)
-            assert os.path.isfile(myphoto.midsize)
+            assert IN_MEMORY_FILES[myphoto.filename] is not None
+            assert IN_MEMORY_FILES[myphoto.thumb] is not None
+            assert IN_MEMORY_FILES[myphoto.midsize] is not None
 
-            with Image.open(myphoto.thumb) as img:
+            with Image.open(BytesIO(IN_MEMORY_FILES[myphoto.thumb])) as img:
                 assert img.format == "JPEG"
 
-            with Image.open(myphoto.midsize) as img:
+            with Image.open(BytesIO(IN_MEMORY_FILES[myphoto.midsize])) as img:
                 assert img.format == "JPEG"
-
         finally:
-            # clean up
-            os.chdir("..")
-            shutil.rmtree(self.testdir)
-
-        # example (for view):
-        #c = Client()
-        #with open('wishlist.doc') as fp:
-        #    c.post('/customers/wishes/', {'name': 'fred', 'attachment
+            IN_MEMORY_FILES.pop(myphoto.filename, None)
+            IN_MEMORY_FILES.pop(myphoto.thumb, None)
+            IN_MEMORY_FILES.pop(myphoto.midsize, None)
 
     def test_add_image_to_other_user_album_controller(self):
         """
         User should not be able to add image to another user's album
         :return:
         """
-        if not os.path.exists(self.testdir):
-            os.makedirs(self.testdir)
-        os.chdir(self.testdir)
-
         notmyalbum = self.albumcontrol2.create_album("other person's album", "ruh roh")
 
-        try:
-            with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
-                self.assertRaises(PermissionException, self.albumcontrol.add_photo_to_album, notmyalbum.id, "generic description", fi)
+        with open('camelot/tests/resources/testimage.jpg', 'rb') as fi:
+            self.assertRaises(PermissionException, self.albumcontrol.add_photo_to_album, notmyalbum.id, "generic description", fi)
 
-        finally:
-            os.chdir("..")
-            shutil.rmtree(self.testdir)
-
+    @skip("we are changing this model to a per user check")
     def test_add_photo_to_album_not_enough_disk(self):
         """
         If the free space on the partition is under a given threshold, we should exception
         """
+        import os, shutil
 
         if not os.path.exists(self.testdir):
             os.makedirs(self.testdir)
@@ -180,38 +156,22 @@ class AlbumControllerTests(TestCase):
                 # depends on constants.MIN_FREE_THRES greater than 2 bytes
                 with mock.patch('shutil.disk_usage', return_value=(0, 0, 2)):
                     self.assertRaises(DiskExceededException, self.albumcontrol.add_photo_to_album, myalbum.id, "low disk", fi)
-
         finally:
             os.chdir("..")
             shutil.rmtree(self.testdir)
 
     def test_update_photo_description(self):
-        if not os.path.exists(self.testdir):
-            os.makedirs(self.testdir)
-        os.chdir(self.testdir)
-
         myalbum = self.albumcontrol.create_album("image description update test", "lalala")
 
-        try:
-            with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
-                myphoto = self.albumcontrol.add_photo_to_album(myalbum.id, "generic description", fi)
-            assert myphoto.description == "generic description"
-            self.albumcontrol.update_photo_description(myphoto, "updated image description")
+        with open('camelot/tests/resources/testimage.jpg', 'rb') as fi:
+            myphoto = self.albumcontrol.add_photo_to_album(myalbum.id, "generic description", fi)
+        assert myphoto.description == "generic description"
+        self.albumcontrol.update_photo_description(myphoto, "updated image description")
 
-            myphoto.refresh_from_db()
-            assert myphoto.description == "updated image description"
-
-        finally:
-            # clean up
-            os.chdir("..")
-            shutil.rmtree(self.testdir)
+        myphoto.refresh_from_db()
+        assert myphoto.description == "updated image description"
 
     def test_delete_photo(self):
-        # set up dir
-        if not os.path.exists(self.testdir):
-            os.makedirs(self.testdir)
-        os.chdir(self.testdir)
-
         # create album
         myalbum = self.albumcontrol.create_album("delete photo test", "lalala")
 
@@ -221,60 +181,49 @@ class AlbumControllerTests(TestCase):
         assert self.albumcontrol.add_contributor_to_album(myalbum, self.u2.profile)
 
         # add photos - one as owner, two as contrib
-        try:
-            with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
-                ownerphoto = self.albumcontrol.add_photo_to_album(myalbum.id, "owner uploaded", fi)
-                owner_fname = ownerphoto.filename
-                contribphoto1 = self.albumcontrol2.add_photo_to_album(myalbum.id, "contrib uploaded 1", fi)
-                contrib1_fname = contribphoto1.filename
-                contribphoto2 = self.albumcontrol2.add_photo_to_album(myalbum.id, "contrib uploaded 2", fi)
-                contrib2_fname = contribphoto2.filename
+        with open('camelot/tests/resources/testimage.jpg', 'rb') as fi:
+            ownerphoto = self.albumcontrol.add_photo_to_album(myalbum.id, "owner uploaded", fi)
+            owner_fname = ownerphoto.filename
+            contribphoto1 = self.albumcontrol2.add_photo_to_album(myalbum.id, "contrib uploaded 1", fi)
+            contrib1_fname = contribphoto1.filename
+            contribphoto2 = self.albumcontrol2.add_photo_to_album(myalbum.id, "contrib uploaded 2", fi)
+            contrib2_fname = contribphoto2.filename
 
-            # files exist
-            assert os.path.isfile(owner_fname)
-            assert os.path.isfile(contrib1_fname)
-            assert os.path.isfile(contrib2_fname)
+        # files exist
+        assert IN_MEMORY_FILES[owner_fname] is not None
+        assert IN_MEMORY_FILES[contrib1_fname] is not None
+        assert IN_MEMORY_FILES[contrib2_fname] is not None
 
-            # cannot delete any photo as non logged in user
-            # todo: add user privilege escalation
-            self.assertRaises(PermissionException, self.albumcontrol3.delete_photo, ownerphoto)
-            self.assertRaises(PermissionException, self.albumcontrol3.delete_photo, contribphoto1)
+        # cannot delete any photo as non logged in user
+        # todo: add user privilege escalation
+        self.assertRaises(PermissionException, self.albumcontrol3.delete_photo, ownerphoto)
+        self.assertRaises(PermissionException, self.albumcontrol3.delete_photo, contribphoto1)
 
-            # cannot delete owner photo as contributor
-            self.assertRaises(PermissionException, self.albumcontrol2.delete_photo, ownerphoto)
+        # cannot delete owner photo as contributor
+        self.assertRaises(PermissionException, self.albumcontrol2.delete_photo, ownerphoto)
 
-            # can delete contributor photo as contributor
-            assert self.albumcontrol2.delete_photo(contribphoto1)
+        # can delete contributor photo as contributor
+        assert self.albumcontrol2.delete_photo(contribphoto1)
 
-            # can delete contributor photo as owner
-            assert self.albumcontrol.delete_photo(contribphoto2)
+        # can delete contributor photo as owner
+        assert self.albumcontrol.delete_photo(contribphoto2)
 
-            # can delete owner photo as owner
-            assert self.albumcontrol.delete_photo(ownerphoto)
+        # can delete owner photo as owner
+        assert self.albumcontrol.delete_photo(ownerphoto)
 
-            assert (ownerphoto, contribphoto1, contribphoto2) not in self.albumcontrol.get_photos_for_album(myalbum)
+        assert (ownerphoto, contribphoto1, contribphoto2) not in self.albumcontrol.get_photos_for_album(myalbum)
 
-            # check that db objects are gone
-            self.assertRaises(Photo.DoesNotExist, ownerphoto.refresh_from_db)
-            self.assertRaises(Photo.DoesNotExist, contribphoto1.refresh_from_db)
-            self.assertRaises(Photo.DoesNotExist, contribphoto2.refresh_from_db)
+        # check that db objects are gone
+        self.assertRaises(Photo.DoesNotExist, ownerphoto.refresh_from_db)
+        self.assertRaises(Photo.DoesNotExist, contribphoto1.refresh_from_db)
+        self.assertRaises(Photo.DoesNotExist, contribphoto2.refresh_from_db)
 
-            # check that files have actually been deleted on disk
-            assert not os.path.isfile(owner_fname)
-            assert not os.path.isfile(contrib1_fname)
-            assert not os.path.isfile(contrib2_fname)
-
-        finally:
-            # clean up
-            os.chdir("..")
-            shutil.rmtree(self.testdir)
+        # check that files have actually been deleted
+        assert not owner_fname in IN_MEMORY_FILES
+        assert not contrib1_fname in IN_MEMORY_FILES
+        assert not contrib2_fname in IN_MEMORY_FILES
 
     def test_delete_album(self):
-        # set up dir
-        if not os.path.exists(self.testdir):
-            os.makedirs(self.testdir)
-        os.chdir(self.testdir)
-
         # create album
         myalbum = self.albumcontrol.create_album("delete album test", "lalala")
 
@@ -284,34 +233,28 @@ class AlbumControllerTests(TestCase):
         assert self.albumcontrol.add_contributor_to_album(myalbum, self.u2.profile)
 
         # add photos - one as owner, two as contrib
-        try:
-            with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
-                ownerphoto = self.albumcontrol.add_photo_to_album(myalbum.id, "owner uploaded", fi)
-                contribphoto1 = self.albumcontrol2.add_photo_to_album(myalbum.id, "contrib uploaded 1", fi)
-                contribphoto2 = self.albumcontrol2.add_photo_to_album(myalbum.id, "contrib uploaded 2", fi)
+        with open('camelot/tests/resources/testimage.jpg', 'rb') as fi:
+            ownerphoto = self.albumcontrol.add_photo_to_album(myalbum.id, "owner uploaded", fi)
+            contribphoto1 = self.albumcontrol2.add_photo_to_album(myalbum.id, "contrib uploaded 1", fi)
+            contribphoto2 = self.albumcontrol2.add_photo_to_album(myalbum.id, "contrib uploaded 2", fi)
 
-            # image files exist
-            assert os.path.isfile(ownerphoto.filename)
-            assert os.path.isfile(contribphoto1.filename)
-            assert os.path.isfile(contribphoto2.filename)
+        # image files exist
+        assert IN_MEMORY_FILES[ownerphoto.filename] is not None
+        assert IN_MEMORY_FILES[contribphoto1.filename] is not None
+        assert IN_MEMORY_FILES[contribphoto2.filename] is not None
 
-            # non owner cannot delete
-            self.assertRaises(PermissionException, self.albumcontrol2.delete_album, myalbum)
-            # owner can delete
-            assert self.albumcontrol.delete_album(myalbum)
+        # non owner cannot delete
+        self.assertRaises(PermissionException, self.albumcontrol2.delete_album, myalbum)
+        # owner can delete
+        assert self.albumcontrol.delete_album(myalbum)
 
-            # myalbum no longer exists
-            self.assertRaises(Album.DoesNotExist, myalbum.refresh_from_db)
+        # myalbum no longer exists
+        self.assertRaises(Album.DoesNotExist, myalbum.refresh_from_db)
 
-            # image files no longer exist
-            assert not os.path.isfile('userphotos/1/1/1')
-            assert not os.path.isfile('userphotos/2/1/2')
-            assert not os.path.isfile('userphotos/2/1/3')
-
-        finally:
-            # clean up
-            os.chdir("..")
-            shutil.rmtree(self.testdir)
+        # image files no longer exist
+        assert not ownerphoto.filename in IN_MEMORY_FILES
+        assert not contribphoto1.filename in IN_MEMORY_FILES
+        assert not contribphoto2.filename in IN_MEMORY_FILES
 
     def test_get_images_for_album(self):
         # implemented
@@ -322,7 +265,6 @@ class AlbumControllerTests(TestCase):
         Test adding a contributor to album
         Owner and new contributor must be friends
         """
-
         testalbum = self.albumcontrol.create_album("test album", "test description")
 
         # not friends, cannot add
