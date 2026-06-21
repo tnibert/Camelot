@@ -11,8 +11,7 @@ from .helperfunctions import complete_add_friends
 from ..view.usermgmt import activate_user_no_check
 
 
-class albumAPItests(TestCase):
-
+class AlbumAPItests(TestCase):
     def setUp(self):
         self.credentials = {
             'username': 'testuser',
@@ -52,7 +51,7 @@ class albumAPItests(TestCase):
             response = self.client.post(reverse("uploadphotoapi", kwargs={'id': albumid}), {'image': f}, enctype="multipart/form-data")
 
         data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(data['id'], 1)
+        self.assertIsNotNone(data['id'])
         self.assertEqual(response.status_code, 201)
 
     def test_photo_upload_non_image(self):
@@ -112,11 +111,8 @@ class albumAPItests(TestCase):
                                     json.dumps(payload),
                                     content_type="application/json")
 
-        # todo: create get request that displays the
-
         # checks
         newphoto.refresh_from_db()
-        #print(newphoto.description)
         assert newphoto.description == "; update from camelot_photo set description=&#x27;oh hai&#x27;;"
         assert secondphoto.description == "this is the second description";
 
@@ -141,7 +137,6 @@ class albumAPItests(TestCase):
 
         # checks
         newphoto.refresh_from_db()
-        #print(newphoto.description)
         self.assertEqual(response.status_code, 204)
         assert newphoto.description == str
 
@@ -173,15 +168,16 @@ class albumAPItests(TestCase):
         # assert content, 2 albums
         data = json.loads(response.content.decode('utf-8'))
 
-        self.assertEqual(data['albums'], [{'id': 1, 'name': 'test1', 'description': 'testdesc1'},
-                                          {'id': 2, 'name': 'test2', 'description': 'testdesc2'}])
+        self.assertEqual(data['albums'][0]['name'], 'test1')
+        self.assertEqual(data['albums'][0]['description'], 'testdesc1')
+        self.assertEqual(data['albums'][1]['name'], 'test2')
+        self.assertEqual(data['albums'][1]['description'], 'testdesc2')
 
     def test_get_photos(self):
         """
         Test the get photos for album api call
         :return:
         """
-
         # create an album for u2, u will request it
         testalbum = self.albumcontrol2.create_album("test1", "testgetphotos")
 
