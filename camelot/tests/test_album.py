@@ -152,7 +152,7 @@ class AlbumControllerTests(TestCase):
         myalbum = self.albumcontrol.create_album("my album", "low disk")
 
         try:
-            with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
+            with open('camelot/tests/resources/testimage.jpg', 'rb') as fi:
                 # depends on constants.MIN_FREE_THRES greater than 2 bytes
                 with mock.patch('shutil.disk_usage', return_value=(0, 0, 2)):
                     self.assertRaises(DiskExceededException, self.albumcontrol.add_photo_to_album, myalbum.id, "low disk", fi)

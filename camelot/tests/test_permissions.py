@@ -3,8 +3,6 @@ from django.test.client import RequestFactory
 from django.contrib.auth.models import User, AnonymousUser
 from django.shortcuts import reverse
 from django.http import Http404
-import os
-import shutil
 from ..controllers.albumcontroller import albumcontroller, collate_owner_and_contrib
 from ..controllers.groupcontroller import groupcontroller
 from ..controllers.utilities import PermissionException
@@ -57,10 +55,6 @@ Requirements:
         - can add/remove contributors
         - can add photos to album
 """
-
-#class test_controller_permissions(TestCase):
-#    pass
-
 
 class PermissionTestCase(TestCase):
     """
@@ -201,8 +195,6 @@ class PermissionTestCase(TestCase):
                 4: private
                 -- defined in constants --
         """
-        #permexceptstr = "Well, look at you, trying to access stuff you can't access on a privacy aware website."
-
         albumcontrol.set_accesstype(testalbum, ALBUM_PUBLIC)
 
         response = self.client.get(reverse(func, kwargs={argname: id}))
@@ -247,28 +239,16 @@ class AlbumPhotoViewPermissionsTest(PermissionTestCase):
     """
     # todo: adjust all of these tests to use the client fixture
     def setUp(self):
-
         super(AlbumPhotoViewPermissionsTest, self).setUp()
 
-        self.testdir = "testdir"
-
         # add photo to album
-        if not os.path.exists(self.testdir):
-            os.makedirs(self.testdir)
-        os.chdir(self.testdir)
-
-        with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
+        with open('camelot/tests/resources/testimage.jpg', 'rb') as fi:
             self.photo = self.albumcontrol.add_photo_to_album(self.testalbum.id, "our test album", fi)
 
         # define requests to test
         self.showalbumrequest = self.factory.get(reverse("show_album", kwargs={'id': self.testalbum.id}))
         self.photorequest = self.factory.get(reverse("show_photo", kwargs={'photoid': self.photo.id}))
         self.indivphotorequest = self.factory.get(reverse("present_photo", kwargs={'photoid': self.photo.id}))
-
-
-    def tearDown(self):
-        os.chdir("..")
-        shutil.rmtree(self.testdir)
 
     def test_not_logged_in(self):
         """

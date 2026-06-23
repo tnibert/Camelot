@@ -4,8 +4,6 @@ from django.test.client import RequestFactory
 from django.shortcuts import reverse
 import json
 from json.decoder import JSONDecodeError
-import os
-import shutil
 from ..controllers.albumcontroller import albumcontroller
 from .helperfunctions import complete_add_friends
 from ..view.usermgmt import activate_user_no_check
@@ -37,8 +35,6 @@ class AlbumAPItests(TestCase):
 
         self.albumcontrol = albumcontroller(self.u.id)
         self.albumcontrol2 = albumcontroller(self.u2.id)
-
-        self.testdir = "testdir"
 
     def test_photo_upload(self):
         """
@@ -144,7 +140,6 @@ class AlbumAPItests(TestCase):
         """
         Test the getalbumsapi api call
         """
-
         # u2 adds two albums, not public (by default)
         self.albumcontrol2.create_album("test1", "testdesc1")
         self.albumcontrol2.create_album("test2", "testdesc2")
@@ -185,29 +180,19 @@ class AlbumAPItests(TestCase):
         complete_add_friends(self.u.id, self.u2.id)
 
         # add photos to album
-        if not os.path.exists(self.testdir):
-            os.makedirs(self.testdir)
-        os.chdir(self.testdir)
+        with open('camelot/tests/resources/testimage.jpg', 'rb') as fi:
+            testphoto = self.albumcontrol2.add_photo_to_album(testalbum.id, "generic description", fi)
+            testphoto2 = self.albumcontrol2.add_photo_to_album(testalbum.id, "generic description", fi)
 
-        try:
-            with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
-                testphoto = self.albumcontrol2.add_photo_to_album(testalbum.id, "generic description", fi)
-                testphoto2 = self.albumcontrol2.add_photo_to_album(testalbum.id, "generic description", fi)
+        # make api call
+        response = self.client.get(reverse("getphotosapi", kwargs={'id': testalbum.id}))
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content.decode('utf-8'))
 
-            # make api call
-            response = self.client.get(reverse("getphotosapi", kwargs={'id': testalbum.id}))
-            self.assertEqual(response.status_code, 200)
-            data = json.loads(response.content.decode('utf-8'))
-
-            # confirm accuracy
-            # datetime text format: 2019-03-13T09:18:15.628Z
-            self.assertEqual(data['photos'], [{'id': testphoto.id, 'description': testphoto.description, 'pub_date': testphoto.pub_date.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+'Z', 'type': testphoto.imgtype},
-                                              {'id': testphoto2.id, 'description': testphoto2.description, 'pub_date': testphoto2.pub_date.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+'Z', 'type': testphoto2.imgtype}])
-
-        finally:
-            # clean up
-            os.chdir("..")
-            shutil.rmtree(self.testdir)
+        # confirm accuracy
+        # datetime text format: 2019-03-13T09:18:15.628Z
+        self.assertEqual(data['photos'], [{'id': testphoto.id, 'description': testphoto.description, 'pub_date': testphoto.pub_date.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+'Z', 'type': testphoto.imgtype},
+                                          {'id': testphoto2.id, 'description': testphoto2.description, 'pub_date': testphoto2.pub_date.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+'Z', 'type': testphoto2.imgtype}])
 
     def test_get_photos_invalid_post(self):
         """
@@ -222,23 +207,13 @@ class AlbumAPItests(TestCase):
         complete_add_friends(self.u.id, self.u2.id)
 
         # add photos to album
-        if not os.path.exists(self.testdir):
-            os.makedirs(self.testdir)
-        os.chdir(self.testdir)
+        with open('camelot/tests/resources/testimage.jpg', 'rb') as fi:
+            testphoto = self.albumcontrol2.add_photo_to_album(testalbum.id, "generic description", fi)
 
-        try:
-            with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
-                testphoto = self.albumcontrol2.add_photo_to_album(testalbum.id, "generic description", fi)
-
-            # make api call
-            response = self.client.post(reverse("getphotosapi", kwargs={'id': testalbum.id}))
-            self.assertEqual(response.status_code, 404)
-            self.assertRaises(JSONDecodeError, json.loads, response.content.decode('utf-8'))
-
-        finally:
-            # clean up
-            os.chdir("..")
-            shutil.rmtree(self.testdir)
+        # make api call
+        response = self.client.post(reverse("getphotosapi", kwargs={'id': testalbum.id}))
+        self.assertEqual(response.status_code, 404)
+        self.assertRaises(JSONDecodeError, json.loads, response.content.decode('utf-8'))
 
     def test_get_photos_permission_violation(self):
         """
@@ -251,23 +226,12 @@ class AlbumAPItests(TestCase):
         testalbum = self.albumcontrol2.create_album("test1", "testgetphotos")
 
         # add photos to album
-        # todo: maybe we should be putting these folder setups and tear downs in the setup method, consider
-        if not os.path.exists(self.testdir):
-            os.makedirs(self.testdir)
-        os.chdir(self.testdir)
+        with open('camelot/tests/resources/testimage.jpg', 'rb') as fi:
+            testphoto = self.albumcontrol2.add_photo_to_album(testalbum.id, "generic description", fi)
 
-        try:
-            with open('../camelot/tests/resources/testimage.jpg', 'rb') as fi:
-                testphoto = self.albumcontrol2.add_photo_to_album(testalbum.id, "generic description", fi)
-
-            # make api call
-            response = self.client.get(reverse("getphotosapi", kwargs={'id': testalbum.id}))
-            self.assertEqual(response.status_code, 404)
-
-        finally:
-            # clean up
-            os.chdir("..")
-            shutil.rmtree(self.testdir)
+        # make api call
+        response = self.client.get(reverse("getphotosapi", kwargs={'id': testalbum.id}))
+        self.assertEqual(response.status_code, 404)
 
     def test_rename_album(self):
         """
