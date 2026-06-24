@@ -2,8 +2,6 @@ from .controllers.utilities import PermissionException, AlreadyExistsException, 
 from django.http import HttpResponseRedirect, JsonResponse
 from django.http.response import Http404
 from django.core.exceptions import ValidationError
-from django.shortcuts import render
-from django.contrib import messages
 from django.utils.deprecation import MiddlewareMixin
 from .logs import log_exception
 
