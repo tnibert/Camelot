@@ -16,9 +16,12 @@ In order to run the application, you need a .env file in the project root direct
 - GOOGLE_RECAPTCHA_SECRET_KEY
 - GOOGLE_RECAPTCHA_PUBLIC_KEY
 - SITE_DOMAIN
-- ENV_DEPLOYMENT - one of either `linux` or `aws`
+- DEPLOYMENT - one of either `linux` or `aws`
   - If set to `aws` must define environment variable:
     - BUCKET - the S3 bucket to store photos in
+- REGISTRATION_MODE - one of `code`, `email`, `disabled`, for registration via shared code, email confirmation, or disabled registration respectively.
+  - If set to `code` must define environment variable:
+    - INVITE_CODE - the registration code required to register
 
 ### Run Locally Using Docker Compose (Recommended)
 ```

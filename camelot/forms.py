@@ -2,13 +2,11 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
-from .constants import *
+from .constants import SITEDOMAIN, MAXDISPLAYNAME, GROUPNAMELEN, ACCESSTYPES, INVITE_CODE
 from .controllers.groupcontroller import groupcontroller
 from .controllers.friendcontroller import friendcontroller
 from .logs import log_exception
 from .user_emailing import send_registration_email
-
-INVITE_CODE = "abc" # todo: if we move forward with this architectural choice, need to actually implement
 
 
 def validate_email(value):
