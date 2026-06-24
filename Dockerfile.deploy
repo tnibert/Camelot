@@ -15,5 +15,10 @@ RUN pip install gunicorn==20.1.0
 COPY requirements.txt /
 RUN pip install --no-cache-dir -r /requirements.txt --only-binary Pillow --only-binary psycopg2-binary
 
-# application files - provided by docker compose bind mount
+# application files - copied into container
 WORKDIR /app
+
+COPY ./camelot /app/camelot
+COPY ./projectcamelot /app/projectcamelot
+COPY ./static /app/static
+RUN ./manage.py collectstatic --noinput

@@ -5,10 +5,10 @@ source .env_aws
 
 case "$1" in
     build)
-        docker build . -t $AWSID.dkr.ecr.$REGION.amazonaws.com/camelot:latest
+        docker build -f ./Dockerfile.deploy -t $AWSID.dkr.ecr.$REGION.amazonaws.com/camelot:latest
         ;;
     push)
-        aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin $AWSID.dkr.ecr.$REGION.amazonaws.com
+        aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $AWSID.dkr.ecr.$REGION.amazonaws.com
         docker push $AWSID.dkr.ecr.$REGION.amazonaws.com/camelot:latest
         ;;
     run)
