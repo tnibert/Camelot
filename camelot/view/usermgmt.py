@@ -8,7 +8,7 @@ from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from django.conf import settings
 from functools import wraps
-from ..forms import SignUpForm, SearchForm
+from ..forms import SignUpForm, SearchForm, SignUpWithCodeForm
 from ..models import Profile
 from ..tokens import account_activation_token
 from ..controllers.friendcontroller import friendcontroller
@@ -16,6 +16,7 @@ from ..friendfeed import generate_feed
 from ..controllers.profilecontroller import profilecontroller
 from ..user_emailing import send_registration_email
 from ..logs import log_exception
+from ..constants import REGISTRATION_MODE, REGISTER_DISABLED
 import requests
 
 
@@ -45,7 +46,6 @@ def index(request):
                 # add unit test coverage
                 messages.add_message(request, messages.INFO, 'Please confirm your account')
                 return redirect("index")
-
         else:
             # need to do something like flask's flash function for these...
             # only one error message should show for all bad logins (don't reveal user's existance)
@@ -58,7 +58,9 @@ def index(request):
         # redirect to user page
         return redirect("user_home")
     else:
-        return render(request, 'camelot/index.html')
+        return render(request,
+                     'camelot/index.html',
+                     {'show_registration_link': REGISTRATION_MODE != REGISTER_DISABLED})
 
 
 @login_required
@@ -115,6 +117,39 @@ def check_recaptcha(view_func):
 
 
 @check_recaptcha
+def register_invite_code(request):
+    """
+    Register via invite code
+    :param request:
+    :return:
+    """
+    if request.method == 'POST' and request.recaptcha_is_valid is True:
+        form = SignUpWithCodeForm(request.POST)
+
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.is_active = False
+            user.save()
+
+            activate_user_no_check(user)
+
+            # login(request, user)
+            return redirect('user_home')
+
+        else:
+            # there was some error, rerender with errors displayed to user
+            return render(request, 'camelot/register.html',
+                          {'form': form, 'recaptchakey': settings.GOOGLE_RECAPTCHA_PUBLIC_KEY})
+
+    form = SignUpWithCodeForm()
+
+    return render(request,
+                 'camelot/register.html',
+                 {'form': form,
+                  'recaptchakey': settings.GOOGLE_RECAPTCHA_PUBLIC_KEY})
+
+
+@check_recaptcha
 def register(request):
     """
     User registration function with email confirmation
@@ -136,14 +171,11 @@ def register(request):
 
                 # did not send email correctly, roll back
                 user.delete()
-
                 messages.add_message(request, messages.INFO, 'Error sending confirmation email, please try again')
-
                 return render(request, 'camelot/register.html', {'form': form,
                                                         'recaptchakey': settings.GOOGLE_RECAPTCHA_PUBLIC_KEY})
 
             return redirect('account_activation_sent')
-
         else:
             # there was some error, rerender with errors displayed to user
             return render(request, 'camelot/register.html',

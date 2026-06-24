@@ -3,7 +3,7 @@
 <div id="banner"></div>
 <div id="logincontent">
     <div id="logintable">
-        <p class="centerText">welcome to PicPicPanda<br>a pretty cool photo sharing platform</p>
+        <p class="centerText">Welcome to Camelot<br>a pretty cool photo sharing platform</p>
 
         {% if messages %}
             {% for message in messages %}
@@ -16,15 +16,15 @@
 
             {# this might be better implemented the normal form way #}
                 <div class="logintable">
-
                     <input class="logininput" type="text" name="username" placeholder="username" required><br>
                     <input class="logininput" type="password" name="password" placeholder="password" required><br>
                     <input class="logininput" type="submit" value="Login">
-
                 </div>
         </form>
         <p id="loginpageoptions">
-            {# <a href="{% url 'user_register' %}"><span>Create An Account</span></a><br> #}
+            {% if show_registration_link %}
+            <a href="{% url 'user_register' %}"><span>Create An Account</span></a><br>
+            {% endif %}
             <a href="{% url 'password_reset' %}"><span>I Forgot My Password</span></a>
         </p>
     </div>
