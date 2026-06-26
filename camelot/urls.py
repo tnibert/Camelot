@@ -4,15 +4,14 @@ from django.conf import settings
 from django.contrib.auth import views as auth_views
 from .view import album, usermgmt, profile, friend, group
 from .view.api import albumapi
+from .registration import REGISTRATION_URLS
+from .constants import REGISTRATION_MODE
+
 
 urlpatterns = [
     path('', usermgmt.index, name='index'),
     path('logout', usermgmt.user_logout, name='logout'),
     path('home', usermgmt.user_home, name='user_home'),         # lets move this one to another file
-    #path('register', usermgmt.register, name='user_register'),
-    #url('^account_activation_sent/$', usermgmt.account_activation_sent, name='account_activation_sent'),
-    #url('^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
-    #    usermgmt.activate, name='activate'),
     path('createalbum', album.create_album, name="create_album"),
     re_path(r'^profile/(?P<userid>\d+)/albums$', album.display_albums, name="show_albums"),
     re_path(r'^album/(?P<id>\d+)/$', album.display_album, name="show_album"),
@@ -57,7 +56,7 @@ urlpatterns = [
     re_path(r'^api/update/photo/desc/(?P<photoid>\d+)$', albumapi.update_photo_description, name='updatephotodescapi'),
     re_path(r'^api/(?P<userid>\d+)/getalbums$', album.display_albums, {'api': True}, name="getalbumsapi"),
     re_path(r'^api/album/(?P<id>\d+)/getphotos$', album.display_album, {'api': True}, name="getphotosapi"),
-]
+] + REGISTRATION_URLS[REGISTRATION_MODE]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

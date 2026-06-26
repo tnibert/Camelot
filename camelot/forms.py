@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
-from .constants import *
+from .constants import SITEDOMAIN, MAXDISPLAYNAME, GROUPNAMELEN, ACCESSTYPES, INVITE_CODE
 from .controllers.groupcontroller import groupcontroller
 from .controllers.friendcontroller import friendcontroller
 from .logs import log_exception
@@ -52,6 +52,11 @@ def validate_username(value):
     raise ValidationError("Username already exists")
 
 
+def validate_invite_code(value):
+    if value != INVITE_CODE:
+        raise ValidationError("Invalid invite code")
+
+
 class SignUpForm(UserCreationForm):
     email = forms.EmailField(help_text='Required', validators=[validate_email])
     username = forms.CharField(help_text='Required', validators=[validate_username])
@@ -59,6 +64,16 @@ class SignUpForm(UserCreationForm):
     class Meta:
         model = User
         fields = ('username', 'email', 'password1', 'password2', )
+
+
+class SignUpWithCodeForm(UserCreationForm):
+    email = forms.EmailField(help_text='Required', validators=[validate_email])
+    username = forms.CharField(help_text='Required', validators=[validate_username])
+    invite_code = forms.CharField(help_text='Required', validators=[validate_invite_code])
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'invite_code', 'password1', 'password2', )
 
 
 class AlbumCreateForm(forms.Form):
@@ -107,7 +122,6 @@ class AddGroupForm(forms.Form):
 
 
 class MyGroupSelectForm(forms.Form):
-
     def __init__(self, myuid, choicefieldtype, *args, **kwargs):
         """
         Form populated by the current user's groups
@@ -131,7 +145,6 @@ class EditAlbumAccesstypeForm(forms.Form):
 
 
 class AddContributorForm(forms.Form):
-
     def __init__(self, myuid, album, *args, **kwargs):
         """
         Form populated by the current user's groups
@@ -170,7 +183,6 @@ class ManageGroupMemberForm(forms.Form):
 
 
 class DeleteConfirmForm(forms.Form):
-
     def __init__(self, id, *args, **kwargs):
         super(DeleteConfirmForm, self).__init__(*args, **kwargs)
 

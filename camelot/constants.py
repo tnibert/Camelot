@@ -2,7 +2,7 @@
 Define constants that we use throughout the application
 """
 import environ
-from .envvars import ENV_SITE_DOMAIN
+from .envvars import ENV_SITE_DOMAIN, ENV_REGISTRATION_MODE, ENV_INVITE_CODE
 
 env = environ.Env()
 SITEDOMAIN = env(ENV_SITE_DOMAIN)
@@ -35,3 +35,13 @@ MIDHEIGHT=600
 DEPLOYMENT_AWS = "aws"
 DEPLOYMENT_LOCAL = "linux"
 DEPLOYMENT_TEST = "test" # for automated tests
+
+# enum
+REGISTER_CODE = "code"
+REGISTER_DISABLED = "disabled"
+REGISTER_EMAIL = "email"
+
+# current setting
+REGISTRATION_MODE = env(ENV_REGISTRATION_MODE)
+
+INVITE_CODE = env(ENV_INVITE_CODE)
