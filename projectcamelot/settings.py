@@ -13,13 +13,16 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 import os
 import sys
 
+import dj_database_url
+
 import environ
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 env = environ.Env(
-    DEBUG=(bool, False)     # default debug to false
+    DEBUG=(bool, False),     # default debug to false
+    DATABASE_URL=(str, None)
 )
 env_path = os.path.join(BASE_DIR, ".env")
 if os.path.isfile(env_path):
@@ -91,8 +94,17 @@ WSGI_APPLICATION = 'projectcamelot.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
+DB_URL = env("DATABASE_URL")
+# Can use in-memory SQLite for testing
+if 'test' in sys.argv and SQLITE_TEST_DB:
+    db_config = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory:'
+    }
+elif DB_URL is not None:
+    db_config = dj_database_url.config(default=DB_URL)
+else:
+    db_config = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.environ.get('POSTGRES_NAME'),
         'USER': os.environ.get('POSTGRES_USER'),
@@ -100,6 +112,10 @@ DATABASES = {
         'HOST': 'postgres',
         'PORT': 5432,
     }
+
+
+DATABASES = {
+    'default': db_config
 }
 
 # Password validation
@@ -141,10 +157,3 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-# Use in-memory SQLite for testing
-if 'test' in sys.argv and SQLITE_TEST_DB:
-    DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ':memory:'
-    }
