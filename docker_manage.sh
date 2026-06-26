@@ -3,12 +3,14 @@
 # define AWSID and REGION
 source .env_aws
 
+set -x
+
 case "$1" in
     build)
-        docker build -f ./Dockerfile.deploy -t $AWSID.dkr.ecr.$REGION.amazonaws.com/camelot:latest
+        docker build . -f ./deployment.Dockerfile -t $AWSID.dkr.ecr.$REGION.amazonaws.com/camelot:latest
         ;;
     push)
-        aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $AWSID.dkr.ecr.$REGION.amazonaws.com
+        aws ecr get-login-password --region "$REGION" | docker login --username AWS --password-stdin $AWSID.dkr.ecr.$REGION.amazonaws.com
         docker push $AWSID.dkr.ecr.$REGION.amazonaws.com/camelot:latest
         ;;
     run)
