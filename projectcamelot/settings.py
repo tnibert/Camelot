@@ -16,6 +16,7 @@ import sys
 import dj_database_url
 
 import environ
+from camelot.envvars import load_boolean_from_env, ENV_DEBUG
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -35,12 +36,12 @@ if os.path.isfile(env_path):
 SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env("DEBUG")
+DEBUG = load_boolean_from_env(ENV_DEBUG, False)
 
 # what hosts can be used to access
 ALLOWED_HOSTS = ["*"]
 
-# debug recaptcha keys
+# recaptcha keys
 GOOGLE_RECAPTCHA_SECRET_KEY = env('GOOGLE_RECAPTCHA_SECRET_KEY')
 GOOGLE_RECAPTCHA_PUBLIC_KEY = env('GOOGLE_RECAPTCHA_PUBLIC_KEY')
 
