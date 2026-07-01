@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
 from django.utils import timezone
-from .constants import *
+from .constants import MAXDISPLAYNAME, GROUPNAMELEN, MAX_ALBUM_NAME_LEN, ALBUM_ALLFRIENDS, MAXPHOTODESC
 from .fileaccess.storagebackend import storage_backend
 from .logs import log_exception
 
