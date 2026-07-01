@@ -5,8 +5,10 @@
   {% csrf_token %}
   <div id="registerform">
       {{ form.as_p }}
+      {% if captcha_enabled %}
       <script src="https://www.google.com/recaptcha/api.js" async defer></script>
       <div class="g-recaptcha" data-sitekey="{{ recaptchakey }}"></div>
+      {% endif %}
   </div>
   <br>
   <button type="submit">Sign up</button>

@@ -8,6 +8,9 @@ build:
 	docker-compose run web python manage.py collectstatic --noinput
 	docker-compose run web python manage.py migrate
 
+restart:
+	docker-compose restart
+
 build-deployment-image:
 	./docker_manage.sh build
 

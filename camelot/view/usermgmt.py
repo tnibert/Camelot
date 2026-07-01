@@ -16,7 +16,7 @@ from ..friendfeed import generate_feed
 from ..controllers.profilecontroller import profilecontroller
 from ..user_emailing import send_registration_email
 from ..logs import log_exception
-from ..constants import REGISTRATION_MODE, REGISTER_DISABLED
+from ..constants import REGISTRATION_MODE, REGISTER_DISABLED, RECAPTCHA_ENABLED
 import requests
 
 
@@ -93,8 +93,8 @@ def check_recaptcha(view_func):
     """
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):
-        # if we are not in production, do not use recaptcha
-        if settings.DEBUG is True:
+        # if recaptcha disabled, all good
+        if not RECAPTCHA_ENABLED:
             request.recaptcha_is_valid = True
             return view_func(request, *args, **kwargs)
 
@@ -115,6 +115,14 @@ def check_recaptcha(view_func):
         return view_func(request, *args, **kwargs)
     return _wrapped_view
 
+def render_register(request, form):
+    return render(request,
+           'camelot/register.html',
+           {
+               'form': form,
+               'recaptchakey': settings.GOOGLE_RECAPTCHA_PUBLIC_KEY,
+               'captcha_enabled': RECAPTCHA_ENABLED
+            })
 
 @check_recaptcha
 def register_invite_code(request):
@@ -138,15 +146,9 @@ def register_invite_code(request):
 
         else:
             # there was some error, rerender with errors displayed to user
-            return render(request, 'camelot/register.html',
-                          {'form': form, 'recaptchakey': settings.GOOGLE_RECAPTCHA_PUBLIC_KEY})
+            return render_register(request, form)
 
-    form = SignUpWithCodeForm()
-
-    return render(request,
-                 'camelot/register.html',
-                 {'form': form,
-                  'recaptchakey': settings.GOOGLE_RECAPTCHA_PUBLIC_KEY})
+    return render_register(request, SignUpWithCodeForm())
 
 
 @check_recaptcha
@@ -172,20 +174,14 @@ def register(request):
                 # did not send email correctly, roll back
                 user.delete()
                 messages.add_message(request, messages.INFO, 'Error sending confirmation email, please try again')
-                return render(request, 'camelot/register.html', {'form': form,
-                                                        'recaptchakey': settings.GOOGLE_RECAPTCHA_PUBLIC_KEY})
+                return render_register(request, form)
 
             return redirect('account_activation_sent')
         else:
             # there was some error, rerender with errors displayed to user
-            return render(request, 'camelot/register.html',
-                          {'form': form, 'recaptchakey': settings.GOOGLE_RECAPTCHA_PUBLIC_KEY})
+            return render_register(request, form)
 
-    form = SignUpForm()
-
-    return render(request,
-                  'camelot/register.html',
-                  {'form': form, 'recaptchakey': settings.GOOGLE_RECAPTCHA_PUBLIC_KEY})
+    return render_register(request, SignUpForm())
 
 
 def account_activation_sent(request):

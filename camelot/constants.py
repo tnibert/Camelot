@@ -2,9 +2,12 @@
 Define constants that we use throughout the application
 """
 import environ
-from .envvars import ENV_SITE_DOMAIN, ENV_REGISTRATION_MODE, ENV_INVITE_CODE
+from .envvars import ENV_SITE_DOMAIN, ENV_REGISTRATION_MODE, ENV_INVITE_CODE, ENV_RECAPTCHA_ENABLE, load_boolean_from_env
 
 env = environ.Env()
+
+RECAPTCHA_ENABLED = load_boolean_from_env(ENV_RECAPTCHA_ENABLE, True)
+
 SITEDOMAIN = env(ENV_SITE_DOMAIN)
 
 # model sizes, will be used in forms and model definitions
