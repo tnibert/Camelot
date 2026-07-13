@@ -3,7 +3,7 @@ boto3==1.43.32
 botocore==1.43.32
 certifi==2023.7.22
 charset-normalizer==3.2.0
-Django==5.2.14
+Django==5.2.15
 django-environ==0.13.0
 dj-database-url==3.1.2
 idna==3.4
